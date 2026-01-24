@@ -1,2 +1,110 @@
-# slm-agentic-benchmarking
+# SLM Agentic Benchmarking Framework
 
+Comprehensive benchmarking framework for evaluating Small Language Models (SLMs) in agentic architectures, deployed on Azure AI.
+
+## Overview
+
+This framework extends the CrewAI-based agent architectures to benchmark SOTA SLMs on:
+- **Medical benchmarks**: MedAgentBench (agentic), MedQA/MedMCQA (knowledge)
+- **Tool calling benchmarks**: MCP-Bench, BFCL v3
+
+## Features
+
+- **4 Agent Architectures**: OneShot, Sequential, Concurrent, GroupChat
+- **SOTA Baseline**: GPT-4o/GPT-4o-mini non-agentic comparison
+- **Cost Tracking**: Real-time budget monitoring with alerts
+- **Azure Integration**: Serverless models + Azure ML endpoints
+- **Multiple Benchmarks**: Medical and tool-calling evaluation
+
+## Quick Start
+
+### 1. Install Dependencies
+
+```bash
+poetry install
+```
+
+### 2. Configure Azure Credentials
+
+```bash
+# For Azure OpenAI (GPT-4o baseline)
+export AZURE_OPENAI_API_KEY="your-key"
+export AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com"
+
+# For Azure AI Foundry (serverless models)
+export AZURE_AI_API_KEY="your-key"
+
+# For Azure ML endpoints (custom models)
+export AZURE_ML_ENDPOINT="https://your-endpoint.inference.ml.azure.com"
+```
+
+### 3. Estimate Costs
+
+```bash
+python run_benchmark.py --estimate --models all --benchmark all
+```
+
+### 4. Run Benchmarks
+
+```bash
+# Non-agentic baseline
+python run_benchmark.py --model gpt-4o-mini --agent baseline --benchmark medqa
+
+# Agentic architecture
+python run_benchmark.py --model phi-4 --agent sequential --benchmark medagent
+
+# Compare agentic vs baseline
+python run_benchmark.py --compare-baseline --model phi-4 --agent sequential --benchmark medqa
+```
+
+## Available Models
+
+### Serverless (Pay-per-token)
+- `phi-4` - Microsoft Phi-4 14B
+- `llama-3.3-70b` - Meta Llama 3.3 70B
+- `mistral-small-3.1` - Mistral Small 3.1 24B
+- `gpt-4o` - OpenAI GPT-4o (baseline)
+- `gpt-4o-mini` - OpenAI GPT-4o-mini (cost-efficient baseline)
+
+### Azure ML Endpoints (Requires deployment)
+- `glm-4.7-flash` - GLM-4.7-Flash 30B MoE
+- `qwen3-30b-a3b` - Qwen3 30B MoE
+- `lfm2.5-1.2b` - LFM2.5 1.2B Thinking
+
+## Benchmarks
+
+- **MedAgentBench**: 100 clinical agentic tasks (FHIR-compliant)
+- **MedQA**: 1,273 USMLE-style questions
+- **MedMCQA**: Indian medical MCQs
+- **MCP-Bench**: 250+ tool-calling tasks
+- **BFCL v3**: Function calling evaluation
+
+## Cost Management
+
+The framework includes built-in cost tracking:
+
+```python
+from src.evaluation import CostTracker
+
+tracker = CostTracker(budget_limit=10000.0)
+tracker.print_summary()  # View spending breakdown
+```
+
+Budget alerts trigger at 30%, 60%, and 90% thresholds.
+
+## Project Structure
+
+```
+slm-agentic-benchmarking/
+├── src/
+│   ├── agents/          # Agent architectures
+│   ├── config/          # Azure LLM configuration
+│   ├── benchmarks/      # Benchmark integrations
+│   └── evaluation/      # Metrics and cost tracking
+├── run_benchmark.py     # Main CLI
+└── results/             # Benchmark results
+```
+
+## License
+
+MIT License
