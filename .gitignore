@@ -54,3 +54,8 @@ poetry.lock
 # OS
 .DS_Store
 Thumbs.db
+
+# Large data files (downloaded datasets, episodic memory benchmark data)
+data/
+
+# Combined results are tracked
