@@ -22,15 +22,24 @@ class BenchmarkMetrics:
     per_task_metrics: Optional[List[Dict[str, Any]]] = None
 
 
+def _get_attr(obj, key: str, default: Any = None) -> Any:
+    """Get attribute from object or dict."""
+    if hasattr(obj, key):
+        return getattr(obj, key, default)
+    elif isinstance(obj, dict):
+        return obj.get(key, default)
+    return default
+
+
 def calculate_metrics(
-    results: List[Dict[str, Any]],
+    results: List[Any],
     ground_truth: Optional[List[Any]] = None
 ) -> BenchmarkMetrics:
     """
     Calculate metrics from benchmark results.
     
     Args:
-        results: List of result dicts with keys: success, confidence, latency, cost
+        results: List of result objects or dicts with: success, score, latency, cost
         ground_truth: Optional ground truth labels for accuracy calculation
     
     Returns:
@@ -47,17 +56,17 @@ def calculate_metrics(
         )
     
     num_tasks = len(results)
-    success_count = sum(1 for r in results if r.get("success", False))
-    total_confidence = sum(r.get("confidence", 0.0) for r in results)
-    total_latency = sum(r.get("latency", 0.0) for r in results)
-    total_cost = sum(r.get("cost", 0.0) for r in results)
+    success_count = sum(1 for r in results if _get_attr(r, "success", False))
+    total_confidence = sum(_get_attr(r, "score", 0.0) or 0.0 for r in results)
+    total_latency = sum(_get_attr(r, "latency", 0.0) or 0.0 for r in results)
+    total_cost = sum(_get_attr(r, "cost", 0.0) or 0.0 for r in results)
     
     # Calculate accuracy if ground truth provided
     accuracy = 0.0
     if ground_truth and len(ground_truth) == num_tasks:
         correct = sum(
             1 for r, gt in zip(results, ground_truth)
-            if r.get("prediction") == gt
+            if _get_attr(r, "prediction") == gt
         )
         accuracy = correct / num_tasks
     

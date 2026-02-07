@@ -122,42 +122,41 @@ class BaseAgent(ABC):
         self.response_history = []
         self.iteration_count = 0
 
-    def get_system_prompt(self, benchmark_type: str = "general") -> str:
-        """Get the system prompt for task response generation."""
+    def get_system_prompt(self, benchmark_type: str = "general", role: str = "oneshot") -> str:
+        """
+        Get the system prompt for task response generation.
+        
+        Args:
+            benchmark_type: The benchmark type (medical, tool_calling, general)
+            role: The agent role (oneshot, sequential_analyzer, etc.)
+        
+        Returns:
+            The appropriate prompt string
+        """
+        try:
+            from .prompts import get_prompt
+            return get_prompt(benchmark_type, role)
+        except (ImportError, FileNotFoundError, KeyError):
+            # Fallback to basic prompts if prompt system not available
+            return self._get_fallback_prompt(benchmark_type)
+    
+    def _get_fallback_prompt(self, benchmark_type: str) -> str:
+        """Fallback prompts if the prompt system is not available."""
         prompts = {
-            "medical": """You are an AI assistant being evaluated on medical benchmarks.
-You will receive medical questions and clinical scenarios.
-Provide accurate, evidence-based responses that demonstrate medical knowledge and reasoning.
+            "medical": """You are a medical AI assistant. Answer the multiple-choice question by selecting the best answer.
 
-OUTPUT FORMAT:
-Return a JSON block with:
-{
-    "reasoning": "<your thought process>",
-    "confidence": <0.0 to 1.0>,
-    "response": "<your answer or actions>"
-}""",
-            "tool_calling": """You are an AI assistant being evaluated on tool-calling benchmarks.
-You have access to various tools and APIs to complete tasks.
-Use the available tools appropriately to achieve the task goals.
+OUTPUT FORMAT (required JSON):
+{"reasoning": "<your analysis>", "answer": "<A, B, C, D, or E>", "confidence": <0.0-1.0>}""",
+            
+            "tool_calling": """You are an AI assistant for function calling. Determine the correct function call(s).
 
-OUTPUT FORMAT:
-Return a JSON block with:
-{
-    "reasoning": "<your thought process>",
-    "tool_calls": [<list of tool calls>],
-    "confidence": <0.0 to 1.0>,
-    "response": "<final answer after tool use>"
-}""",
-            "general": """You are an AI assistant being evaluated on various benchmarks.
-Provide accurate, helpful responses to the tasks you receive.
+OUTPUT FORMAT (required JSON):
+{"reasoning": "<your analysis>", "tool_calls": [{"name": "<func>", "arguments": {...}}], "confidence": <0.0-1.0>}""",
+            
+            "general": """You are an AI assistant. Answer the question accurately.
 
-OUTPUT FORMAT:
-Return a JSON block with:
-{
-    "reasoning": "<your thought process>",
-    "confidence": <0.0 to 1.0>,
-    "response": "<your response>"
-}"""
+OUTPUT FORMAT (required JSON):
+{"reasoning": "<your analysis>", "answer": "<your answer>", "confidence": <0.0-1.0>}"""
         }
         return prompts.get(benchmark_type, prompts["general"])
 
@@ -174,8 +173,10 @@ Return a JSON block with:
             json_str = code_block_match.group(1)
             try:
                 data = json.loads(json_str)
+                # Handle both "response" and "answer" fields (prompts use "answer")
+                response_text = data.get("response") or data.get("answer", "")
                 return BenchmarkResponse(
-                    response=data.get("response", ""),
+                    response=str(response_text),
                     reasoning=data.get("reasoning", ""),
                     success=data.get("success", True),
                     confidence=float(data.get("confidence", 0.5)),
@@ -197,9 +198,11 @@ Return a JSON block with:
                         json_candidate = result[start:i+1]
                         try:
                             data = json.loads(json_candidate)
-                            if "response" in data or "reasoning" in data:
+                            # Accept if has response, answer, or reasoning field
+                            if "response" in data or "answer" in data or "reasoning" in data:
+                                response_text = data.get("response") or data.get("answer", "")
                                 return BenchmarkResponse(
-                                    response=data.get("response", ""),
+                                    response=str(response_text),
                                     reasoning=data.get("reasoning", ""),
                                     success=data.get("success", True),
                                     confidence=float(data.get("confidence", 0.5)),
