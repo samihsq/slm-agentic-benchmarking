@@ -8,11 +8,12 @@ Based on Microsoft's Sequential Orchestration pattern:
 https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/ai-agent-design-patterns
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 from crewai import Agent, Task, Crew, Process
 from .base_agent import BaseAgent, BenchmarkResponse
 from ..config import get_llm
+from ..utils.trace import TraceCapture
 
 
 class SequentialAgent(BaseAgent):
@@ -46,22 +47,20 @@ class SequentialAgent(BaseAgent):
         )
 
         self.llm = get_llm(model)
-        self._setup_agents()
 
-    def _setup_agents(self):
-        """Initialize the sequential pipeline agents."""
+    def _setup_agents(self, benchmark_type: str = "general"):
+        """Initialize the sequential pipeline agents with benchmark-specific prompts."""
+        
+        # Get prompts for this benchmark type
+        analyzer_prompt = self.get_system_prompt(benchmark_type, "sequential_analyzer")
+        evaluator_prompt = self.get_system_prompt(benchmark_type, "sequential_evaluator")
+        responder_prompt = self.get_system_prompt(benchmark_type, "sequential_responder")
 
         # Stage 1: Analyzer - Identifies task type and requirements
         self.analyzer = Agent(
             role="Task Analyzer",
             goal="Analyze the nature and requirements of tasks",
-            backstory="""You are an expert at understanding task requirements.
-            
-            Your job is to identify:
-            - What is the core objective of the task
-            - What domain or topic does this relate to
-            - What information or tools are needed
-            - What would constitute a successful response""",
+            backstory=analyzer_prompt,
             llm=self.llm,
             verbose=self.verbose,
         )
@@ -70,13 +69,7 @@ class SequentialAgent(BaseAgent):
         self.evaluator = Agent(
             role="Approach Evaluator",
             goal="Determine the best approach to complete the task",
-            backstory="""You evaluate how to best approach tasks.
-            
-            Consider:
-            - What strategy should be used?
-            - Are there multiple steps required?
-            - What information would be most relevant?
-            - What potential issues might arise?""",
+            backstory=evaluator_prompt,
             llm=self.llm,
             verbose=self.verbose,
         )
@@ -85,13 +78,7 @@ class SequentialAgent(BaseAgent):
         self.responder = Agent(
             role="Response Generator",
             goal="Execute the approach and provide the final response",
-            backstory="""You synthesize the analysis and execute the task.
-            
-            Guidelines:
-            - Follow the recommended approach
-            - Provide complete and accurate responses
-            - Use available tools or data as needed
-            - Output valid JSON with your response""",
+            backstory=responder_prompt,
             llm=self.llm,
             verbose=self.verbose,
         )
@@ -111,6 +98,10 @@ class SequentialAgent(BaseAgent):
         Returns:
             BenchmarkResponse with reasoning and the response
         """
+        
+        # Determine benchmark type and setup agents with appropriate prompts
+        benchmark_type = (context or {}).get("benchmark_type", "general")
+        self._setup_agents(benchmark_type)
 
         # Add context information to task if provided
         context_str = ""
@@ -130,13 +121,7 @@ class SequentialAgent(BaseAgent):
 
 TASK: {full_task}
 
-Identify:
-1. What is the core objective?
-2. What domain/topic does this relate to?
-3. What information or tools are needed?
-4. What would constitute a successful response?
-
-Provide your analysis.""",
+Provide your analysis following your role guidelines.""",
             expected_output="Analysis of the task's nature and requirements",
             agent=self.analyzer,
         )
@@ -147,27 +132,23 @@ Provide your analysis.""",
 
 TASK: {full_task}
 
-Based on the analysis, determine:
-1. What strategy should be used?
-2. Are there multiple steps required?
-3. What would be the most effective approach?
-4. What potential challenges might arise?
-
-Provide your evaluation.""",
+Based on the analysis, provide your evaluation following your role guidelines.""",
             expected_output="Evaluation of the best approach",
             agent=self.evaluator,
             context=[analyze_task],
         )
 
-        # Stage 3: Respond
+        # Stage 3: Respond - use benchmark-specific output format
+        responder_prompt = self.get_system_prompt(benchmark_type, "sequential_responder")
         respond_task = Task(
-            description="""Execute the task and provide the final response as JSON.
+            description=f"""Complete the task and provide your final answer.
 
-Based on the analysis and evaluation, complete the task:
-{{"reasoning": "<summary of your approach>", "confidence": <0.0-1.0>, "response": "<your complete response>"}}
+ORIGINAL TASK: {full_task}
 
-ONLY output the JSON object, nothing else.""",
-            expected_output="JSON with reasoning, confidence, and response",
+Based on the analysis and evaluation, generate your final response.
+
+{responder_prompt}""",
+            expected_output="JSON with reasoning and the final answer",
             agent=self.responder,
             context=[analyze_task, evaluate_task],
         )
@@ -184,6 +165,38 @@ ONLY output the JSON object, nothing else.""",
 
         # Parse the response using robust parser from base class
         response = self.parse_json_response(str(result))
+        
+        # Capture the pipeline steps for debugging and tracing
+        pipeline_steps = []
+        task_descriptions = [
+            analyze_task.description,
+            evaluate_task.description, 
+            respond_task.description,
+        ]
+        for i, task_obj in enumerate([analyze_task, evaluate_task, respond_task]):
+            task_output = getattr(task_obj, 'output', None)
+            output_str = ""
+            if task_output:
+                output_str = str(task_output.raw) if hasattr(task_output, 'raw') else str(task_output)
+            
+            step = {
+                "stage": task_obj.agent.role if task_obj.agent else "unknown",
+                "input": task_descriptions[i][:1000],
+                "output": output_str,
+            }
+            pipeline_steps.append(step)
+            
+            # Record to trace if capture is active
+            TraceCapture.record(
+                role=step["stage"],
+                input_prompt=step["input"],
+                output_response=output_str,
+            )
+        
+        # Add pipeline steps to metadata
+        if response.metadata is None:
+            response.metadata = {}
+        response.metadata["pipeline_steps"] = pipeline_steps
 
         # Add to history
         self.add_to_history(

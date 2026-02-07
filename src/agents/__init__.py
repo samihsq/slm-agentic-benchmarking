@@ -6,6 +6,7 @@ from .sequential_agent import SequentialAgent
 from .concurrent_agent import ConcurrentAgent
 from .group_chat_agent import GroupChatAgent
 from .baseline_agent import BaselineAgent, get_baseline_agent
+from .ollama_agent import OllamaAgent
 
 __all__ = [
     "BaseAgent",
@@ -16,4 +17,5 @@ __all__ = [
     "GroupChatAgent",
     "BaselineAgent",
     "get_baseline_agent",
+    "OllamaAgent",
 ]

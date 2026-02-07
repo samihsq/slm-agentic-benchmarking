@@ -8,10 +8,17 @@ This provides the upper-bound performance baseline.
 """
 
 import litellm
+import time
+import random
 from typing import Optional, Dict, Any
 
 from .base_agent import BaseAgent, BenchmarkResponse
 from ..config import get_llm_config
+
+# Retry configuration
+MAX_RETRIES = 5
+BASE_DELAY = 1.0  # seconds
+MAX_DELAY = 60.0  # seconds
 
 
 class BaselineAgent(BaseAgent):
@@ -32,14 +39,14 @@ class BaselineAgent(BaseAgent):
 
     def __init__(
         self,
-        model: str = "gpt-4o-mini",  # Default to cost-efficient SOTA
+        model: str = "llama-3.3-70b",  # Default to Llama 3.3 70B for SOTA baseline
         verbose: bool = False,
     ):
         """
-        Initialize baseline agent.
+        Initialize baseline agent for SOTA comparison.
         
         Args:
-            model: SOTA model to use (gpt-4o or gpt-4o-mini)
+            model: Model to use (llama-3.3-70b for SOTA, or any other model)
             verbose: Enable verbose output
         """
         super().__init__(
@@ -47,10 +54,6 @@ class BaselineAgent(BaseAgent):
             verbose=verbose,
             max_iterations=1,
         )
-        
-        # Validate it's a SOTA model
-        if not model.startswith("gpt-4o"):
-            print(f"Warning: BaselineAgent is designed for GPT-4o models, got {model}")
         
         # Get model config for direct LiteLLM calls
         self.config = get_llm_config(model)
@@ -88,41 +91,54 @@ class BaselineAgent(BaseAgent):
 
         user_message = f"TASK: {task}{context_str}"
 
-        try:
-            # Direct LiteLLM call to Azure OpenAI
-            llm_kwargs = {
-                "model": self.model_id,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message},
-                ],
-                "temperature": 0.7,
-                "max_tokens": 2048,
-                "api_key": self.config["azure_api_key"],
-                "api_base": self.config["azure_endpoint"],
-                "api_version": "2024-08-01-preview",
-            }
-            
-            response = litellm.completion(**llm_kwargs)
-            
-            result_text = response.choices[0].message.content
-            
-            # Track token usage for cost estimation
-            usage = response.usage
-            if self.verbose:
-                print(f"Tokens: {usage.prompt_tokens} in, {usage.completion_tokens} out")
-            
-        except Exception as e:
-            # Fallback response on error
-            result_text = f'{{"reasoning": "Error calling frontier model: {str(e)[:200]}", "confidence": 0.0, "response": "I encountered an error processing this task."}}'
-            if self.verbose:
-                print(f"Error in BaselineAgent: {e}")
+        # Direct LiteLLM call with exponential backoff retry
+        llm_kwargs = {
+            "model": self.model_id,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            "temperature": 0.7,
+            "max_tokens": 2048,
+            "api_key": self.config["azure_api_key"],
+            "api_base": self.config["azure_endpoint"],
+        }
+        
+        result_text = None
+        usage = None
+        last_error = None
+        
+        for attempt in range(MAX_RETRIES):
+            try:
+                response = litellm.completion(**llm_kwargs)
+                result_text = response.choices[0].message.content
+                usage = response.usage
+                
+                if self.verbose:
+                    print(f"Tokens: {usage.prompt_tokens} in, {usage.completion_tokens} out")
+                break  # Success, exit retry loop
+                
+            except Exception as e:
+                last_error = e
+                if attempt < MAX_RETRIES - 1:
+                    # Exponential backoff with jitter
+                    delay = min(BASE_DELAY * (2 ** attempt) + random.uniform(0, 1), MAX_DELAY)
+                    if self.verbose:
+                        print(f"Retry {attempt + 1}/{MAX_RETRIES} after {delay:.1f}s: {str(e)[:100]}")
+                    time.sleep(delay)
+                else:
+                    if self.verbose:
+                        print(f"All {MAX_RETRIES} retries failed: {e}")
+        
+        if result_text is None:
+            # All retries failed
+            result_text = f'{{"reasoning": "Error after {MAX_RETRIES} retries: {str(last_error)[:150]}", "confidence": 0.0, "response": "Error: {str(last_error)[:100]}"}}'
 
         # Parse the response
         parsed = self.parse_json_response(result_text)
 
         # Add token usage to metadata if available
-        if 'usage' in locals():
+        if usage is not None:
             parsed.metadata = parsed.metadata or {}
             parsed.metadata.update({
                 "prompt_tokens": usage.prompt_tokens,
@@ -141,16 +157,15 @@ class BaselineAgent(BaseAgent):
         return parsed
 
 
-def get_baseline_agent(cost_efficient: bool = True, verbose: bool = False) -> BaselineAgent:
+def get_baseline_agent(model: str = "llama-3.3-70b", verbose: bool = False) -> BaselineAgent:
     """
-    Convenience function to get a baseline agent.
+    Convenience function to get a SOTA baseline agent.
     
     Args:
-        cost_efficient: If True, use gpt-4o-mini. If False, use gpt-4o.
+        model: Model to use (llama-3.3-70b for SOTA comparison)
         verbose: Enable verbose output
     
     Returns:
         Configured BaselineAgent
     """
-    model = "gpt-4o-mini" if cost_efficient else "gpt-4o"
     return BaselineAgent(model=model, verbose=verbose)

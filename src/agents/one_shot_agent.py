@@ -8,10 +8,17 @@ This is the true non-agentic baseline - 1 task = 1 LLM call.
 """
 
 import litellm
+import time
+import random
 from typing import Optional, Dict, Any
 
 from .base_agent import BaseAgent, BenchmarkResponse
 from ..config import get_llm_config
+
+# Retry configuration
+MAX_RETRIES = 5
+BASE_DELAY = 1.0  # seconds
+MAX_DELAY = 60.0  # seconds
 
 
 class OneShotAgent(BaseAgent):
@@ -40,15 +47,13 @@ class OneShotAgent(BaseAgent):
             verbose=verbose,
             max_iterations=1,
         )
-        
+
         # Get model config for direct LiteLLM calls
         self.config = get_llm_config(model)
         self.model_id = self.config["model"]
 
     def respond_to_task(
-        self, 
-        task: str, 
-        context: Optional[Dict[str, Any]] = None
+        self, task: str, context: Optional[Dict[str, Any]] = None
     ) -> BenchmarkResponse:
         """
         Generate a response with a single LLM call.
@@ -60,7 +65,7 @@ class OneShotAgent(BaseAgent):
         Returns:
             BenchmarkResponse with the response and reasoning
         """
-        
+
         # Determine benchmark type from context
         benchmark_type = (context or {}).get("benchmark_type", "general")
         system_prompt = self.get_system_prompt(benchmark_type)
@@ -77,42 +82,60 @@ class OneShotAgent(BaseAgent):
 
         user_message = f"TASK: {task}{context_str}"
 
-        try:
-            # Prepare LiteLLM kwargs based on provider
-            llm_kwargs = {
-                "model": self.model_id,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message},
-                ],
-                "temperature": 0.7,
-                "max_tokens": 2048,
-            }
-            
-            # Add provider-specific configuration
-            if self.config["provider"] == "openai":
-                llm_kwargs["api_key"] = self.config["azure_api_key"]
-                llm_kwargs["api_base"] = self.config["azure_endpoint"]
-                llm_kwargs["api_version"] = "2024-08-01-preview"
-            elif self.config.get("requires_endpoint"):
-                llm_kwargs["api_base"] = self.config["endpoint_url"]
-                llm_kwargs["api_key"] = "dummy"  # Azure ML endpoints may not need key
-            else:
-                llm_kwargs["api_key"] = self.config.get("azure_api_key", "dummy")
-            
-            # Direct LiteLLM call - bypasses CrewAI overhead
-            response = litellm.completion(**llm_kwargs)
-            
-            result_text = response.choices[0].message.content
-            
-        except Exception as e:
-            # Fallback response on error
-            result_text = f'{{"reasoning": "Error calling LLM: {str(e)[:200]}", "confidence": 0.0, "response": "I encountered an error processing this task."}}'
-            if self.verbose:
-                print(f"Error in OneShotAgent: {e}")
+        # Prepare LiteLLM kwargs
+        llm_kwargs = {
+            "model": self.model_id,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            "temperature": 0.7,
+            "max_tokens": 2048,
+            "api_key": self.config["azure_api_key"],
+            "api_base": self.config["azure_endpoint"],
+        }
+
+        result_text = None
+        last_error = None
+        usage = None
+
+        # Retry with exponential backoff
+        for attempt in range(MAX_RETRIES):
+            try:
+                response = litellm.completion(**llm_kwargs)
+                result_text = response.choices[0].message.content
+                usage = response.usage
+                break  # Success
+
+            except Exception as e:
+                last_error = e
+                if attempt < MAX_RETRIES - 1:
+                    delay = min(BASE_DELAY * (2**attempt) + random.uniform(0, 1), MAX_DELAY)
+                    if self.verbose:
+                        print(
+                            f"Retry {attempt + 1}/{MAX_RETRIES} after {delay:.1f}s: {str(e)[:100]}"
+                        )
+                    time.sleep(delay)
+                else:
+                    if self.verbose:
+                        print(f"All {MAX_RETRIES} retries failed: {e}")
+
+        if result_text is None:
+            result_text = f'{{"reasoning": "Error after {MAX_RETRIES} retries: {str(last_error)[:150]}", "confidence": 0.0, "response": "Error: {str(last_error)[:100]}"}}'
 
         # Parse the response using robust parser from base class
         parsed = self.parse_json_response(result_text)
+
+        # Add token usage to metadata if available
+        if usage is not None:
+            parsed.metadata = parsed.metadata or {}
+            parsed.metadata.update(
+                {
+                    "prompt_tokens": usage.prompt_tokens,
+                    "completion_tokens": usage.completion_tokens,
+                    "total_tokens": usage.total_tokens,
+                }
+            )
 
         # Add to history
         self.add_to_history(
