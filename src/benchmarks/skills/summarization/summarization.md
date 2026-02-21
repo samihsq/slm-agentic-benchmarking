@@ -1,3 +1,9 @@
+## (for Samih)
+
+### TL;DR
+
+Run XSum summarization via `python benchmark_runner.py --benchmarks summarization ...` and it will write outputs under `results/summarization/<model>_<timestamp>/<AgentClassName>/` (including per-task `trace.json` and a `results.jsonl`). Switch scoring from ROUGE to embedding/LM-based metrics with `--summarization-metric rougeL|bertscore|bartscore` (defaults to `rougeL`). For BERTScore, set `--summarization-bertscore-model-type <hf_model_id>`; the stored scalar `score` is **BERTScore F1** in \([0,1]\) and `results.jsonl` also includes `bertscore_f1`. For BARTScore, set `--summarization-bartscore-model <hf_model_id>` (optionally `--summarization-device cpu|cuda`); the stored scalar `score` is \( \exp(-\text{NLL}) \in (0,1] \) of generating the candidate summary given the source, and `results.jsonl` includes `bartscore_geomean_prob`. Install deps as needed: ROUGE uses `evaluate` (+ `rouge-score`), BERTScore uses `evaluate` + `bert-score` (+ `torch`, `transformers`), and BARTScore uses `torch` + `transformers`.
+
 ## Goal
 
 Add a **summarization skill benchmark** based on the **XSum** dataset so we can run it via `benchmark_runner.py` like the other skills (`recall`, `episodic_memory`, `criticality`).
@@ -89,27 +95,23 @@ context = {
 }
 ```
 
-### 4) Scoring: ROUGE-L (self-scoring, no judge model)
+### 4) Scoring: configurable (ROUGE-L / BERTScore / BARTScore)
 
-Pick one automatic metric and stick to it initially:
+This repo’s summarization runner supports swapping the metric without changing code:
 
-- **Primary**: ROUGE-L F1
-- (Optional) Track ROUGE-1/2 as secondary stats
+- **ROUGE-L (reference-based)**: `--summarization-metric rougeL`
+  - **Score**: ROUGE-L F1 in \([0, 1]\)
+  - **Suggested success**: `rougeL >= 0.15` (tune later; XSum is hard)
+- **BERTScore (reference-based)**: `--summarization-metric bertscore`
+  - **Score**: BERTScore **F1** in \([0, 1]\) (embedding cosine similarity with alignment)
+  - **Suggested success**: `bertscore_f1 >= 0.85` (tune later)
+  - **Model**: set `--summarization-bertscore-model-type <hf_model_id>`
+- **BARTScore (source-based)**: `--summarization-metric bartscore`
+  - **Score**: \( \exp(-\text{NLL}) \in (0, 1] \) for generating the *candidate summary* conditioned on the source
+  - **Suggested success**: `bartscore_geomean_prob >= 0.01` (tune later)
+  - **Model**: set `--summarization-bartscore-model <hf_model_id>`
 
-Implementation options:
-
-- **Option A (recommended)**: use HF `evaluate`
-  - `evaluate.load("rouge")`
-  - returns ROUGE scores with stemming support
-  - requires adding dependency: `evaluate` (and it will pull `rouge-score`)
-- **Option B**: use `rouge-score` directly
-  - requires adding dependency: `rouge-score`
-
-Keep the output `score` in `EvaluationResult` as a **0–1 float** (ROUGE-L F1 is already in that range).
-
-Suggested “success” criterion:
-
-- `success = rougeL >= 0.15` (tune later; XSum is hard, so don’t set this too high)
+Keep the output `score` in `EvaluationResult` as a **0–1 float** for easy aggregation and review.
 
 ### 5) Save per-task traces and a JSONL summary (copy existing conventions)
 
@@ -141,7 +143,7 @@ Also add `SummarizationRunner` import in `src/benchmarks/skills/__init__.py` (op
 
 - **Split**: `validation`
 - **Limit default**: respect `-n/--limit`
-- **Metric**: ROUGE-L only (add ROUGE-1/2 later)
+- **Metric**: default `rougeL` (switchable to `bertscore` / `bartscore` via CLI)
 - **Prompt**: one-sentence summary (XSum style)
 - **No extra judge model** (keep it aligned with current repo design)
 

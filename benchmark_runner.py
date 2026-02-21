@@ -45,7 +45,15 @@ from src.agents import OneShotAgent, SequentialAgent, ConcurrentAgent, GroupChat
 # Configuration
 # =============================================================================
 
-BENCHMARKS = ["medqa", "bfcl", "criticality", "criticality_v2", "recall", "episodic_memory"]
+BENCHMARKS = [
+    "medqa",
+    "bfcl",
+    "criticality",
+    "criticality_v2",
+    "recall",
+    "episodic_memory",
+    "summarization",
+]
 AGENTS = {
     "oneshot": OneShotAgent,
     "sequential": SequentialAgent,
@@ -517,6 +525,72 @@ def run_episodic_memory(model: str, agent_type: str, concurrency: int, limit: in
     }
 
 
+def run_summarization(
+    model: str,
+    agent_type: str,
+    concurrency: int,
+    limit: int,
+    *,
+    metric: str = "rougeL",
+    split: str = "validation",
+    threshold: Optional[float] = None,
+    bertscore_model_type: str = "microsoft/deberta-xlarge-mnli",
+    bartscore_model: str = "facebook/bart-large-cnn",
+    device: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Run Summarization (XSum) benchmark."""
+    from src.benchmarks.skills.summarization.runner import SummarizationRunner
+
+    agent_class = AGENTS[agent_type]
+    agent = agent_class(model=model, verbose=False)
+
+    key = dashboard.add_run(model, "summarization", agent_type, limit)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = Path("results") / "summarization" / f"{model}_{timestamp}"
+
+    runner = SummarizationRunner(
+        agent=agent,
+        verbose=False,
+        concurrency=concurrency,
+        run_dir=run_dir,
+        split=split,
+        metric=metric,
+        success_threshold=threshold,
+        bertscore_model_type=bertscore_model_type,
+        bartscore_model=bartscore_model,
+        device=device,
+    )
+
+    original_process = runner._process_task
+
+    def tracked_process(task):
+        result = original_process(task)
+        is_success = getattr(result, "success", False)
+        dashboard.update(key, completed=1, correct=1 if is_success else 0)
+        return result
+
+    runner._process_task = tracked_process
+
+    results = runner.run(limit=limit, save_results=True)
+
+    avg_score = sum(r.score for r in results if r.score is not None) / len(results) if results else 0.0
+    correct = sum(1 for r in results if r.success)
+
+    return {
+        "model": model,
+        "benchmark": "summarization",
+        "agent": agent_type,
+        "num_tasks": len(results),
+        "correct": correct,
+        "avg_score": avg_score,
+        "accuracy": correct / len(results) if results else 0,
+        "metric": metric,
+        "split": split,
+        "output_dir": str(run_dir),
+    }
+
+
 def run_criticality_v2(model: str, agent_type: str, concurrency: int, limit: int, model_path: Optional[str] = None) -> Dict[str, Any]:
     """Run Criticality v2 (Logprob-Based) benchmark."""
     from src.benchmarks.skills.criticality.v2.runner import CriticalityV2Runner
@@ -562,6 +636,7 @@ BENCHMARK_RUNNERS = {
     "criticality_v2": run_criticality_v2,
     "recall": run_recall,
     "episodic_memory": run_episodic_memory,
+    "summarization": run_summarization,
 }
 
 
@@ -576,8 +651,20 @@ def get_concurrency(model: str, base_concurrency: Optional[int]) -> int:
     return DEFAULT_CONCURRENCY.get(model, 10)
 
 
-def run_single(model: str, benchmark: str, agent_type: str, 
-               concurrency: int, limit: int, model_path: Optional[str] = None) -> Dict[str, Any]:
+def run_single(
+    model: str,
+    benchmark: str,
+    agent_type: str,
+    concurrency: int,
+    limit: int,
+    model_path: Optional[str] = None,
+    summarization_metric: str = "rougeL",
+    summarization_split: str = "validation",
+    summarization_threshold: Optional[float] = None,
+    summarization_bertscore_model_type: str = "microsoft/deberta-xlarge-mnli",
+    summarization_bartscore_model: str = "facebook/bart-large-cnn",
+    summarization_device: Optional[str] = None,
+) -> Dict[str, Any]:
     """Run a single benchmark configuration."""
     runner = BENCHMARK_RUNNERS.get(benchmark)
     if not runner:
@@ -587,6 +674,19 @@ def run_single(model: str, benchmark: str, agent_type: str,
         # criticality_v2 accepts model_path, others don't
         if benchmark == "criticality_v2":
             return runner(model, agent_type, concurrency, limit, model_path=model_path)
+        elif benchmark == "summarization":
+            return runner(
+                model,
+                agent_type,
+                concurrency,
+                limit,
+                metric=summarization_metric,
+                split=summarization_split,
+                threshold=summarization_threshold,
+                bertscore_model_type=summarization_bertscore_model_type,
+                bartscore_model=summarization_bartscore_model,
+                device=summarization_device,
+            )
         else:
             return runner(model, agent_type, concurrency, limit)
     except Exception as e:
@@ -669,6 +769,44 @@ Examples:
         default=None,
         help="Path to GGUF model file for criticality_v2 sequence mode (e.g., Ollama blob path)"
     )
+
+    # Summarization-specific options (only used when --benchmarks includes summarization)
+    parser.add_argument(
+        "--summarization-metric",
+        type=str,
+        default="rougeL",
+        help="Summarization score metric: rougeL | bertscore | bartscore (default: rougeL)",
+    )
+    parser.add_argument(
+        "--summarization-split",
+        type=str,
+        default="validation",
+        help="XSum split to use: validation | test (default: validation)",
+    )
+    parser.add_argument(
+        "--summarization-threshold",
+        type=float,
+        default=None,
+        help="Override success threshold for summarization (default depends on metric)",
+    )
+    parser.add_argument(
+        "--summarization-bertscore-model-type",
+        type=str,
+        default="microsoft/deberta-xlarge-mnli",
+        help="HF model id for BERTScore (default: microsoft/deberta-xlarge-mnli)",
+    )
+    parser.add_argument(
+        "--summarization-bartscore-model",
+        type=str,
+        default="facebook/bart-large-cnn",
+        help="HF seq2seq model id for BARTScore (default: facebook/bart-large-cnn)",
+    )
+    parser.add_argument(
+        "--summarization-device",
+        type=str,
+        default=None,
+        help="Device for BERTScore/BARTScore (e.g. cpu, cuda). Default: auto",
+    )
     
     args = parser.parse_args()
     
@@ -723,6 +861,12 @@ Examples:
                     "agent": agent,
                     "concurrency": concurrency,
                     "limit": args.limit,
+                    "summarization_metric": args.summarization_metric,
+                    "summarization_split": args.summarization_split,
+                    "summarization_threshold": args.summarization_threshold,
+                    "summarization_bertscore_model_type": args.summarization_bertscore_model_type,
+                    "summarization_bartscore_model": args.summarization_bartscore_model,
+                    "summarization_device": args.summarization_device,
                 })
     
     print(f"📋 Running {len(configs)} configurations:")
@@ -746,6 +890,18 @@ Examples:
                     cfg["concurrency"],
                     cfg["limit"],
                     model_path=args.model_path,
+                    summarization_metric=cfg.get("summarization_metric", args.summarization_metric),
+                    summarization_split=cfg.get("summarization_split", args.summarization_split),
+                    summarization_threshold=cfg.get(
+                        "summarization_threshold", args.summarization_threshold
+                    ),
+                    summarization_bertscore_model_type=cfg.get(
+                        "summarization_bertscore_model_type", args.summarization_bertscore_model_type
+                    ),
+                    summarization_bartscore_model=cfg.get(
+                        "summarization_bartscore_model", args.summarization_bartscore_model
+                    ),
+                    summarization_device=cfg.get("summarization_device", args.summarization_device),
                 )
                 results.append(result)
         else:
@@ -763,6 +919,15 @@ Examples:
                         cfg["concurrency"],
                         cfg["limit"],
                         args.model_path,
+                        cfg.get("summarization_metric", args.summarization_metric),
+                        cfg.get("summarization_split", args.summarization_split),
+                        cfg.get("summarization_threshold", args.summarization_threshold),
+                        cfg.get(
+                            "summarization_bertscore_model_type",
+                            args.summarization_bertscore_model_type,
+                        ),
+                        cfg.get("summarization_bartscore_model", args.summarization_bartscore_model),
+                        cfg.get("summarization_device", args.summarization_device),
                     ): cfg
                     for cfg in configs
                 }
