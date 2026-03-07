@@ -53,6 +53,7 @@ BENCHMARKS = [
     "recall",
     "episodic_memory",
     "summarization",
+    "planning",
 ]
 AGENTS = {
     "oneshot": OneShotAgent,
@@ -361,8 +362,8 @@ def run_bfcl(model: str, agent_type: str, concurrency: int, limit: int) -> Dict[
         "benchmark": "bfcl",
         "agent": agent_type,
         "num_tasks": results.get("num_tasks", 0),
-        "correct": int(results.get("success_rate", 0) * results.get("num_tasks", 0)),
-        "accuracy": results.get("success_rate", 0),
+        "correct": int((results.get("success_rate") or 0) * results.get("num_tasks", 0)),
+        "accuracy": results.get("success_rate") or 0,
         "output_dir": str(run_dir),
     }
 
@@ -629,6 +630,54 @@ def run_criticality_v2(model: str, agent_type: str, concurrency: int, limit: int
     }
 
 
+def run_planning(model: str, agent_type: str, concurrency: int, limit: int) -> Dict[str, Any]:
+    """Run Planning (DeepPlanning) benchmark."""
+    from src.benchmarks.skills.planning.runner import PlanningRunner
+
+    agent_class = AGENTS[agent_type]
+    agent = agent_class(model=model, verbose=False)
+
+    key = dashboard.add_run(model, "planning", agent_type, limit)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = Path("results") / "planning" / f"{model}_{timestamp}"
+
+    runner = PlanningRunner(
+        agent=agent,
+        verbose=False,
+        concurrency=concurrency,
+        run_dir=run_dir,
+        domain="all",
+        language="en",
+    )
+
+    original_process = runner._process_task
+
+    def tracked_process(task):
+        result = original_process(task)
+        is_success = getattr(result, "success", False)
+        dashboard.update(key, completed=1, correct=1 if is_success else 0)
+        return result
+
+    runner._process_task = tracked_process
+
+    results = runner.run(limit=limit, save_results=True)
+
+    avg_score = sum(r.score for r in results if r.score is not None) / len(results) if results else 0.0
+    correct = sum(1 for r in results if r.success)
+
+    return {
+        "model": model,
+        "benchmark": "planning",
+        "agent": agent_type,
+        "num_tasks": len(results),
+        "correct": correct,
+        "avg_score": avg_score,
+        "accuracy": correct / len(results) if results else 0,
+        "output_dir": str(run_dir),
+    }
+
+
 BENCHMARK_RUNNERS = {
     "medqa": run_medqa,
     "bfcl": run_bfcl,
@@ -637,6 +686,7 @@ BENCHMARK_RUNNERS = {
     "recall": run_recall,
     "episodic_memory": run_episodic_memory,
     "summarization": run_summarization,
+    "planning": run_planning,
 }
 
 

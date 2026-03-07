@@ -12,12 +12,13 @@ from typing import List, Dict, Any, Optional
 class BenchmarkMetrics:
     """Metrics for a benchmark run."""
     accuracy: float  # Percentage correct (0-1)
-    success_rate: float  # Task completion rate (0-1)
+    success_rate: Optional[float]  # Task completion rate (0-1), None when no tasks evaluated (e.g. PlanBench without VAL)
     avg_confidence: float  # Average model confidence (0-1)
     avg_latency: float  # Average time per task (seconds)
     total_cost: float  # Total cost in USD
     num_tasks: int  # Number of tasks completed
-    
+    num_evaluated: Optional[int] = None  # When set, only these tasks had success/score (e.g. PlanBench with VAL)
+
     # Optional detailed metrics
     per_task_metrics: Optional[List[Dict[str, Any]]] = None
 
@@ -54,13 +55,26 @@ def calculate_metrics(
             total_cost=0.0,
             num_tasks=0,
         )
-    
+
     num_tasks = len(results)
-    success_count = sum(1 for r in results if _get_attr(r, "success", False))
-    total_confidence = sum(_get_attr(r, "score", 0.0) or 0.0 for r in results)
+    has_evaluated_key = any(_get_attr(r, "evaluated") is not None for r in results)
+    if has_evaluated_key:
+        evaluated_results = [r for r in results if bool(_get_attr(r, "evaluated", False))]
+        num_evaluated = len(evaluated_results)
+        success_count = sum(1 for r in evaluated_results if _get_attr(r, "success", False))
+        total_confidence = sum((_get_attr(r, "score", 0.0) or 0.0) for r in evaluated_results)
+        success_rate = (success_count / num_evaluated) if num_evaluated else None
+        avg_confidence = total_confidence / num_evaluated if num_evaluated else 0.0
+    else:
+        num_evaluated = None
+        success_count = sum(1 for r in results if _get_attr(r, "success", False))
+        total_confidence = sum(_get_attr(r, "score", 0.0) or 0.0 for r in results)
+        success_rate = success_count / num_tasks
+        avg_confidence = total_confidence / num_tasks
+
     total_latency = sum(_get_attr(r, "latency", 0.0) or 0.0 for r in results)
     total_cost = sum(_get_attr(r, "cost", 0.0) or 0.0 for r in results)
-    
+
     # Calculate accuracy if ground truth provided
     accuracy = 0.0
     if ground_truth and len(ground_truth) == num_tasks:
@@ -69,15 +83,16 @@ def calculate_metrics(
             if _get_attr(r, "prediction") == gt
         )
         accuracy = correct / num_tasks
-    
+
     return BenchmarkMetrics(
         accuracy=accuracy,
-        success_rate=success_count / num_tasks,
-        avg_confidence=total_confidence / num_tasks,
+        success_rate=success_rate,
+        avg_confidence=avg_confidence,
         avg_latency=total_latency / num_tasks if total_latency > 0 else 0.0,
         total_cost=total_cost,
         num_tasks=num_tasks,
-        per_task_metrics=results if len(results) < 100 else None,  # Save only for small runs
+        num_evaluated=num_evaluated,
+        per_task_metrics=results if len(results) < 100 else None,
     )
 
 
@@ -92,7 +107,9 @@ def compare_metrics(
     """
     return {
         "accuracy_change": (comparison.accuracy - baseline.accuracy) * 100,
-        "success_rate_change": (comparison.success_rate - baseline.success_rate) * 100,
+        "success_rate_change": (
+            ((comparison.success_rate or 0.0) - (baseline.success_rate or 0.0)) * 100
+        ),
         "latency_change": (
             ((comparison.avg_latency - baseline.avg_latency) / baseline.avg_latency * 100)
             if baseline.avg_latency > 0 else 0.0

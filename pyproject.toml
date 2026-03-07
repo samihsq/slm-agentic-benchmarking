@@ -21,6 +21,8 @@ azure-keyvault-secrets = "^4.7.0"
 
 # HuggingFace datasets (for benchmarks)
 datasets = "^2.14.0"
+rouge-score = "^0.1.2"
+evaluate = "^0.4.0"
 
 # Utilities
 python-dotenv = "^1.0.0"
@@ -30,6 +32,22 @@ rich = "^13.0.0"
 
 # Async support
 aiohttp = "^3.9.0"
+
+# PlanBench (PDDL planning benchmark)
+tarski = "^0.7.0"
+pddl = "^0.2.0"
+
+# Criticality v2 sequence scoring
+openai = "^1.7.0"
+numpy = "^1.26.0"
+scipy = "^1.11.0"
+llama-cpp-python = {version = "^0.3.0", optional = true}
+bert-score = "^0.3.13"
+torch = "^2.10.0"
+transformers = "^5.2.0"
+
+[tool.poetry.extras]
+sequence = ["llama-cpp-python"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

@@ -119,7 +119,16 @@ class SummarizationRunner:
         return tasks
 
     def format_task(self, task: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
-        doc = task.get("document", "")
+        doc = task.get("document", "") or ""
+
+        # Truncate document to stay within small-context models (e.g. phi-4 = 16384 tokens).
+        # Reserve 512 tokens for template overhead + 512 for completion = ~1024 tokens.
+        # At ~4 chars/token, a 16384-token window gives ~60k chars; cap at 56000 to be safe.
+        MAX_DOC_CHARS = 56_000
+        truncated = len(doc) > MAX_DOC_CHARS
+        if truncated:
+            doc = doc[:MAX_DOC_CHARS]
+
         task_text = f"""You are given a news article. Write a single-sentence summary that captures the main point.
 
 ARTICLE:
@@ -134,6 +143,10 @@ Return JSON:
             "dataset": task.get("dataset", "xsum"),
             "split": task.get("split", self.split),
             "doc_tokens": len(doc) // 4,
+            # One sentence is never more than ~100 tokens; 512 is very generous.
+            # This prevents phi-4 (16384-token context) from crashing when the
+            # agent hardcodes max_tokens=65536, which alone exceeds phi-4's window.
+            "max_completion_tokens": 512,
         }
         return task_text, context
 
