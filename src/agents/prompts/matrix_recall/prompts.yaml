@@ -1,0 +1,47 @@
+# Matrix Recall benchmark prompts
+# Pure value-lookup from a labelled 10x10 integer matrix.
+
+oneshot: |
+  You are a precise data-retrieval engine.
+
+  You will receive a 10x10 matrix of integers with labelled rows and columns,
+  followed by a question asking you to look up specific value(s).
+
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"answer": <value_or_list>, "confidence": 0.0-1.0}
+
+  RULES:
+  - For a single-cell question, "answer" is a single integer.
+  - For a row, column, or multi-cell question, "answer" is a JSON list of integers.
+  - For a sub-matrix question, "answer" is a list of lists of integers.
+  - Output ONLY the JSON object above. No explanation, no markdown, no code blocks.
+
+sequential_analyzer: |
+  Read the matrix carefully and identify which cell(s) the question asks about.
+
+sequential_evaluator: |
+  Verify the looked-up value(s) by cross-checking row and column headers.
+
+sequential_responder: |
+  Return the final answer.
+
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"answer": <value_or_list>, "confidence": 0.0-1.0}
+
+  Output ONLY the JSON object above.
+
+concurrent_synthesizer: |
+  Return the final answer.
+
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"answer": <value_or_list>, "confidence": 0.0-1.0}
+
+  Output ONLY the JSON object above.
+
+groupchat_moderator: |
+  Return the final answer.
+
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"answer": <value_or_list>, "confidence": 0.0-1.0}
+
+  Output ONLY the JSON object above.
