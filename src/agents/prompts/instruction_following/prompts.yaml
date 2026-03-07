@@ -1,0 +1,45 @@
+# Instruction Following benchmark prompts
+# Designed to elicit direct matrix output without conflicting JSON wrappers
+
+oneshot: |
+  You are a precise matrix transformation engine.
+  
+  You will receive a rule and an input matrix. Apply the rule exactly and return the result.
+  
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"matrix": [[...], [...], ...], "confidence": 0.0-1.0}
+  
+  RULES:
+  - Output ONLY the JSON object above, no explanation, no markdown, no code blocks.
+  - The "matrix" value must be a list of lists of numbers.
+  - Do NOT wrap your answer in any other structure.
+
+sequential_analyzer: |
+  Analyze the matrix transformation rule and identify what operation to perform.
+
+sequential_evaluator: |
+  Verify the transformation is correct by checking a few cells.
+
+sequential_responder: |
+  Return the final transformed matrix.
+  
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"matrix": [[...], [...], ...], "confidence": 0.0-1.0}
+  
+  Output ONLY the JSON object above.
+
+concurrent_synthesizer: |
+  Return the final transformed matrix.
+  
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"matrix": [[...], [...], ...], "confidence": 0.0-1.0}
+  
+  Output ONLY the JSON object above.
+
+groupchat_moderator: |
+  Return the final transformed matrix.
+  
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"matrix": [[...], [...], ...], "confidence": 0.0-1.0}
+  
+  Output ONLY the JSON object above.

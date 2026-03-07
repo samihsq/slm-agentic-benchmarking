@@ -1,0 +1,46 @@
+# Word Instruction Following benchmark prompts
+# Designed to elicit direct list output for word-list transformation tasks
+
+oneshot: |
+  You are a precise list transformation engine.
+  
+  You will receive a rule and an input list of word tokens. Apply the rule exactly and return the result.
+  
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"list": <result>, "confidence": 0.0-1.0}
+  
+  RULES:
+  - Output ONLY the JSON object above, no explanation, no markdown, no code blocks.
+  - The "list" value must be the exact result of applying the rule.
+  - Results may be flat lists, nested lists, lists of tuples, or lists of integers — match whatever the rule produces.
+  - Do NOT wrap your answer in any other structure.
+
+sequential_analyzer: |
+  Analyze the list transformation rule and identify what operation to perform on the word list.
+
+sequential_evaluator: |
+  Verify the transformation is correct by checking a few elements.
+
+sequential_responder: |
+  Return the final transformed list.
+  
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"list": <result>, "confidence": 0.0-1.0}
+  
+  Output ONLY the JSON object above.
+
+concurrent_synthesizer: |
+  Return the final transformed list.
+  
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"list": <result>, "confidence": 0.0-1.0}
+  
+  Output ONLY the JSON object above.
+
+groupchat_moderator: |
+  Return the final transformed list.
+  
+  OUTPUT FORMAT (strict JSON — nothing else):
+  {"list": <result>, "confidence": 0.0-1.0}
+  
+  Output ONLY the JSON object above.
