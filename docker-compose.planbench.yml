@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  val-api:
+    build:
+      context: ./val_api
+      dockerfile: Dockerfile
+    container_name: slm-val-api
+    environment:
+      - VAL=/usr/local
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  planbench:
+    build:
+      context: .
+      dockerfile: Dockerfile.planbench
+    container_name: slm-planbench
+    environment:
+      # Route VAL calls through the sidecar API (preferred over local binary)
+      - VAL_API_URL=http://val-api:8001
+      # Set your API key via Docker or .env file
+      - LITELLM_API_KEY=${LITELLM_API_KEY}
+      - LITELLM_API_BASE=${LITELLM_API_BASE}
+      - USE_LITELLM=1
+      - LC_ALL=C.UTF-8
+      - LANG=C.UTF-8
+    volumes:
+      # Mount workspace directory (contains the repo)
+      - .:/workspace
+      # Mount results directory to persist outputs
+      - ./results:/workspace/results
+    working_dir: /workspace
+    depends_on:
+      val-api:
+        condition: service_healthy
+    # Default: keep container running for interactive commands
+    # Override with: docker run --rm ... slm-planbench python -m pytest ...
+    command: tail -f /dev/null
