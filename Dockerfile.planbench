@@ -1,0 +1,69 @@
+# Dockerfile for PlanBench with VAL pre-installed
+# Build: docker build -f Dockerfile.planbench -t slm-planbench .
+# Run: docker run --rm -it -v $(pwd):/workspace -e LITELLM_API_KEY=your_key slm-planbench
+
+FROM ubuntu:22.04
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    flex \
+    bison \
+    git \
+    python3.10 \
+    python3-pip \
+    python3-venv \
+    wget \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Python 3.10 as default python3
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+
+# Build VAL (KCL-Planning validator)
+RUN git clone https://github.com/KCL-Planning/VAL.git /tmp/VAL && \
+    cd /tmp/VAL && \
+    mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release .. && \
+    make -j$(nproc) && \
+    make install && \
+    cd / && rm -rf /tmp/VAL
+
+# Add VAL to PATH
+ENV VAL=/usr/local
+ENV PATH=$VAL/bin:$PATH
+
+# Set working directory
+WORKDIR /workspace
+
+# Copy project files
+COPY . /workspace/
+
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -e \
+    && pip3 install --no-cache-dir \
+    litellm \
+    tarski \
+    pddl \
+    transformers \
+    tqdm \
+    tqdm \
+    pytest \
+    crewai \
+    pyyaml \
+    python-dotenv \
+    openai
+
+# Verify VAL is installed
+RUN echo "Checking VAL installation..." && \
+    ls -la $VAL/bin/validate && \
+    $VAL/bin/validate --help 2>&1 | head -5 || echo "VAL installed (no help available)"
+
+# Set environment for PlanBench
+ENV USE_LITELLM=1
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+# Default command: show help
+CMD ["python3", "-m", "pytest", "tests/benchmarks/test_plan_bench_runner.py", "-v"]
