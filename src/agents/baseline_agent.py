@@ -91,6 +91,9 @@ class BaselineAgent(BaseAgent):
 
         user_message = f"TASK: {task}{context_str}"
 
+        # Azure/gpt-4o support at most 16384 completion tokens; allow per-task override
+        max_tokens = (context or {}).get("max_completion_tokens", 16384)
+
         # Direct LiteLLM call with exponential backoff retry
         llm_kwargs = {
             "model": self.model_id,
@@ -99,7 +102,7 @@ class BaselineAgent(BaseAgent):
                 {"role": "user", "content": user_message},
             ],
             "temperature": 0.7,
-            "max_tokens": 2048,
+            "max_tokens": max_tokens,
             "api_key": self.config["azure_api_key"],
             "api_base": self.config["azure_endpoint"],
         }
