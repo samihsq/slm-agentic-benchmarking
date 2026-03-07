@@ -35,6 +35,7 @@ ENV/
 
 # Results and logs
 results/
+plots/
 *.json
 cost_tracking.json
 *.log
