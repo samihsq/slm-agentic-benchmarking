@@ -287,10 +287,10 @@ class CriticalityV2Runner:
         task_id = task["task_id"]
         
         if self._mode == "sequence":
-            # Sequence scoring mode
+            # Sequence scoring mode (single-token MCQ)
             start = time.time()
             
-            # Build prefix for sequence scoring
+            # Build prefix (used as fallback if MCQ mode unavailable)
             prefix = f'Topic: "{task["topic"]}". The strongest argument is: '
             
             # Extract option texts and labels
@@ -298,8 +298,10 @@ class CriticalityV2Runner:
             labels = [opt["label"] for opt in task["options"]]
             
             try:
-                # Score all options
-                choice_lps = self._scorer.score_options(prefix, options, labels)
+                # Score all options — passes full task for MCQ prompt building
+                choice_lps = self._scorer.score_options(
+                    prefix, options, labels, task=task,
+                )
                 latency = time.time() - start
                 content = ""
                 prompt_tokens = 0
@@ -451,8 +453,9 @@ class CriticalityV2Runner:
             Dict with calibration metrics and task-level results.
         """
         # Load dataset and generate tasks
+        # Load plenty of data so we can enforce quality gaps across tiers
         num_tasks = limit or 200
-        arg_limit = num_tasks * 5  # Load enough arguments
+        arg_limit = max(num_tasks * 20, 2000)
         self._task_gen.load_arguments(limit=arg_limit)
         tasks = self._task_gen.generate_tasks(num_tasks=num_tasks)
 
