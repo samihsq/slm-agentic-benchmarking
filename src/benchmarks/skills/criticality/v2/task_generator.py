@@ -133,82 +133,110 @@ class MCQTaskGenerator:
         topic: str,
         tiers: Dict[str, List[Dict]],
         task_idx: int,
+        min_quality_gap: float = 0.15,
+        max_retries: int = 20,
     ) -> Optional[Dict[str, Any]]:
         """
-        Build a single 4-option MCQ task.
+        Build a single 4-option MCQ task with guaranteed quality separation.
 
         Strategy:
-          1. Sample one strong, one medium, one weak argument.
-          2. Add a 4th from whichever tier has the most remaining.
-          3. Shuffle the options and record the ground-truth ranking.
+          1. Require at least 2 distinct tiers present for this topic.
+          2. Sample one from the best available tier and one from the worst,
+             ensuring the top-2 quality gap >= min_quality_gap.
+          3. Fill remaining slots from other tiers.
+          4. Retry sampling up to max_retries to find a valid combination.
         """
-        strong = self._pick_one(tiers.get("strong", []))
-        medium = self._pick_one(tiers.get("medium", []))
-        weak = self._pick_one(tiers.get("weak", []))
-
-        # Need at least 3 distinct tiers for a meaningful task
-        available = [a for a in [strong, medium, weak] if a is not None]
-        if len(available) < 2:
+        # Need at least 2 tiers with arguments for a meaningful task
+        available_tiers = [t for t in ["strong", "medium", "weak"] if tiers.get(t)]
+        if len(available_tiers) < 2:
             return None
 
-        # Fill to 4 options
-        while len(available) < 4:
-            # Pick from the tier with the most arguments
-            best_tier = max(tiers.keys(), key=lambda t: len(tiers[t]))
-            extra = self._pick_one(tiers[best_tier])
-            if extra and extra not in available:
-                available.append(extra)
-            else:
-                break  # Can't get to 4 unique options
+        for _ in range(max_retries):
+            # Sample one from the highest tier and one from the lowest
+            best_tier = available_tiers[0]   # strong > medium > weak
+            worst_tier = available_tiers[-1]
 
-        if len(available) < 3:
-            return None
+            best_arg = self._pick_one(tiers[best_tier])
+            worst_arg = self._pick_one(tiers[worst_tier])
+            if not best_arg or not worst_arg or best_arg is worst_arg:
+                continue
 
-        # Shuffle for presentation
-        self._rng.shuffle(available)
+            available = [best_arg, worst_arg]
 
-        # Build the ground-truth quality ranking (1 = best)
-        sorted_by_quality = sorted(available, key=lambda a: a["quality"], reverse=True)
-        quality_rank = {id(a): rank + 1 for rank, a in enumerate(sorted_by_quality)}
+            # Fill remaining slots from middle tiers or duplicates of existing tiers
+            for tier in available_tiers:
+                if len(available) >= 4:
+                    break
+                candidate = self._pick_one(tiers[tier])
+                if candidate and candidate not in available:
+                    available.append(candidate)
 
-        # The correct answer is the option with rank 1 (highest quality)
-        best_arg = sorted_by_quality[0]
-        correct_label = CHOICE_LABELS[available.index(best_arg)]
+            # If still < 4, try any tier
+            for tier in available_tiers:
+                if len(available) >= 4:
+                    break
+                for arg in tiers[tier]:
+                    if arg not in available:
+                        available.append(arg)
+                        break
 
-        options = []
-        for i, arg in enumerate(available):
-            label = CHOICE_LABELS[i]
-            options.append(
-                {
-                    "label": label,
-                    "argument": arg["argument"],
-                    "quality": arg["quality"],
-                    "tier": arg["tier"],
-                    "rank": quality_rank[id(arg)],
-                }
-            )
+            if len(available) < 3:
+                continue
 
-        # Ground-truth ranking: label → rank
-        ground_truth_ranking = {opt["label"]: opt["rank"] for opt in options}
-        # Quality scores for correlation: label → quality
-        ground_truth_qualities = {opt["label"]: opt["quality"] for opt in options}
+            # Check quality gap: best - second-best must be >= min_quality_gap
+            sorted_by_quality = sorted(available, key=lambda a: a["quality"], reverse=True)
+            top_gap = sorted_by_quality[0]["quality"] - sorted_by_quality[1]["quality"]
+            if top_gap < min_quality_gap:
+                continue  # Retry — options too close in quality
 
-        return {
-            "task_id": f"crit_v2_{task_idx:04d}",
-            "topic": topic,
-            "options": options,
-            "correct_label": correct_label,
-            "ground_truth_ranking": ground_truth_ranking,
-            "ground_truth_qualities": ground_truth_qualities,
-            "num_options": len(options),
-        }
+            # Valid task found — shuffle and build
+            self._rng.shuffle(available)
 
-    def generate_tasks(self, num_tasks: int = 200) -> List[Dict[str, Any]]:
+            quality_rank = {id(a): rank + 1 for rank, a in enumerate(sorted_by_quality)}
+            best_arg = sorted_by_quality[0]
+            correct_label = CHOICE_LABELS[available.index(best_arg)]
+
+            options = []
+            for i, arg in enumerate(available):
+                label = CHOICE_LABELS[i]
+                options.append(
+                    {
+                        "label": label,
+                        "argument": arg["argument"],
+                        "quality": arg["quality"],
+                        "tier": arg["tier"],
+                        "rank": quality_rank[id(arg)],
+                    }
+                )
+
+            ground_truth_ranking = {opt["label"]: opt["rank"] for opt in options}
+            ground_truth_qualities = {opt["label"]: opt["quality"] for opt in options}
+
+            return {
+                "task_id": f"crit_v2_{task_idx:04d}",
+                "topic": topic,
+                "options": options,
+                "correct_label": correct_label,
+                "ground_truth_ranking": ground_truth_ranking,
+                "ground_truth_qualities": ground_truth_qualities,
+                "num_options": len(options),
+                "top_quality_gap": round(top_gap, 4),
+            }
+
+        return None  # Could not build a valid task after max_retries
+
+    def generate_tasks(
+        self,
+        num_tasks: int = 200,
+        min_quality_gap: float = 0.15,
+    ) -> List[Dict[str, Any]]:
         """
         Generate MCQ tasks across all loaded topics.
 
         Args:
             num_tasks: Target number of tasks.
+            min_quality_gap: Minimum quality difference between best and
+                second-best option (enforced during task construction).
 
         Returns:
             List of MCQ task dictionaries.
@@ -228,14 +256,21 @@ class MCQTaskGenerator:
                 if len(tasks) >= num_tasks:
                     break
                 tiers = self._arguments_by_topic[topic]
-                task = self._build_mcq(topic, tiers, task_idx)
+                task = self._build_mcq(
+                    topic, tiers, task_idx,
+                    min_quality_gap=min_quality_gap,
+                )
                 if task:
                     tasks.append(task)
                     task_idx += 1
             round_num += 1
 
         if self.verbose:
-            print(f"Generated {len(tasks)} MCQ tasks from {len(set(t['topic'] for t in tasks))} topics")
+            gaps = [t.get("top_quality_gap", 0) for t in tasks]
+            avg_gap = sum(gaps) / len(gaps) if gaps else 0
+            n_topics = len(set(t["topic"] for t in tasks))
+            print(f"Generated {len(tasks)} MCQ tasks from {n_topics} topics")
+            print(f"  min_quality_gap={min_quality_gap}, avg gap={avg_gap:.3f}")
 
         return tasks
 
