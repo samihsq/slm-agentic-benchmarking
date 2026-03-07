@@ -58,4 +58,11 @@ Thumbs.db
 # Large data files (downloaded datasets, episodic memory benchmark data)
 data/
 
+# GGUF model files (downloaded from HuggingFace)
+models/*.gguf
+
 # Combined results are tracked
+
+# PlanBench vendored generated outputs (keep prompts/ for pre-generated if needed)
+benchmarks/plan_bench/responses/
+benchmarks/plan_bench/results/
