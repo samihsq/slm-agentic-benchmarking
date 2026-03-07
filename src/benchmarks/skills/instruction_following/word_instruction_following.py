@@ -22,9 +22,9 @@ def L1_sort_alpha(L): return sorted(L)
 
 def L2_reverse(L): return L[::-1]
 
-def L3_sort_len_asc(L): return sorted(L, key=lambda x: len(x))
+def L3_sort_len_asc(L): return sorted(L, key=lambda x: (len(x), x))
 
-def L4_sort_len_desc(L): return sorted(L, key=lambda x: -len(x))
+def L4_sort_len_desc(L): return sorted(L, key=lambda x: (-len(x), x))
 
 def L5_rotate_right(L): return [L[-1]] + L[:-1]
 
@@ -45,10 +45,10 @@ def L11_append_index(L):
     return [f"{x}_{i}" for i,x in enumerate(L)]
 
 def L12_sort_by_suffix(L):
-    return sorted(L, key=lambda x: int(x.split("_")[-1]))
+    return sorted(L, key=lambda x: (int(x.split("_")[-1]), x))
 
 def L13_remove_suffix(L):
-    return [x.split("_")[0] for x in L]
+    return [x.rsplit("_", 1)[0] for x in L]
 
 def L14_double_first_letter(L):
     return [x[0]*2 for x in L]
@@ -93,39 +93,54 @@ def L21_length_compare(L):
         if i==0:
             out.append("SHORT")
         else:
-            out.append("LONG" if len(x)>len(L[i-1]) else "SHORT")
+            if len(x) > len(L[i-1]):
+                out.append("LONGER")
+            elif len(x) < len(L[i-1]):
+                out.append("SHORTER")
+            else:
+                out.append("EQUAL")
     return out
 
 def L22_even_reverse_else_sort(L):
     return L[::-1] if len(L)%2==0 else sorted(L)
 
 def L23_majority_duplicate_remove(L):
+    if not L:
+        return L
     counts={}
     for x in L:
         counts[x]=counts.get(x,0)+1
-    if max(counts.values()) > len(L)/2:
-        return list(dict.fromkeys(L))
+    if max(counts.values()) > len(L)//2:
+        seen = set()
+        result = []
+        for x in L:
+            if x not in seen:
+                seen.add(x)
+                result.append(x)
+        return result
     return L
 
 def L24_conditional_duplicate(L):
+    if not L:
+        return L
     if sorted(L)[0] < sorted(L)[-1]:
         return L + L
     return L[:-1]
 
 def L25_encode_word_index(L):
-    return [(x,i) for i,x in enumerate(L)]
+    return [[x,i] for i,x in enumerate(L)]
 
 def L26_encode_with_length(L):
-    return [(x,i,len(x)) for (x,i) in L]
+    return [[x,i,len(x)] for x,i in L]
 
 def L27_drop_word_keep_meta(L):
-    return [(i,length) for (_,i,length) in L]
+    return [[i,length] for _,i,length in L]
 
 def L28_index_only(L):
-    return [i for i,_ in enumerate(L)]
+    return [pair[0] for pair in L]
 
 def L29_index_parity(L):
-    return [(i, i%2) for i in L]
+    return [[i, i%2] for i in L]
 
 def L30_structure_only(L):
     return list(range(len(L)))
@@ -135,36 +150,96 @@ def L30_structure_only(L):
 ##########################################
 
 LEVEL_RULES = {
- 1: ("SORT_ALPHA","Sort alphabetically.",L1_sort_alpha),
- 2: ("REVERSE","Reverse the list.",L2_reverse),
- 3: ("SORT_LEN_ASC","Sort by length ascending.",L3_sort_len_asc),
- 4: ("SORT_LEN_DESC","Sort by length descending.",L4_sort_len_desc),
- 5: ("ROTATE_RIGHT","Rotate right by 1.",L5_rotate_right),
- 6: ("ROTATE_LEFT2","Rotate left by 2.",L6_rotate_left2),
- 7: ("LEN_GE4","Keep words length >=4.",L7_len_ge4),
- 8: ("NO_VOWEL_START","Remove words starting with vowel.",L8_remove_vowel_start),
- 9: ("EVEN_IDX","Keep even indices.",L9_keep_even_idx),
- 10: ("SIZE_GUARD","If size<4 duplicate list.",L10_min_size_guard),
- 11: ("APPEND_IDX","Append index suffix.",L11_append_index),
- 12: ("SORT_SUFFIX","Sort by numeric suffix.",L12_sort_by_suffix),
- 13: ("REMOVE_SUFFIX","Remove index suffix.",L13_remove_suffix),
- 14: ("DOUBLE_FIRST","Replace with doubled first letter.",L14_double_first_letter),
- 15: ("GROUP_PAIRS","Group into pairs.",L15_group_pairs),
- 16: ("REV_INNER","Reverse inner lists.",L16_reverse_inner),
- 17: ("REV_OUTER","Reverse outer list.",L17_reverse_outer),
- 18: ("FLATTEN","Flatten one level.",L18_flatten),
- 19: ("PREV_WORD","Replace with previous word.",L19_prev_word),
- 20: ("NEXT_WORD","Replace with next word.",L20_next_word),
- 21: ("LEN_COMPARE","Compare length with previous.",L21_length_compare),
- 22: ("COND_REV_SORT","If even length reverse else sort.",L22_even_reverse_else_sort),
- 23: ("MAJ_DUP_REMOVE","If majority duplicate remove duplicates.",L23_majority_duplicate_remove),
- 24: ("COND_DUP","Conditional duplicate or remove last.",L24_conditional_duplicate),
- 25: ("ENCODE_META","Encode (word,index).",L25_encode_word_index),
- 26: ("ENCODE_LEN","Encode (word,index,length).",L26_encode_with_length),
- 27: ("DROP_WORD","Keep (index,length).",L27_drop_word_keep_meta),
- 28: ("INDEX_ONLY","Replace with index only.",L28_index_only),
- 29: ("INDEX_PARITY","Replace with (index,parity).",L29_index_parity),
- 30: ("STRUCT_ONLY","Return indices 0..N-1.",L30_structure_only),
+ 1: ("SORT_ALPHA",
+     "Sort the list alphabetically (a-z).",
+     L1_sort_alpha),
+ 2: ("REVERSE",
+     "Reverse the order of the list.",
+     L2_reverse),
+ 3: ("SORT_LEN_ASC",
+     "Sort by string length ascending. Break ties alphabetically.",
+     L3_sort_len_asc),
+ 4: ("SORT_LEN_DESC",
+     "Sort by string length descending. Break ties alphabetically.",
+     L4_sort_len_desc),
+ 5: ("ROTATE_RIGHT",
+     "Rotate the list right by 1 position (last element moves to front).",
+     L5_rotate_right),
+ 6: ("ROTATE_LEFT2",
+     "Rotate the list left by 2 positions (first two elements move to end).",
+     L6_rotate_left2),
+ 7: ("LEN_GE4",
+     "Keep only words with length >= 4. Preserve order.",
+     L7_len_ge4),
+ 8: ("NO_VOWEL_START",
+     "Remove words that start with a vowel (a, e, i, o, u). Preserve order.",
+     L8_remove_vowel_start),
+ 9: ("EVEN_IDX",
+     "Keep only elements at 0-based even indices (0, 2, 4, ...). Preserve order.",
+     L9_keep_even_idx),
+ 10: ("SIZE_GUARD",
+      "If the list has fewer than 4 elements, concatenate it with itself (double it). Otherwise return it unchanged.",
+      L10_min_size_guard),
+ 11: ("APPEND_IDX",
+      "Append a 0-based index suffix to each word: word_0, word_1, word_2, etc.",
+      L11_append_index),
+ 12: ("SORT_SUFFIX",
+      "Sort by the numeric suffix after the underscore (ascending). Break ties alphabetically by full string.",
+      L12_sort_by_suffix),
+ 13: ("REMOVE_SUFFIX",
+      "Remove the last underscore and everything after it from each word (e.g. 'abc_3' becomes 'abc').",
+      L13_remove_suffix),
+ 14: ("DOUBLE_FIRST",
+      "Replace each word with its first character repeated twice (e.g. 'hello' becomes 'hh').",
+      L14_double_first_letter),
+ 15: ("GROUP_PAIRS",
+      "Group consecutive elements into sublists of 2. If the list has odd length, the last sublist has 1 element.",
+      L15_group_pairs),
+ 16: ("REV_INNER",
+      "Reverse each inner sublist. The outer list order stays the same.",
+      L16_reverse_inner),
+ 17: ("REV_OUTER",
+      "Reverse the order of the outer list. Inner sublists stay unchanged.",
+      L17_reverse_outer),
+ 18: ("FLATTEN",
+      "Flatten one level of nesting: each inner sublist's elements become top-level elements.",
+      L18_flatten),
+ 19: ("PREV_WORD",
+      "Replace each element with the element before it. The first element becomes \"START\".",
+      L19_prev_word),
+ 20: ("NEXT_WORD",
+      "Replace each element with the element after it. The last element becomes \"END\".",
+      L20_next_word),
+ 21: ("LEN_COMPARE",
+      "Compare each element's length to the previous element's length. Output \"LONGER\" if longer, \"SHORTER\" if shorter, \"EQUAL\" if same. The first element is always \"SHORT\".",
+      L21_length_compare),
+ 22: ("COND_REV_SORT",
+      "If the list has even length, reverse it. If odd length, sort it alphabetically.",
+      L22_even_reverse_else_sort),
+ 23: ("MAJ_DUP_REMOVE",
+      "If any single value appears more than half the list's length (floor division), remove all duplicates keeping only the first occurrence of each. Otherwise return the list unchanged.",
+      L23_majority_duplicate_remove),
+ 24: ("COND_DUP",
+      "Sort the list alphabetically. If the first element is less than the last element, concatenate the original (unsorted) list with itself. Otherwise, remove the last element from the original list.",
+      L24_conditional_duplicate),
+ 25: ("ENCODE_META",
+      "Replace each element with a [word, index] pair, where index is the 0-based position. Output a list of 2-element lists.",
+      L25_encode_word_index),
+ 26: ("ENCODE_LEN",
+      "Each element is currently [word, index]. Extend it to [word, index, length] where length is len(word). Output a list of 3-element lists.",
+      L26_encode_with_length),
+ 27: ("DROP_WORD",
+      "Each element is currently [word, index, length]. Drop the word and keep [index, length]. Output a list of 2-element lists.",
+      L27_drop_word_keep_meta),
+ 28: ("INDEX_ONLY",
+      "Each element is currently [index, length]. Extract just the index (first element) from each pair. Output a flat list of integers.",
+      L28_index_only),
+ 29: ("INDEX_PARITY",
+      "Each element is an integer. Replace it with [value, value % 2]. Output a list of 2-element lists.",
+      L29_index_parity),
+ 30: ("STRUCT_ONLY",
+      "Return a list of integers from 0 to N-1, where N is the current list length.",
+      L30_structure_only),
 }
 
 ##########################################
