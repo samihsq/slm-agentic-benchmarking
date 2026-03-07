@@ -45,24 +45,39 @@ class OllamaAgent(BaseAgent):
         self,
         model: str = "qwen3:0.6b",
         verbose: bool = False,
-        ollama_base_url: str = "http://10.27.102.240:11434",
+        ollama_base_url: str = "http://localhost:11434",
         temperature: float = 0.7,
-        max_tokens: int = 2048,
+        max_tokens: Optional[int] = 512,
+        think: bool = True,
     ):
+        # Resolve config key (e.g. "falcon-h1-90m") to the actual Ollama model
+        # name (e.g. "hf.co/tiiuae/Falcon-H1-Tiny-R-90M-GGUF:Q4_K_M").
+        try:
+            from ..config.azure_llm_config import OLLAMA_MODELS
+            if model in OLLAMA_MODELS:
+                model_name = OLLAMA_MODELS[model]["model"]
+            else:
+                model_name = model
+        except ImportError:
+            model_name = model
+
         super().__init__(
-            model=model,
+            model=model,           # keep config key as the identity/display name
             verbose=verbose,
             max_iterations=1,
         )
 
+        self._ollama_model_name = model_name  # actual name sent to Ollama API
         self.ollama_base_url = ollama_base_url.rstrip("/")
         self.temperature = temperature
+        # None = no limit (Ollama uses num_predict: -1 for unlimited)
         self.max_tokens = max_tokens
+        self.think = think
 
         # Model display name for results (strip HF prefix)
         self._display_name = model
-        if "/" in model:
-            parts = model.split("/")
+        if "/" in model_name:
+            parts = model_name.split("/")
             self._display_name = parts[-1].replace("-GGUF", "").replace(":Q4_K_M", "")
 
     def _call_ollama(
@@ -75,22 +90,60 @@ class OllamaAgent(BaseAgent):
         Call the Ollama native API (not OpenAI-compatible) to get
         separated thinking and content fields.
 
+        If the model doesn't support the `think` parameter (returns 400/404),
+        automatically retries without it so GGUF and non-thinking models work.
+
         Returns:
             Dict with 'thinking', 'content', 'total_duration', 'eval_count', etc.
         """
-        payload = {
-            "model": self.model,
+        # num_predict: -1 = unlimited in Ollama; otherwise use requested or instance limit
+        num_predict = max_tokens if max_tokens is not None else self.max_tokens
+        if num_predict is None:
+            num_predict = -1
+
+        url = f"{self.ollama_base_url}/api/chat"
+
+        def _make_request(include_think: bool) -> Dict[str, Any]:
+            payload: Dict[str, Any] = {
+                "model": self._ollama_model_name,
+                "messages": messages,
+                "stream": False,
+                "options": {
+                    "temperature": temperature or self.temperature,
+                    "num_predict": num_predict,
+                },
+            }
+            if include_think:
+                payload["think"] = True
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                url,
+                data=data,
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+
+        if self.think:
+            try:
+                return _make_request(include_think=True)
+            except urllib.error.HTTPError as e:
+                if e.code in (400, 404):
+                    # Model doesn't support think parameter; disable and retry
+                    self.think = False
+                    return _make_request(include_think=False)
+                raise
+
+        data = json.dumps({
+            "model": self._ollama_model_name,
             "messages": messages,
             "stream": False,
             "options": {
                 "temperature": temperature or self.temperature,
-                "num_predict": max_tokens or self.max_tokens,
+                "num_predict": num_predict,
             },
-        }
-
-        data = json.dumps(payload).encode("utf-8")
-        url = f"{self.ollama_base_url}/api/chat"
-
+        }).encode("utf-8")
         req = urllib.request.Request(
             url,
             data=data,
