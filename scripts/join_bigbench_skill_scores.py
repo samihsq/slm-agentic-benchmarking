@@ -96,11 +96,28 @@ def _benchmark_from_path(path: Path) -> Optional[str]:
     return None
 
 
+def _wilson_se(p: float, n: int, z: float = 1.96) -> float:
+    """
+    Wilson CI half-width divided by z, as a drop-in SE replacement.
+    Always > 0, handles p=0 and p=1 correctly.
+    Wilson half-width: z * sqrt(p_tilde*(1-p_tilde) / (n+z^2))
+    where p_tilde = (n*p + z^2/2) / (n + z^2)
+    """
+    import math
+    n = max(n, 1)
+    z2 = z * z
+    p_tilde = (n * p + z2 / 2.0) / (n + z2)
+    hw = z * math.sqrt(max(p_tilde * (1.0 - p_tilde), 1e-12) / (n + z2))
+    return hw / z  # SE-equivalent so caller's 1.96× gives the Wilson CI
+
+
 def load_bigbench_results(bigbench_dir: Path) -> List[Dict[str, Any]]:
     """
     Walk bigbench_dir for summary.json files written by the BBL24 runner.
-    Returns list of dicts with keys: backend, model, architecture, weighted_accuracy.
+    Returns list of dicts with keys: backend, model, architecture, weighted_accuracy,
+    weighted_accuracy_se (std of per-task accuracies / sqrt(n_tasks)).
     """
+    import math
     rows = []
     for p in bigbench_dir.rglob("summary.json"):
         try:
@@ -112,12 +129,37 @@ def load_bigbench_results(bigbench_dir: Path) -> List[Dict[str, Any]]:
         if d.get("suite") != "bbl24" or d.get("weighted_accuracy") is None:
             continue
         model_raw = d.get("model", "")
+
+        # Compute SE from per-task accuracy variance; fall back to Wilson SE when std=0
+        breakdown = d.get("breakdown_by_task", {})
+        task_accs = [
+            v["accuracy"] for v in breakdown.values()
+            if isinstance(v, dict) and v.get("accuracy") is not None
+        ]
+        task_ns = [
+            v["total"] for v in breakdown.values()
+            if isinstance(v, dict) and v.get("total") is not None
+        ]
+        if len(task_accs) >= 2:
+            mean_acc = sum(task_accs) / len(task_accs)
+            variance = sum((a - mean_acc) ** 2 for a in task_accs) / (len(task_accs) - 1)
+            if variance > 0:
+                se = math.sqrt(variance / len(task_accs))
+            else:
+                # All tasks same accuracy — use Wilson SE on overall accuracy
+                n_total = sum(task_ns) if task_ns else len(task_accs) * 20
+                wacc = float(d["weighted_accuracy"])
+                se = _wilson_se(wacc, n_total)
+        else:
+            se = None
+
         rows.append({
-            "backend":           d.get("backend", "azure"),
-            "model":             normalize_model_key(model_raw) if model_raw else "",
-            "architecture":      d.get("architecture", "one_shot"),
-            "weighted_accuracy": float(d["weighted_accuracy"]),
-            "_source":           str(p),
+            "backend":              d.get("backend", "azure"),
+            "model":                normalize_model_key(model_raw) if model_raw else "",
+            "architecture":         d.get("architecture", "one_shot"),
+            "weighted_accuracy":    float(d["weighted_accuracy"]),
+            "weighted_accuracy_se": se,
+            "_source":              str(p),
         })
     return rows
 
@@ -161,12 +203,31 @@ def _extract_backend(path: Path) -> str:
     return "azure"
 
 
-def load_skill_scores(results_root: Path) -> Dict[Tuple[str, str, str], Dict[str, List[float]]]:
+def _extract_n(obj: Dict[str, Any]) -> Optional[int]:
+    """Extract number of examples from a skill benchmark summary."""
+    for key in ("num_tasks", "num_rollouts", "num_examples", "total_examples", "n"):
+        if key in obj and obj[key] is not None:
+            try:
+                return int(obj[key])
+            except (TypeError, ValueError):
+                pass
+    return None
+
+
+def load_skill_scores(
+    results_root: Path,
+) -> Tuple[
+    Dict[Tuple[str, str, str], Dict[str, List[float]]],
+    Dict[Tuple[str, str, str], Dict[str, List[int]]],
+]:
     """
     Walk results_root for skill benchmark summary.json files.
-    Returns { (backend, model, architecture) -> { benchmark_name: [scores] } }.
+    Returns:
+      scores:    { (backend, model, architecture) -> { benchmark_name: [scores] } }
+      n_samples: { (backend, model, architecture) -> { benchmark_name: [n_examples] } }
     """
     scores: Dict[Tuple[str, str, str], Dict[str, List[float]]] = {}
+    n_samples: Dict[Tuple[str, str, str], Dict[str, List[int]]] = {}
 
     for p in results_root.rglob("summary.json"):
         benchmark = _benchmark_from_path(p)
@@ -203,14 +264,19 @@ def load_skill_scores(results_root: Path) -> Dict[Tuple[str, str, str], Dict[str
             score = _extract_score(item)
             if score is None:
                 continue
+            n = _extract_n(item)
             key = (backend, model, arch)
             if key not in scores:
                 scores[key] = {}
+                n_samples[key] = {}
             if benchmark not in scores[key]:
                 scores[key][benchmark] = []
+                n_samples[key][benchmark] = []
             scores[key][benchmark].append(score)
+            if n is not None:
+                n_samples[key][benchmark].append(n)
 
-    return scores
+    return scores, n_samples
 
 
 # ---------------------------------------------------------------------------
@@ -230,18 +296,54 @@ def compute_skill_score(
     return sum(vals) / len(vals) if vals else None
 
 
+def compute_skill_se(
+    benchmark_scores: Dict[str, List[float]],
+    benchmark_n: Dict[str, List[int]],
+    skill: str,
+) -> Optional[float]:
+    """
+    Standard error of the skill score.
+    - Multiple benchmarks in bucket with spread: std(scores) / sqrt(n_benchmarks)
+    - Multiple benchmarks all same score, or single benchmark: Wilson SE
+    """
+    import math
+    benchmarks = SKILL_BUCKETS.get(skill, [])
+    vals, ns = [], []
+    for b in benchmarks:
+        if b in benchmark_scores and benchmark_scores[b]:
+            vals.append(max(benchmark_scores[b]))
+            if b in benchmark_n and benchmark_n[b]:
+                ns.append(sum(benchmark_n[b]) // len(benchmark_n[b]))
+    if not vals:
+        return None
+    if len(vals) >= 2:
+        mean_v = sum(vals) / len(vals)
+        variance = sum((v - mean_v) ** 2 for v in vals) / (len(vals) - 1)
+        if variance > 0:
+            return math.sqrt(variance / len(vals))
+        # All benchmarks identical — fall through to Wilson pooled over benchmarks
+    # Single benchmark or all-identical: mean Wilson SE over available benchmarks
+    wilson_ses = [
+        _wilson_se(p, n)
+        for p, n in zip(vals, ns if len(ns) == len(vals) else [50] * len(vals))
+    ]
+    return sum(wilson_ses) / len(wilson_ses)
+
+
 def join(
     bigbench_rows: List[Dict[str, Any]],
     skill_scores: Dict[Tuple[str, str, str], Dict[str, List[float]]],
+    skill_n: Dict[Tuple[str, str, str], Dict[str, List[int]]],
 ) -> List[Dict[str, Any]]:
     """
     Merge BBL rows with skill scores.
-    Returns one row per (backend, model, architecture) with all skill scores included.
+    Returns one row per (backend, model, architecture) with skill scores and SEs included.
     """
     joined = []
     for row in bigbench_rows:
         key = (row["backend"], row["model"], row["architecture"])
         bench_scores = skill_scores.get(key, {})
+        bench_n = skill_n.get(key, {})
 
         # Also try without backend (Azure results may lack explicit backend label)
         if not bench_scores:
@@ -249,18 +351,30 @@ def join(
                 alt_key = (candidate_backend, row["model"], row["architecture"])
                 if alt_key in skill_scores:
                     bench_scores = skill_scores[alt_key]
+                    bench_n = skill_n.get(alt_key, {})
+                    break
+
+        # Fall back to one_shot skill scores for the same model — skill scores reflect
+        # the model's inherent capability and were only measured with one_shot agents.
+        if not bench_scores:
+            for candidate_backend in ("azure", "ollama"):
+                fallback_key = (candidate_backend, row["model"], "one_shot")
+                if fallback_key in skill_scores:
+                    bench_scores = skill_scores[fallback_key]
+                    bench_n = skill_n.get(fallback_key, {})
                     break
 
         out = {
-            "backend":           row["backend"],
-            "model":             row["model"],
-            "architecture":      row["architecture"],
-            "weighted_accuracy": row["weighted_accuracy"],
-            "_bbl_source":       row.get("_source", ""),
+            "backend":              row["backend"],
+            "model":                row["model"],
+            "architecture":         row["architecture"],
+            "weighted_accuracy":    row["weighted_accuracy"],
+            "weighted_accuracy_se": row.get("weighted_accuracy_se"),
+            "_bbl_source":          row.get("_source", ""),
         }
         for skill in SKILLS:
-            s = compute_skill_score(bench_scores, skill)
-            out[skill] = s
+            out[skill] = compute_skill_score(bench_scores, skill)
+            out[f"{skill}_se"] = compute_skill_se(bench_scores, bench_n, skill)
         joined.append(out)
     return joined
 
@@ -300,10 +414,10 @@ def main() -> int:
         return 0
 
     print(f"\nLoading skill scores from: {args.results_dir}")
-    skill_scores = load_skill_scores(args.results_dir)
+    skill_scores, skill_n = load_skill_scores(args.results_dir)
     print(f"  Found {len(skill_scores)} (backend, model, architecture) skill entries.")
 
-    joined = join(bbl_rows, skill_scores)
+    joined = join(bbl_rows, skill_scores, skill_n)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with open(args.output, "w") as f:

@@ -106,17 +106,61 @@ def plot_all(
             backend = r.get("backend", "azure")
             marker = ARCHITECTURE_MARKERS.get(arch, "o")
             color = color_map.get(model, "#888888")
-            # Outline Azure points with black, Ollama with grey, for quick backend discrimination
             edge_color = "#000000" if backend == "azure" else "#888888"
-            ax.scatter(
-                x, y,
-                marker=marker,
-                c=color,
-                edgecolors=edge_color,
-                linewidths=0.8,
-                s=80,
-                zorder=3,
-            )
+
+            # A point "failed" if BBL accuracy < 5% OR skill score is 0/missing
+            skill_val = r.get(skill)
+            failed = (r["weighted_accuracy"] < 0.05) or (skill_val is None) or (skill_val == 0)
+
+            # 95% CI ellipse (1.96 × SE in each axis) — only for non-failed points
+            if not failed:
+                se_x = r.get(f"{skill}_se")
+                se_y = r.get("weighted_accuracy_se")
+                if se_x is not None and se_y is not None:
+                    ellipse = mpatches.Ellipse(
+                        (x, y),
+                        width=2 * 1.96 * se_x * 100,
+                        height=2 * 1.96 * se_y * 100,
+                        facecolor=color,
+                        edgecolor="none",
+                        alpha=0.18,
+                        zorder=2,
+                    )
+                    ax.add_patch(ellipse)
+                elif se_y is not None:
+                    ellipse = mpatches.Ellipse(
+                        (x, y),
+                        width=2.0,
+                        height=2 * 1.96 * se_y * 100,
+                        facecolor=color,
+                        edgecolor="none",
+                        alpha=0.18,
+                        zorder=2,
+                    )
+                    ax.add_patch(ellipse)
+
+            if failed:
+                # Hollow marker with thick dashed edge to signal failure
+                ax.scatter(
+                    x, y,
+                    marker=marker,
+                    facecolors="none",
+                    edgecolors=color,
+                    linewidths=2.0,
+                    s=100,
+                    zorder=3,
+                    linestyle="--",
+                )
+            else:
+                ax.scatter(
+                    x, y,
+                    marker=marker,
+                    c=color,
+                    edgecolors=edge_color,
+                    linewidths=0.8,
+                    s=80,
+                    zorder=3,
+                )
 
         ax.set_xlabel(f"{skill.replace('_', ' ').title()} Score (%)", fontsize=11)
         ax.set_ylabel("BIG-bench Lite Accuracy (%) — equal task weight", fontsize=11)
@@ -124,6 +168,8 @@ def plot_all(
             f"BIG-bench Lite vs. {skill.replace('_', ' ').title()} Skill",
             fontsize=13, fontweight="bold",
         )
+        ax.set_xlim(-2, 102)
+        ax.set_ylim(-2, 102)
         ax.grid(True, linestyle="--", alpha=0.5)
 
         # Legend: color = model
