@@ -42,7 +42,8 @@ class QuestionTrace:
     total_latency: float = 0.0
     total_cost: float = 0.0
     reasoning: str = ""
-    
+    timed_out: bool = False
+
     def add_call(self, call: LLMCall):
         """Add an LLM call to the trace."""
         self.calls.append(call)
@@ -62,6 +63,7 @@ class QuestionTrace:
             "total_latency": self.total_latency,
             "total_cost": self.total_cost,
             "reasoning": self.reasoning,
+            "timed_out": self.timed_out,
         }
     
     def save(self, output_dir: Path):

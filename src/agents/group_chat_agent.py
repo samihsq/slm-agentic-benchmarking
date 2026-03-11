@@ -7,7 +7,7 @@ Agents collaborate through discussion to reach a consensus response.
 from typing import Optional, Dict, Any, List
 
 from crewai import Agent, Task, Crew, Process
-from .base_agent import BaseAgent, BenchmarkResponse
+from .base_agent import BaseAgent, BenchmarkResponse, kickoff_with_timeout
 from ..config import get_llm
 from ..utils.trace import TraceCapture
 
@@ -58,6 +58,7 @@ class GroupChatAgent(BaseAgent):
             backstory=proposer_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
         self.critic = Agent(
@@ -66,6 +67,7 @@ class GroupChatAgent(BaseAgent):
             backstory=critic_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
         self.advisor = Agent(
@@ -74,6 +76,7 @@ class GroupChatAgent(BaseAgent):
             backstory=advisor_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
         self.moderator = Agent(
@@ -82,6 +85,7 @@ class GroupChatAgent(BaseAgent):
             backstory=moderator_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
     def respond_to_task(
@@ -147,10 +151,12 @@ Based on all perspectives shared, generate your final response.
             tasks=[propose, critique, advise, moderate],
             process=Process.sequential,
             verbose=self.verbose,
+            max_execution_time=600,
         )
 
-        result = crew.kickoff()
-        response = self.parse_json_response(str(result))
+        result, timed_out = kickoff_with_timeout(crew)
+        result_str = "" if timed_out else str(result)
+        response = self.parse_json_response(result_str)
         
         # Capture the full discussion from each task
         task_descriptions = [
@@ -184,6 +190,7 @@ Based on all perspectives shared, generate your final response.
         if response.metadata is None:
             response.metadata = {}
         response.metadata["discussion"] = discussion
+        response.metadata["timed_out"] = timed_out
 
         self.add_to_history(
             task=task,

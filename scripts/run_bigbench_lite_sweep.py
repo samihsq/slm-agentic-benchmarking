@@ -362,6 +362,10 @@ def main() -> int:
         "--concurrency", type=int, default=1,
         help="Concurrent examples per model within a single run (default: 1)",
     )
+    parser.add_argument(
+        "--azure-concurrency", type=int, default=20,
+        help="Concurrent examples for Azure runs (default: 20, serverless has high rate limits)",
+    )
     parser.add_argument("--resume", action="store_true", help="Skip combos with existing complete summaries")
     parser.add_argument("--validate-only", action="store_true", help="Validate task configs and exit")
     parser.add_argument("--ollama-url", default="http://localhost:11434", help="Ollama base URL")
@@ -421,7 +425,7 @@ def main() -> int:
             backend_futures["azure"] = backend_pool.submit(
                 sweep_backend,
                 "azure", azure_models, architectures, examples_per_task,
-                results_root, cost_tracker, args.verbose, args.concurrency,
+                results_root, cost_tracker, args.verbose, args.azure_concurrency,
                 args.ollama_url, args.resume,
                 True,   # parallel_models: all Azure models run concurrently
             )

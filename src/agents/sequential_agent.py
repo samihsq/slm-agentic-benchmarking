@@ -11,7 +11,7 @@ https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/ai-agent-design
 from typing import Optional, Dict, Any, List
 
 from crewai import Agent, Task, Crew, Process
-from .base_agent import BaseAgent, BenchmarkResponse
+from .base_agent import BaseAgent, BenchmarkResponse, kickoff_with_timeout
 from ..config import get_llm
 from ..utils.trace import TraceCapture
 
@@ -63,6 +63,7 @@ class SequentialAgent(BaseAgent):
             backstory=analyzer_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
         # Stage 2: Evaluator - Assesses appropriate approach
@@ -72,6 +73,7 @@ class SequentialAgent(BaseAgent):
             backstory=evaluator_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
         # Stage 3: Responder - Executes and provides final response
@@ -81,6 +83,7 @@ class SequentialAgent(BaseAgent):
             backstory=responder_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
     def respond_to_task(
@@ -159,12 +162,17 @@ Based on the analysis and evaluation, generate your final response.
             tasks=[analyze_task, evaluate_task, respond_task],
             process=Process.sequential,
             verbose=self.verbose,
+            max_execution_time=600,
         )
 
-        result = crew.kickoff()
+        result, timed_out = kickoff_with_timeout(crew)
+        if timed_out:
+            result_str = ""
+        else:
+            result_str = str(result)
 
         # Parse the response using robust parser from base class
-        response = self.parse_json_response(str(result))
+        response = self.parse_json_response(result_str)
         
         # Capture the pipeline steps for debugging and tracing
         pipeline_steps = []
@@ -197,6 +205,7 @@ Based on the analysis and evaluation, generate your final response.
         if response.metadata is None:
             response.metadata = {}
         response.metadata["pipeline_steps"] = pipeline_steps
+        response.metadata["timed_out"] = timed_out
 
         # Add to history
         self.add_to_history(

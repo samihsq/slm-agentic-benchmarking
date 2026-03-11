@@ -19,7 +19,7 @@ from typing import Optional, Dict, Any
 from .base_agent import BaseAgent, BenchmarkResponse
 
 # Retry configuration
-MAX_RETRIES = 5
+MAX_RETRIES = 2
 BASE_DELAY = 1.0
 MAX_DELAY = 30.0
 
@@ -122,7 +122,7 @@ class OllamaAgent(BaseAgent):
                 headers={"Content-Type": "application/json"},
                 method="POST",
             )
-            with urllib.request.urlopen(req, timeout=120) as resp:
+            with urllib.request.urlopen(req, timeout=60) as resp:
                 return json.loads(resp.read().decode("utf-8"))
 
         if self.think:

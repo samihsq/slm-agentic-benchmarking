@@ -6,8 +6,32 @@ All agent types must implement this interface.
 import json
 import re
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, List
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as _FuturesTimeout
+from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
+
+CREW_TIMEOUT_SECONDS = 90  # hard wall-clock cap per crew.kickoff() call
+
+
+def kickoff_with_timeout(crew, timeout_secs: int = CREW_TIMEOUT_SECONDS) -> Tuple[Any, bool]:
+    """
+    Run crew.kickoff() in a background thread with a hard wall-clock timeout.
+    Returns (result, timed_out). If timed_out, result is None and the background
+    thread continues running until it naturally finishes (Python can't kill threads).
+
+    NOTE: Must NOT use `with ThreadPoolExecutor(...)` — the context manager calls
+    shutdown(wait=True) on exit, which blocks until the thread finishes and defeats
+    the timeout entirely. Use shutdown(wait=False) to return immediately.
+    """
+    ex = ThreadPoolExecutor(max_workers=1)
+    fut = ex.submit(crew.kickoff)
+    try:
+        result = fut.result(timeout=timeout_secs)
+        ex.shutdown(wait=False)
+        return result, False
+    except _FuturesTimeout:
+        ex.shutdown(wait=False)
+        return None, True
 
 
 @dataclass

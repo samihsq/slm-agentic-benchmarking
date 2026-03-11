@@ -67,3 +67,6 @@ models/*.gguf
 # PlanBench vendored generated outputs (keep prompts/ for pre-generated if needed)
 benchmarks/plan_bench/responses/
 benchmarks/plan_bench/results/
+
+.claude/
+CLAUDE.md
