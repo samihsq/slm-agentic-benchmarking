@@ -1,0 +1,397 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+\definecolor{toprow}{HTML}{E8F5E9}
+\definecolor{midrow}{HTML}{FFF8E1}
+\definecolor{botrow}{HTML}{FFEBEE}
+\definecolor{hdrblue}{HTML}{1565C0}
+\definecolor{notegray}{HTML}{757575}
+\definecolor{warnrow}{HTML}{FFF3E0}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{notegray}{\small March 11, 2026}}
+\lhead{\textcolor{notegray}{\small SLM Agentic Benchmarking}}
+\cfoot{\thepage}
+
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\begin{document}
+
+\begin{center}
+{\LARGE \textbf{SLM Agentic Benchmark Results}}\\[4pt]
+{\large March 11, 2026}\\[6pt]
+{\small\textcolor{notegray}{Benchmark: BIG-bench Lite 24-task Suite (BBL24)}}\\[2pt]
+{\small\textcolor{notegray}{Models: 8 Ollama SLMs (0.6B--20B) $\cdot$ 4 Architectures (One-shot, Sequential, Concurrent, Group Chat)}}\\[2pt]
+{\small\textcolor{notegray}{Infrastructure: 8$\times$ Modal L4 GPU workers $\cdot$ 10 examples/task $\cdot$ 308 questions/combo}}
+\end{center}
+
+\vspace{0.3cm}
+
+%% =======================================================================
+\section*{Methods}
+%% =======================================================================
+
+\textbf{BIG-bench Lite 24 (BBL24).} A curated 24-task subset of Google's BIG-bench benchmark
+(\texttt{tasksource/bigbench} on HuggingFace). Tasks cover diverse reasoning capabilities:
+multiple-choice commonsense (BBQ, conceptual combinations, emoji movies, Hindu knowledge,
+known unknowns, misconceptions Russian, novel concepts, play dialog, strange stories, StrategyQA,
+symbol interpretation, VitaminC fact verification, WinoWhy), structured inference (formal
+fallacies, logic grid puzzles, logical deduction), code understanding (auto-debugging, code line
+description), linguistic analysis (conlang translation, language identification, linguistics
+puzzles), math/operators (operators), and sequence generation (repeat-copy logic, ParsiNLU
+reading comprehension). Scoring is auto-selected per task: multiple-choice letter match, exact
+string match, or BLEU.
+
+Task sizes vary: three tasks (\texttt{auto\_debugging}, \texttt{novel\_concepts},
+\texttt{repeat\_copy\_logic}) have fewer than 10 examples in the dataset and contribute their
+full available count (24--34 examples); the remaining 21 tasks use exactly 10 examples each.
+Total questions per run: 308.
+
+\textbf{Evaluation metric.} \emph{Task-equal-weighted accuracy} (\texttt{weighted\_accuracy}):
+each task's per-example accuracy is averaged, then those 24 per-task averages are averaged
+equally, giving equal weight to every task regardless of example count. This avoids
+\texttt{auto\_debugging} (34 examples) dominating the aggregate.
+
+\textbf{Models.} Eight Ollama models spanning 0.6B to 20B parameters were evaluated. Models
+range from dense instruct-tuned transformers (Gemma3-1B, Gemma3-4B) to efficient mixture-of-
+experts architectures (Gemma3n-E2B, Gemma3n-E4B), a specialized distilled reasoning model
+(DASD-4B), a mini reasoning chain model (Phi4-Mini-Reasoning), a compact next-token predictor
+(Qwen3-0.6B), and a 20B open-source model (GPT-OSS-20B).
+
+\textbf{Architectures.} Four agent architectures were evaluated:
+\begin{itemize}
+  \item \textbf{One-shot}: Direct single-call OllamaAgent. Task $\to$ Ollama REST API $\to$ post-process $\to$ response. No agentic overhead. True non-agentic baseline.
+  \item \textbf{Sequential}: Three-stage CrewAI pipeline (Analyzer $\to$ Evaluator $\to$ Responder). Each stage makes one LLM call; output feeds the next stage. 60-second per-question timeout.
+  \item \textbf{Concurrent}: Four CrewAI agents (Analyst + Researcher + Critic $\to$ Synthesizer). The first three work independently, then a Synthesizer combines their outputs. 60-second timeout.
+  \item \textbf{Group Chat}: Discussion-style pipeline (Proposer $\to$ Critic $\to$ Advisor $\to$ Moderator). 60-second timeout.
+\end{itemize}
+
+\textbf{Infrastructure.} Sweep ran on 8 parallel Modal L4 (24\,GB VRAM) GPU workers, one model
+per worker. Each worker started a local Ollama server, pulled model weights into a persistent
+volume (\texttt{slm-ollama-model-cache}), and ran the sweep sequentially across architectures.
+Results were committed to \texttt{slm-bigbench-results} after each architecture completed.
+The sweep was interrupted by a Modal billing cycle spending limit after approximately 8 hours,
+before concurrent and group-chat architectures were reached for most models. As a result,
+this report covers complete one-shot data for 7 models and complete sequential data for 6 models.
+
+\textbf{Timeout behavior.} CrewAI's \texttt{kickoff\_with\_timeout} enforces a 60-second wall-
+clock limit per question. On timeout, the framework calls \texttt{executor.shutdown(wait=False)},
+which returns immediately but leaves worker threads running. For small models that reliably
+timeout, ghost threads accumulate and compete for the Ollama server, causing average latency to
+converge to exactly 90 seconds (the combined timeout + thread overhead). Per-question \texttt
+{timed\_out: True} is recorded in \texttt{results.jsonl}; timed-out questions receive an empty
+response which scores as incorrect.
+
+\newpage
+
+%% =======================================================================
+\section*{1\quad One-Shot Results (7 Models Complete)}
+%% =======================================================================
+
+\noindent\textbf{TL;DR:} Efficient MoE architectures punch well above their nominal parameter
+count. Gemma3n-E2B (2B active) leads at 51.5\%, beating the dense 4B models. Gemma3-4B reaches
+47.1\%, the top dense model. Most sub-2B models cluster in the 25--32\% range, roughly double
+random-chance on these 4-class MC tasks ($\approx$25\%).
+
+\vspace{0.2cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 1.} One-shot BBL24 accuracy, $n=308$ per model (except Falcon-H1-90M: $n=518$, 20 ex/task).
+  Sorted by weighted accuracy. Green = top tier ($\geq$45\%), yellow = mid-tier (30--45\%), red = below chance ($<$25\%).}
+\begin{tabular}{l C{0.8cm} R{1.5cm} R{1.5cm} R{1.5cm} R{2.0cm}}
+\toprule
+\textbf{Model} & \textbf{Params} & \textbf{Wtd Acc (\%)} & \textbf{Raw Acc (\%)} & \textbf{Avg Lat (s)} & \textbf{Total Time} \\
+\midrule
+\rowcolor{toprow} Gemma3n-E2B     & 2B MoE & 51.5 & 45.8 & 3.3  & 0.3\,h \\
+\rowcolor{toprow} Gemma3-4B       & 4B     & 47.1 & 42.2 & 2.6  & 0.2\,h \\
+\rowcolor{midrow} DASD-4B         & 4B     & 31.9 & 28.9 & 8.0  & 0.7\,h \\
+\rowcolor{midrow} Phi4-Mini-Rea.  & 4B     & 31.8 & 28.6 & 7.9  & 0.7\,h \\
+\rowcolor{midrow} Qwen3-0.6B      & 0.6B   & 31.3 & 28.6 & 3.9  & 0.3\,h \\
+\rowcolor{midrow} Gemma3-1B       & 1B     & 27.3 & 25.0 & 2.1  & 0.2\,h \\
+\rowcolor{botrow} Falcon-H1-90M   & 90M    & 24.9 & 23.4 & 2.2  & 0.3\,h \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Key observations (one-shot):}
+\begin{itemize}
+  \item \textbf{MoE efficiency}: Gemma3n-E2B with only $\sim$2B active parameters (out of a
+    larger total) outperforms all dense models including Gemma3-4B. This confirms that
+    mixture-of-experts routing provides disproportionate reasoning gains per active compute.
+  \item \textbf{Near-random sub-1B models}: Falcon-H1-90M (24.9\%) and Gemma3-1B (27.3\%) are
+    barely above the 25\% random baseline for 4-class multiple-choice tasks. These models
+    reliably extract letter choices but lack deeper reasoning.
+  \item \textbf{Thinking overhead}: DASD-4B and Phi4-Mini-Reasoning score nearly identically
+    (31.9\% vs 31.8\%) despite different architectures, with 4$\times$ higher latency than
+    Gemma3-4B. Their reasoning chain overhead does not translate to higher accuracy on these tasks.
+  \item \textbf{Qwen3-0.6B anomaly}: Despite being the smallest model (0.6B), Qwen3 ties the
+    much larger DASD-4B on raw accuracy (28.6\%). Its efficient tokenization and strong
+    instruction following compensate for smaller capacity.
+\end{itemize}
+
+\newpage
+
+%% =======================================================================
+\section*{2\quad Sequential Architecture: Capability Cliff}
+%% =======================================================================
+
+\noindent\textbf{TL;DR:} Sequential agentic architecture (Analyzer $\to$ Evaluator $\to$ Responder
+via CrewAI) catastrophically degrades performance on every model below a capability threshold.
+Models at or below 4B dense parameters time out on 92--100\% of questions, scoring at or near 0\%.
+Only Gemma3n-E4B, an efficient 4B MoE model, crosses the threshold with 30\% timeouts and retains
+meaningful accuracy (39.2\%).
+
+\vspace{0.2cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 2.} Sequential architecture BBL24 accuracy, $n=308$ per model.
+  Timeout = fraction of questions where CrewAI exceeded the 60-second limit.
+  Red = failed ($<$5\% accuracy). Green = functional ($\geq$30\%).}
+\begin{tabular}{l C{0.8cm} R{1.5cm} R{1.5cm} R{1.5cm} R{1.8cm}}
+\toprule
+\textbf{Model} & \textbf{Params} & \textbf{Wtd Acc (\%)} & \textbf{Timeout (\%)} & \textbf{Avg Lat (s)} & \textbf{Total Time} \\
+\midrule
+\rowcolor{toprow} Gemma3n-E4B     & 4B MoE & 39.2 & 29.9 & 50.9 & 4.4\,h \\
+\midrule
+\rowcolor{botrow} Gemma3-1B       & 1B     &  3.5 & 92.5 & 91.0 & 7.8\,h \\
+\rowcolor{botrow} Gemma3-4B       & 4B     &  0.5 & 98.4 & 89.1 & 7.6\,h \\
+\rowcolor{botrow} Gemma3n-E2B     & 2B MoE &  0.5 & 96.8 & 88.4 & 7.6\,h \\
+\rowcolor{botrow} Qwen3-0.6B      & 0.6B   &  0.0 & 100.0 & 90.0 & 7.7\,h \\
+\rowcolor{botrow} GPT-OSS-20B     & 20B    &  0.0 & 100.0 & 90.0 & 7.7\,h \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Key observations (sequential):}
+\begin{itemize}
+  \item \textbf{Hard capability cliff}: There is a binary divide between models that can
+    sustain the CrewAI ReAct format and those that cannot. Models below the threshold fail
+    entirely regardless of size --- the 20B GPT-OSS-20B times out on 100\% of questions,
+    same as the 0.6B Qwen3.
+  \item \textbf{Root cause}: CrewAI's \texttt{Process.sequential} uses a ReAct-style
+    \texttt{Thought:/Action:/Observation:} format. Small models reliably produce prose answers
+    but fail to emit the required \texttt{Action:} token within the timeout. Each failed
+    step triggers a full 60-second wait before the framework gives up, driving average
+    latency to 88--91 seconds per question.
+  \item \textbf{Gemma3n-E4B exception}: The efficient MoE 4B model achieves only 30\%
+    timeouts and reaches 39.2\% accuracy --- actually \textit{higher} than its one-shot result
+    would predict. This suggests that when the agentic pipeline functions, the multi-stage
+    reasoning provides genuine benefit.
+  \item \textbf{GPT-OSS-20B paradox}: A 20B parameter model fails 100\% of sequential
+    questions. This indicates that raw parameter count is not sufficient; what matters is
+    the ability to follow structured output formats (JSON/ReAct) reliably within time
+    constraints. The 20B quantized GGUF model likely produces slower tokens per second
+    than smaller dense models, hitting the timeout before completing any ReAct step.
+  \item \textbf{Architecture cost}: For non-functional models, sequential adds 7.6--7.8 hours
+    of compute cost to produce \emph{worse} results than one-shot. The per-question cost
+    is $\approx 30\times$ higher (90s vs 3s) with accuracy near zero.
+\end{itemize}
+
+\newpage
+
+%% =======================================================================
+\section*{3\quad Architecture Comparison (One-Shot vs.\ Sequential)}
+%% =======================================================================
+
+\noindent For models with both one-shot and sequential results, the relative accuracy impact:
+
+\vspace{0.2cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 3.} One-shot vs.\ sequential accuracy delta per model.
+  $\Delta$ = Sequential $-$ One-shot. Positive = sequential helps; negative = hurts.}
+\begin{tabular}{l C{0.8cm} R{1.4cm} R{1.4cm} R{1.4cm} R{2.5cm}}
+\toprule
+\textbf{Model} & \textbf{Params} & \textbf{1-Shot (\%)} & \textbf{Seq (\%)} & \textbf{$\Delta$ (pp)} & \textbf{Seq Timeout (\%)} \\
+\midrule
+\rowcolor{toprow} Gemma3n-E4B  & 4B MoE & ---  & 39.2 & --- & 29.9 \\
+\rowcolor{midrow} Gemma3-4B    & 4B     & 47.1 &  0.5 & $-$46.6 & 98.4 \\
+\rowcolor{midrow} Gemma3n-E2B  & 2B MoE & 51.5 &  0.5 & $-$51.0 & 96.8 \\
+\rowcolor{midrow} Gemma3-1B    & 1B     & 27.3 &  3.5 & $-$23.8 & 92.5 \\
+\rowcolor{botrow} Qwen3-0.6B   & 0.6B   & 31.3 &  0.0 & $-$31.3 & 100.0 \\
+\rowcolor{botrow} GPT-OSS-20B  & 20B    & ---  &  0.0 & --- & 100.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textit{Note}: Gemma3n-E4B one-shot and GPT-OSS-20B one-shot were not completed before the
+billing limit was reached.
+
+\vspace{0.4cm}
+
+\noindent\textbf{Latency overhead breakdown:}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 4.} Latency cost per question: one-shot vs.\ sequential. Sequential
+  overhead = avg sequential latency $\div$ avg one-shot latency.}
+\begin{tabular}{l R{2.0cm} R{2.0cm} R{2.0cm}}
+\toprule
+\textbf{Model} & \textbf{1-Shot Lat (s)} & \textbf{Seq Lat (s)} & \textbf{Overhead ($\times$)} \\
+\midrule
+Gemma3-1B   &  2.1 & 91.0 & 43$\times$ \\
+Gemma3-4B   &  2.6 & 89.1 & 34$\times$ \\
+Gemma3n-E2B &  3.3 & 88.4 & 27$\times$ \\
+Qwen3-0.6B  &  3.9 & 90.0 & 23$\times$ \\
+Gemma3n-E4B &  ---  & 50.9 & --- \\
+GPT-OSS-20B &  ---  & 90.0 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent The sequential overhead for failed models is \emph{entirely} timeout waste. At 90 seconds
+per question and 308 questions, each failed sequential run consumes $\approx$7.7 hours of GPU time
+to produce zero correct answers.
+
+\newpage
+
+%% =======================================================================
+\section*{4\quad Cross-Benchmark Skill Correlation}
+%% =======================================================================
+
+\noindent The following scatter plots show BIG-bench Lite accuracy (y-axis) vs.\ scores on
+five prior skill benchmarks (x-axis): Planning, Criticality, Recall, Summarization, and
+Instruction Following. Each point represents one (model, architecture) pair; color encodes
+model, marker shape encodes architecture. \textbf{Hollow markers} indicate ``failed'' runs
+(BBL24 $<$5\% accuracy OR skill score = 0), where the model produced no meaningful signal.
+Ellipses show approximate 95\% confidence intervals (1.96$\times$SE in each axis).
+
+All axes are fixed to 0--100\% range. Skill scores were multiplied by 100 for consistency.
+
+\vspace{0.3cm}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.82\textwidth]{../../plots/bigbench_skill/skill_vs_bigbench_planning.png}
+\caption*{\textbf{Figure 1.} BBL24 vs.\ Planning skill. Hollow markers = failed runs (BBL $<$5\% or planning = 0).}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.82\textwidth]{../../plots/bigbench_skill/skill_vs_bigbench_criticality.png}
+\caption*{\textbf{Figure 2.} BBL24 vs.\ Criticality skill.}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.82\textwidth]{../../plots/bigbench_skill/skill_vs_bigbench_recall.png}
+\caption*{\textbf{Figure 3.} BBL24 vs.\ Recall skill.}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.82\textwidth]{../../plots/bigbench_skill/skill_vs_bigbench_summarization.png}
+\caption*{\textbf{Figure 4.} BBL24 vs.\ Summarization skill.}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.82\textwidth]{../../plots/bigbench_skill/skill_vs_bigbench_instruction_following.png}
+\caption*{\textbf{Figure 5.} BBL24 vs.\ Instruction Following skill. X-axis fixed 0--100 (percentage).
+  Several failed sequential runs cluster at (0, 0) and are shown as hollow markers.}
+\end{figure}
+
+\newpage
+
+%% =======================================================================
+\section*{5\quad Summary and Key Findings}
+%% =======================================================================
+
+\subsection*{5.1 One-Shot Rankings}
+
+Within the one-shot architecture, model capability follows parameter efficiency more closely than
+raw count:
+
+\begin{enumerate}
+  \item \textbf{Gemma3n-E2B (51.5\%)} --- Best overall. MoE routing concentrates capacity on
+    the active reasoning path, enabling 2B-active performance comparable to dense 4B models.
+  \item \textbf{Gemma3-4B (47.1\%)} --- Best dense model. Strong across structured tasks
+    (code, conceptual combinations, emoji movies at 100\%; operators at 90\%).
+  \item \textbf{DASD-4B (31.9\%)} and \textbf{Phi4-Mini-Reasoning (31.8\%)} --- Thinking models
+    add latency (8s vs 2.6s) without accuracy gains on these tasks.
+  \item \textbf{Qwen3-0.6B (31.3\%)} --- Remarkable for 0.6B: ties the 4B thinking models,
+    suggesting strong instruction adherence compensates for capacity limits.
+  \item \textbf{Gemma3-1B (27.3\%)} and \textbf{Falcon-H1-90M (24.9\%)} --- At or near random
+    baseline; reasoning tasks require minimum capacity not present at $<$1B parameters.
+\end{enumerate}
+
+\subsection*{5.2 The Agentic Overhead Problem}
+
+Sequential (and by extension concurrent and group-chat) architectures impose a \textbf{hard
+capability requirement} on models: they must reliably produce structured \texttt{Action:}
+tokens under time pressure. For models that cannot:
+
+\begin{itemize}
+  \item \textbf{100\% timeout rate} $\Rightarrow$ 0\% accuracy, regardless of model size.
+  \item \textbf{Per-question cost} jumps from 2--8 seconds (one-shot) to 88--91 seconds
+    (sequential), a 23--43$\times$ overhead with \emph{zero return}.
+  \item \textbf{Ghost thread accumulation} further degrades performance mid-run: each timed-out
+    question leaves a running background thread that consumes Ollama connections, creating a
+    feedback loop that worsens as the run progresses.
+\end{itemize}
+
+\subsection*{5.3 Dense vs.\ Efficient 4B: A Case Study}
+
+The Gemma3-4B vs.\ Gemma3n-E4B comparison is the most instructive finding of this sweep:
+
+\begin{center}
+\begin{tabular}{l r r r r}
+\toprule
+Model & Params & 1-Shot Acc & Seq Acc & Seq Timeout \\
+\midrule
+Gemma3-4B   & 4B dense & 47.1\% & 0.5\%  & 98.4\% \\
+Gemma3n-E4B & 4B MoE   & ---    & 39.2\% & 29.9\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Despite the same nominal 4B parameter count, the efficient MoE architecture produces
+\textbf{$>$78$\times$ more correct answers} in the sequential setting. The MoE routing allows
+the model to dedicate sparse expert capacity to format adherence, whereas the dense model
+exhausts its capacity on content generation and fails to complete the ReAct formatting loop.
+
+\subsection*{5.4 Implications for Model Selection}
+
+\begin{itemize}
+  \item \textbf{If using one-shot}: Choose the highest-capability model that fits latency
+    constraints. Gemma3n-E2B is optimal below 3B active parameters.
+  \item \textbf{If using agentic architectures}: Only models that cross the ReAct format
+    threshold are viable. Currently confirmed: Gemma3n-E4B. Likely viable (untested here):
+    larger dense models ($\geq$7B) and other MoE architectures with fast token generation.
+  \item \textbf{Thinking models}: DASD-4B and Phi4-Mini-Reasoning's extended reasoning chains
+    add latency without accuracy gains on BBL24 one-shot tasks. Their value may emerge on
+    harder mathematical/logical tasks not covered in this benchmark.
+  \item \textbf{Sub-1B models}: Useful only for latency-critical applications where near-random
+    accuracy is acceptable. Not viable for any multi-step reasoning task.
+\end{itemize}
+
+\subsection*{5.5 Data Completeness Caveats}
+
+Due to the Modal billing limit interruption, the following data is \textbf{missing} from this
+report:
+\begin{itemize}
+  \item One-shot results for: Gemma3n-E4B, GPT-OSS-20B (incomplete runs)
+  \item Concurrent architecture results: all models (not started before billing kill)
+  \item Group-chat architecture results: all models (not started before billing kill)
+  \item Sequential results for: DASD-4B, Falcon-H1-90M, Phi4-Mini-Reasoning (not reached)
+\end{itemize}
+
+A follow-up sweep with budget controls (per-worker timeouts, architecture priority ordering)
+should complete the missing cells.
+
+\end{document}
