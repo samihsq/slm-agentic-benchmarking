@@ -375,6 +375,7 @@ class BigBenchRunner:
             trace_ctx.trace.total_latency = latency
             trace_ctx.trace.total_cost = cost
             trace_ctx.trace.reasoning = response.reasoning or ""
+            trace_ctx.trace.timed_out = bool(meta.get("timed_out", False))
 
             with self._lock:
                 self._total_count += 1
@@ -441,6 +442,7 @@ class BigBenchRunner:
                         "score": result.score,
                         "latency": round(result.latency or 0, 2),
                         "cost": round(result.cost or 0, 6),
+                        "timed_out": bool((metadata.get("trace") and getattr(metadata["trace"], "timed_out", False)) or False),
                     })
                     + "\n"
                 )

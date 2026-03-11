@@ -8,7 +8,7 @@ combines their outputs into a final response.
 from typing import Optional, Dict, Any, List
 
 from crewai import Agent, Task, Crew, Process
-from .base_agent import BaseAgent, BenchmarkResponse
+from .base_agent import BaseAgent, BenchmarkResponse, kickoff_with_timeout
 from ..config import get_llm
 from ..utils.trace import TraceCapture
 
@@ -60,6 +60,7 @@ class ConcurrentAgent(BaseAgent):
             backstory=analyst_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
         self.researcher = Agent(
@@ -68,6 +69,7 @@ class ConcurrentAgent(BaseAgent):
             backstory=researcher_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
         self.critic = Agent(
@@ -76,6 +78,7 @@ class ConcurrentAgent(BaseAgent):
             backstory=critic_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
         self.synthesizer = Agent(
@@ -84,6 +87,7 @@ class ConcurrentAgent(BaseAgent):
             backstory=synthesizer_prompt,
             llm=self.llm,
             verbose=self.verbose,
+            max_iter=1,
         )
 
     def respond_to_task(
@@ -147,10 +151,12 @@ Based on the analysis, research, and critical review, generate your final respon
             tasks=[analyze, research, critique, synthesize],
             process=Process.sequential,  # CrewAI handles concurrent via context
             verbose=self.verbose,
+            max_execution_time=600,
         )
 
-        result = crew.kickoff()
-        response = self.parse_json_response(str(result))
+        result, timed_out = kickoff_with_timeout(crew)
+        result_str = "" if timed_out else str(result)
+        response = self.parse_json_response(result_str)
         
         # Capture the parallel agent outputs
         task_descriptions = [
@@ -184,6 +190,7 @@ Based on the analysis, research, and critical review, generate your final respon
         if response.metadata is None:
             response.metadata = {}
         response.metadata["parallel_outputs"] = parallel_outputs
+        response.metadata["timed_out"] = timed_out
 
         self.add_to_history(
             task=task,

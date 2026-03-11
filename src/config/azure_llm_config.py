@@ -273,7 +273,9 @@ def get_llm_config(model_name: Optional[str] = None) -> Dict[str, Any]:
 
     # Add Azure AI Foundry configuration
     config["azure_api_key"] = os.getenv("AZURE_API_KEY")
-    config["azure_endpoint"] = os.getenv(
+    # Per-model endpoint takes priority (for dedicated managed online endpoints).
+    # Falls back to the shared serverless endpoint env var.
+    config["azure_endpoint"] = config.get("azure_endpoint") or os.getenv(
         "AZURE_AI_ENDPOINT",
         "https://SLM-Bench-CS199-Winter-26.openai.azure.com/openai/v1"
     )
@@ -288,9 +290,10 @@ def get_llm_config(model_name: Optional[str] = None) -> Dict[str, Any]:
 
 
 def get_llm(
-    model_name: Optional[str] = None, 
-    temperature: float = 0.7, 
-    max_tokens: int = 4096
+    model_name: Optional[str] = None,
+    temperature: float = 0.7,
+    max_tokens: int = 4096,
+    timeout: int = 120,
 ) -> LLM:
     """
     Create a CrewAI LLM instance configured for Azure AI.
@@ -301,6 +304,7 @@ def get_llm(
         model_name: Name of the model
         temperature: Sampling temperature
         max_tokens: Maximum output tokens
+        timeout: HTTP timeout in seconds (prevents hung Azure calls)
 
     Returns:
         Configured LLM instance
@@ -312,6 +316,7 @@ def get_llm(
         "model": config["model"],
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "timeout": timeout,
     }
 
     # Azure AI Foundry (OpenAI-compatible endpoint)

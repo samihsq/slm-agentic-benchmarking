@@ -9,7 +9,7 @@ from typing import Optional, Dict, Any
 
 from crewai import Agent, Task, Crew, Process, LLM
 
-from .base_agent import BaseAgent, BenchmarkResponse
+from .base_agent import BaseAgent, BenchmarkResponse, kickoff_with_timeout
 from ..config.azure_llm_config import OLLAMA_MODELS
 from ..utils.trace import TraceCapture
 
@@ -105,9 +105,10 @@ class OllamaSequentialAgent(BaseAgent):
             tasks=[analyze_task, evaluate_task, respond_task],
             process=Process.sequential,
             verbose=self.verbose,
+            max_execution_time=60,
         )
-        result = crew.kickoff()
-        response = self.parse_json_response(str(result))
+        result, timed_out = kickoff_with_timeout(crew)
+        response = self.parse_json_response("" if timed_out else str(result))
 
         for task_obj in [analyze_task, evaluate_task, respond_task]:
             task_output = getattr(task_obj, "output", None)
@@ -120,6 +121,7 @@ class OllamaSequentialAgent(BaseAgent):
 
         if response.metadata is None:
             response.metadata = {}
+        response.metadata["timed_out"] = timed_out
         self.add_to_history(task=task, response=response.response, reasoning=response.reasoning, success=response.success)
         return response
 
@@ -211,9 +213,10 @@ class OllamaConcurrentAgent(BaseAgent):
             tasks=[analyze, research, critique, synthesize],
             process=Process.sequential,
             verbose=self.verbose,
+            max_execution_time=60,
         )
-        result = crew.kickoff()
-        response = self.parse_json_response(str(result))
+        result, timed_out = kickoff_with_timeout(crew)
+        response = self.parse_json_response("" if timed_out else str(result))
 
         for task_obj in [analyze, research, critique, synthesize]:
             task_output = getattr(task_obj, "output", None)
@@ -226,6 +229,7 @@ class OllamaConcurrentAgent(BaseAgent):
 
         if response.metadata is None:
             response.metadata = {}
+        response.metadata["timed_out"] = timed_out
         self.add_to_history(task=task, response=response.response, reasoning=response.reasoning, success=response.success)
         return response
 
@@ -319,9 +323,10 @@ class OllamaGroupChatAgent(BaseAgent):
             tasks=[propose, critique, advise, moderate],
             process=Process.sequential,
             verbose=self.verbose,
+            max_execution_time=60,
         )
-        result = crew.kickoff()
-        response = self.parse_json_response(str(result))
+        result, timed_out = kickoff_with_timeout(crew)
+        response = self.parse_json_response("" if timed_out else str(result))
 
         for task_obj in [propose, critique, advise, moderate]:
             task_output = getattr(task_obj, "output", None)
@@ -334,5 +339,6 @@ class OllamaGroupChatAgent(BaseAgent):
 
         if response.metadata is None:
             response.metadata = {}
+        response.metadata["timed_out"] = timed_out
         self.add_to_history(task=task, response=response.response, reasoning=response.reasoning, success=response.success)
         return response
