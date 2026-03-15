@@ -34,11 +34,12 @@ ENV/
 *~
 
 # Results and logs
-results/
 plots/
-*.json
 cost_tracking.json
 *.log
+
+# Per-question LLM call traces (heavy; stored in GitHub release instead)
+results/**/trace.json
 
 # Environment variables
 .env
@@ -67,6 +68,3 @@ models/*.gguf
 # PlanBench vendored generated outputs (keep prompts/ for pre-generated if needed)
 benchmarks/plan_bench/responses/
 benchmarks/plan_bench/results/
-
-.claude/
-CLAUDE.md
