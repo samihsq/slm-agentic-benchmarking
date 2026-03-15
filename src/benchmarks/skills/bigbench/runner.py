@@ -250,6 +250,8 @@ class BigBenchRunner:
             if i != -1:
                 try:
                     obj = json.loads(text[i:].split("\n")[0].strip().rstrip(";"))
+                    if not isinstance(obj, dict):
+                        continue
                     ans = obj.get("answer") or obj.get("response") or obj.get("choice")
                     if ans is not None:
                         ans = str(ans).strip().upper()
@@ -279,6 +281,8 @@ class BigBenchRunner:
             if i != -1:
                 try:
                     obj = json.loads(text[i:].split("\n")[0].strip().rstrip(";"))
+                    if not isinstance(obj, dict):
+                        continue
                     ans = obj.get("answer") or obj.get("response")
                     if ans is not None:
                         return str(ans).strip()
