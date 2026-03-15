@@ -1,0 +1,211 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+\definecolor{toprow}{HTML}{E8F5E9}
+\definecolor{midrow}{HTML}{FFF8E1}
+\definecolor{botrow}{HTML}{FFEBEE}
+\definecolor{hdrblue}{HTML}{1565C0}
+\definecolor{notegray}{HTML}{757575}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{notegray}{\small February 18, 2026}}
+\lhead{\textcolor{notegray}{\small SLM Agentic Benchmarking}}
+\cfoot{\thepage}
+
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+\begin{document}
+
+\begin{center}
+{\LARGE \textbf{SLM Agentic Benchmark Results}}\\[4pt]
+{\large February 18, 2026}\\[6pt]
+{\small\textcolor{notegray}{Benchmarks: Matrix Recall $\cdot$ Word Instruction Following}}\\[2pt]
+{\small\textcolor{notegray}{Agents: OneShotAgent (Azure) $\cdot$ OllamaAgent (Local)}}\\[2pt]
+{\small\textcolor{red}{\textbf{Note:} Some runs still in progress---see $n$ column for sample sizes. Models with $n < 10$ had API failures.}}
+\end{center}
+
+\vspace{0.4cm}
+
+\section*{1\quad Matrix Recall --- Standard (10$\times$10)}
+
+Tasks present a randomly generated 10$\times$10 integer matrix and ask the model to extract specific values via natural language queries. Difficulties span easy (single cell), medium (row/column), and hard (submatrix/diagonal) extractions. Accuracy = exact match of all requested values.
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 1.} Matrix Recall --- Standard (10$\times$10, mixed difficulty)}
+\begin{tabular}{l R{1.1cm} R{1.6cm} R{2.6cm} l}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{Acc.\ (\%)} & \textbf{95\% CI} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} dasd-4b             & 50 & 100.0 & [92.9, 100.0] & Ollama \\
+\rowcolor{toprow} gpt-oss-20b         & 50 & 100.0 & [92.9, 100.0] & Ollama \\
+\rowcolor{toprow} deepseek-v3.2       & 50 &  98.0 & [89.5, 99.6]  & Azure \\
+\rowcolor{toprow} gpt-4o              & 50 &  98.0 & [89.5, 99.6]  & Azure \\
+mistral-large-3     & 50 &  92.0 & [81.2, 96.8]  & Azure \\
+mistral-small       & 50 &  92.0 & [81.2, 96.8]  & Azure \\
+phi-4               & 50 &  90.0 & [78.6, 95.7]  & Azure \\
+phi4-mini-reasoning & 50 &  88.0 & [76.2, 94.4]  & Ollama \\
+gemma3n-e4b         & 50 &  78.0 & [64.8, 87.2]  & Ollama \\
+phi-4-mini-reasoning& 50 &  66.0 & [52.2, 77.6]  & Azure \\
+gemma3-4b           & 50 &  62.0 & [48.2, 74.1]  & Ollama \\
+gemma3n-e2b         & 50 &  60.0 & [46.2, 72.4]  & Ollama \\
+ministral-3b        & 50 &  50.0 & [36.6, 63.4]  & Azure \\
+qwen3-0.6b          & 50 &  48.0 & [34.8, 61.5]  & Ollama \\
+\rowcolor{botrow} deepseek-r1        & 50 &  12.0 & [5.6, 23.8]   & Azure \\
+\rowcolor{botrow} deepseek-v3        & 50 &  12.0 & [5.6, 23.8]   & Azure \\
+\rowcolor{botrow} gemma3-1b          & 50 &   6.0 & [2.1, 16.2]   & Ollama \\
+\rowcolor{botrow} falcon-h1-90m      & 50 &   4.0 & [1.1, 13.5]   & Ollama \\
+\rowcolor{botrow} phi-4-mini         & 50 &   0.0 & [0.0, 7.1]    & Azure \\
+\midrule
+\multicolumn{5}{l}{\textcolor{notegray}{\footnotesize Models below had API failures ($n < 10$); results not meaningful:}} \\
+\rowcolor{botrow} llama-3.2-11b-vision& 1 &  0.0 & [0.0, 79.3]   & Azure \\
+\rowcolor{botrow} llama-3.3-70b       & 1 &  0.0 & [0.0, 79.3]   & Azure \\
+\rowcolor{botrow} mistral-nemo        & 1 &  0.0 & [0.0, 79.3]   & Azure \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\section*{2\quad Matrix Recall --- X-Hard (15$\times$15)}
+
+The x-hard tier uses 15$\times$15 matrices with more complex extraction patterns: 5--8 scattered cells, 4$\times$4 / 5$\times$5 submatrices, dual rows, and cross-row-column queries. Designed to differentiate models that scored $\geq$98\% on the standard tier.
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 2.} Matrix Recall --- X-Hard (15$\times$15, x-hard only)}
+\begin{tabular}{l R{1.1cm} R{1.6cm} R{2.6cm} l}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{Acc.\ (\%)} & \textbf{95\% CI} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} gpt-oss-20b         & 50 & 100.0 & [92.9, 100.0] & Ollama \\
+\rowcolor{toprow} deepseek-v3.2       & 50 &  84.0 & [71.5, 91.7]  & Azure \\
+\rowcolor{toprow} gpt-4o              & 50 &  82.0 & [69.2, 90.2]  & Azure \\
+mistral-large-3     & 50 &  68.0 & [54.2, 79.2]  & Azure \\
+dasd-4b             & 50 &  58.0 & [44.2, 70.6]  & Ollama \\
+phi-4               & 50 &  40.0 & [27.6, 53.8]  & Azure \\
+mistral-small       & 50 &  34.0 & [22.4, 47.8]  & Azure \\
+\rowcolor{midrow} qwen3-0.6b          & 50 &  10.0 & [4.3, 21.4]   & Ollama \\
+\rowcolor{botrow} ministral-3b        & 50 &   4.0 & [1.1, 13.5]   & Azure \\
+\rowcolor{botrow} falcon-h1-90m       & 50 &   0.0 & [0.0, 7.1]    & Ollama \\
+\rowcolor{botrow} gemma3-1b           & 50 &   0.0 & [0.0, 7.1]    & Ollama \\
+\rowcolor{botrow} gemma3-4b           & 50 &   0.0 & [0.0, 7.1]    & Ollama \\
+\rowcolor{botrow} gemma3n-e2b         & 50 &   0.0 & [0.0, 7.1]    & Ollama \\
+\rowcolor{botrow} gemma3n-e4b         & 50 &   0.0 & [0.0, 7.1]    & Ollama \\
+\rowcolor{botrow} phi4-mini-reasoning & 50 &   0.0 & [0.0, 7.1]    & Ollama \\
+\midrule
+\multicolumn{5}{l}{\textcolor{notegray}{\footnotesize Azure models with persistent API errors (not included):}} \\
+\multicolumn{5}{l}{\textcolor{notegray}{\footnotesize deepseek-r1, deepseek-v3, phi-4-mini, phi-4-mini-reasoning}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}
+
+\section*{3\quad Word Instruction Following}
+
+Models receive a list of words and must follow a sequence of 30 transformation instructions (reverse, sort, remove, insert, swap, etc.). Score = fraction of instructions executed correctly. List sizes range from 1 to 10 words, with 10 rollouts per size (total 100 per model on Ollama, 200 on Azure).
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 3.} Word Instruction Following (mean score across rollouts)}
+\begin{tabular}{l R{1.1cm} R{1.6cm} R{2.6cm} R{1.3cm} l}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{Score (\%)} & \textbf{95\% CI} & \textbf{SR (\%)} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} dasd-4b             & 100 &  97.1 & [91.7, 99.0]  & 100 & Ollama \\
+\rowcolor{toprow} gpt-4o              & 200 &  85.8 & [80.2, 89.9]  & 100 & Azure \\
+\rowcolor{toprow} mistral-large-3     & 200 &  79.7 & [73.6, 84.7]  & 100 & Azure \\
+phi-4               & 200 &  76.2 & [69.8, 81.6]  & 100 & Azure \\
+mistral-small       & 200 &  75.9 & [69.5, 81.3]  & 100 & Azure \\
+ministral-3b        & 200 &  59.4 & [52.5, 66.0]  & 100 & Azure \\
+\rowcolor{midrow} gemma3-4b           &  96 &  58.9 & [48.9, 68.2]  & 100 & Ollama \\
+qwen3-0.6b          & 100 &  22.2 & [15.2, 31.3]  & 100 & Ollama \\
+gemma3-1b           & 100 &  20.8 & [14.0, 29.8]  & 100 & Ollama \\
+\rowcolor{botrow} falcon-h1-90m      & 100 &   9.5 & [5.2, 16.8]   &  94 & Ollama \\
+\midrule
+\multicolumn{6}{l}{\textcolor{notegray}{\footnotesize SR = Success Rate (produced parseable output).}} \\
+\multicolumn{6}{l}{\textcolor{notegray}{\footnotesize Models below had API failures ($n \leq 1$); results not meaningful:}} \\
+llama-3.3-70b       &   1 &   6.7 & [0.1, 82.0]   & 100 & Azure \\
+deepseek-v3.2       &   1 &   0.0 & [0.0, 79.3]   &   0 & Azure \\
+llama-3.2-11b-vision&   1 &   0.0 & [0.0, 79.3]   &   0 & Azure \\
+phi-4-mini-reasoning&   1 &   0.0 & [0.0, 79.3]   &   0 & Azure \\
+phi-4-mini          &   1 &   0.0 & [0.0, 79.3]   &   0 & Azure \\
+\midrule
+\multicolumn{6}{l}{\textcolor{notegray}{\footnotesize Still running: gemma3n-e2b, gemma3n-e4b, gpt-oss-20b, phi4-mini-reasoning (Ollama)}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\section*{4\quad Cross-Benchmark Summary}
+
+Combined view of models with $\geq$50 samples on at least two benchmarks. Only meaningful results included (API-failure models excluded).
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 4.} Cross-benchmark comparison (models with sufficient data)}
+\begin{tabular}{l R{2.0cm} R{2.0cm} R{2.0cm} l}
+\toprule
+\textbf{Model} & \textbf{MR Std} & \textbf{MR X-Hard} & \textbf{WIF} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} gpt-oss-20b         & 100.0 & 100.0 &  ---$^{*}$ & Ollama \\
+\rowcolor{toprow} gpt-4o              &  98.0 &  82.0 & 85.8 & Azure \\
+\rowcolor{toprow} deepseek-v3.2       &  98.0 &  84.0 &  ---$^{\dag}$ & Azure \\
+\rowcolor{toprow} dasd-4b             & 100.0 &  58.0 & 97.1 & Ollama \\
+mistral-large-3     &  92.0 &  68.0 & 79.7 & Azure \\
+phi-4               &  90.0 &  40.0 & 76.2 & Azure \\
+mistral-small       &  92.0 &  34.0 & 75.9 & Azure \\
+phi4-mini-reasoning &  88.0 &   0.0 &  ---$^{*}$ & Ollama \\
+gemma3n-e4b         &  78.0 &   0.0 &  ---$^{*}$ & Ollama \\
+gemma3-4b           &  62.0 &   0.0 & 58.9 & Ollama \\
+gemma3n-e2b         &  60.0 &   0.0 &  ---$^{*}$ & Ollama \\
+ministral-3b        &  50.0 &   4.0 & 59.4 & Azure \\
+qwen3-0.6b          &  48.0 &  10.0 & 22.2 & Ollama \\
+gemma3-1b           &   6.0 &   0.0 & 20.8 & Ollama \\
+falcon-h1-90m       &   4.0 &   0.0 &  9.5 & Ollama \\
+phi-4-mini          &   0.0 &  --- &  ---$^{\dag}$ & Azure \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize
+$^{*}$ Still running \quad
+$^{\dag}$ API failures ($n \leq 1$) \quad
+--- = insufficient data \\
+MR Std = Matrix Recall 10$\times$10 \quad MR X-Hard = Matrix Recall 15$\times$15 \quad WIF = Word Instruction Following
+}
+\end{table}
+
+\vspace{0.5cm}
+
+\section*{Methodology Notes}
+
+\begin{itemize}
+\item \textbf{Confidence intervals}: Wilson score intervals at 95\% confidence level, appropriate for binomial proportions near 0 or 1.
+\item \textbf{Matrix Recall}: Each task generates a fresh random matrix with labeled rows/columns. The model must return exact integer values in JSON format. Partial credit is not given.
+\item \textbf{Word Instruction Following}: Score is the mean fraction of 30 sequential word-list instructions executed correctly per rollout. Wilson CI applied to the per-rollout mean score.
+\item \textbf{API failures}: Several Azure-hosted models (deepseek-r1, deepseek-v3, phi-4-mini, phi-4-mini-reasoning, llama variants, mistral-nemo) experienced persistent rate-limit or authentication errors, resulting in $n \leq 1$. These are excluded from substantive analysis.
+\item \textbf{Ollama models}: Run locally with concurrency 1--8 depending on model size. No API cost.
+\item \textbf{In-progress runs}: Ollama WIF is still completing for gemma3n-e2b, gemma3n-e4b, gpt-oss-20b, and phi4-mini-reasoning. Results will be updated.
+\end{itemize}
+
+\end{document}

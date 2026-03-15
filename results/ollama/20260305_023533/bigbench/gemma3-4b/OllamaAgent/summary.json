@@ -1,0 +1,45 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gemma3:4b",
+  "benchmark": "BIG-bench",
+  "task_configs": [
+    "logical_deduction",
+    "navigate",
+    "penguins_in_a_table",
+    "causal_judgment",
+    "date_understanding",
+    "arithmetic"
+  ],
+  "accuracy": 0.0,
+  "num_tasks": 6,
+  "total_latency_seconds": 101.46352171897888,
+  "avg_latency_seconds": 16.910586953163147,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260305_023533/bigbench/gemma3-4b/OllamaAgent",
+  "breakdown_by_config": {
+    "logical_deduction": {
+      "correct": 0,
+      "total": 1
+    },
+    "navigate": {
+      "correct": 0,
+      "total": 1
+    },
+    "causal_judgment": {
+      "correct": 0,
+      "total": 1
+    },
+    "penguins_in_a_table": {
+      "correct": 0,
+      "total": 1
+    },
+    "arithmetic": {
+      "correct": 0,
+      "total": 1
+    },
+    "date_understanding": {
+      "correct": 0,
+      "total": 1
+    }
+  }
+}

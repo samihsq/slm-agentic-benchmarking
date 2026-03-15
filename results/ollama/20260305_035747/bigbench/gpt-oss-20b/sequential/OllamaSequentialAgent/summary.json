@@ -1,0 +1,45 @@
+{
+  "agent": "OllamaSequentialAgent",
+  "model": "gpt-oss-20b",
+  "benchmark": "BIG-bench",
+  "task_configs": [
+    "logical_deduction",
+    "navigate",
+    "penguins_in_a_table",
+    "causal_judgment",
+    "date_understanding",
+    "arithmetic"
+  ],
+  "accuracy": 0.8659217877094972,
+  "num_tasks": 180,
+  "total_latency_seconds": 81780.26937651634,
+  "avg_latency_seconds": 454.3348298695352,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260305_035747/bigbench/gpt-oss-20b/sequential/OllamaSequentialAgent",
+  "breakdown_by_config": {
+    "logical_deduction": {
+      "correct": 27,
+      "total": 29
+    },
+    "navigate": {
+      "correct": 25,
+      "total": 30
+    },
+    "penguins_in_a_table": {
+      "correct": 27,
+      "total": 30
+    },
+    "causal_judgment": {
+      "correct": 21,
+      "total": 30
+    },
+    "date_understanding": {
+      "correct": 26,
+      "total": 30
+    },
+    "arithmetic": {
+      "correct": 29,
+      "total": 30
+    }
+  }
+}

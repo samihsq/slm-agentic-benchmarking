@@ -1,0 +1,20 @@
+[
+  {
+    "model": "gemma3-4b",
+    "benchmark": "bigbench",
+    "accuracy": 1.0,
+    "correct": 6,
+    "total": 6,
+    "elapsed_seconds": 19.0,
+    "avg_latency": 3.16
+  },
+  {
+    "model": "dasd-4b",
+    "benchmark": "bigbench",
+    "accuracy": 0.6666666666666666,
+    "correct": 4,
+    "total": 6,
+    "elapsed_seconds": 43.5,
+    "avg_latency": 7.25
+  }
+]

@@ -1,0 +1,4 @@
+{"task_id": "auto_debugging_0", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 90.02, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_1", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 90.01, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_2", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 90.01, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_3", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 90.02, "cost": 0, "timed_out": true}

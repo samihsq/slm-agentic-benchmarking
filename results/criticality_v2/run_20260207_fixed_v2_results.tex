@@ -1,0 +1,177 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+% enumitem not available on this system
+\usepackage{amsmath}
+\usepackage{caption}
+
+\definecolor{tierA}{HTML}{1a7f37}
+\definecolor{tierB}{HTML}{0969da}
+\definecolor{tierC}{HTML}{8250df}
+\definecolor{tierD}{HTML}{bf8700}
+\definecolor{tierF}{HTML}{cf222e}
+\definecolor{lightgray}{HTML}{f6f8fa}
+
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\title{\textbf{Criticality v2 --- Fixed Scoring Results}}
+\author{SLM Agentic Benchmarking}
+\date{February 7, 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\vspace{-1em}
+\begin{center}
+\small 200 tasks per model\enspace$\cdot$\enspace 4-choice MCQ\enspace$\cdot$\enspace random baseline = 25\%
+\end{center}
+
+%----------------------------------------------------------------------
+\section{Results}
+
+\begin{table}[h]
+\centering
+\caption{Top-1 accuracy with 95\% Wilson CIs and one-sided binomial $p$-values vs.\ 25\%.}
+\vspace{4pt}
+\begin{tabular}{@{}lrcrccc@{}}
+\toprule
+\textbf{Model} & \textbf{Acc.} & \textbf{95\% CI} & \textbf{$p$} & \textbf{Margin} & \textbf{Entropy} & \textbf{Tier} \\
+\midrule
+Gemma3n-E4B          & \textbf{54.0\%} & [47.1, 60.8] & $<$0.0001 & 10.80 & 0.098 & \textcolor{tierA}{\textbf{A}} \\
+GPT-OSS-20B          & 49.0\% & [42.2, 55.9] & $<$0.0001 & 0.80 & 1.625 & \textcolor{tierB}{\textbf{B}} \\
+DASD-4B              & 48.0\% & [41.2, 54.9] & $<$0.0001 & 1.30 & 1.311 & \textcolor{tierB}{\textbf{B}} \\
+Gemma3-4B            & 48.0\% & [41.2, 54.9] & $<$0.0001 & 4.91 & 0.336 & \textcolor{tierB}{\textbf{B}} \\
+Gemma3n-E2B          & 48.0\% & [41.2, 54.9] & $<$0.0001 & 7.97 & 0.170 & \textcolor{tierB}{\textbf{B}} \\
+Phi4-Mini-Reasoning  & 42.5\% & [35.9, 49.4] & $<$0.0001 & 3.05 & 0.644 & \textcolor{tierC}{\textbf{C}} \\
+Gemma3-1B            & 40.5\% & [33.9, 47.4] & $<$0.0001 & 2.18 & 0.883 & \textcolor{tierC}{\textbf{C}} \\
+Qwen3-0.6B           & 37.0\% & [30.6, 43.9] & 0.0001 & 1.32 & 1.324 & \textcolor{tierD}{\textbf{D}} \\
+Falcon-H1-90M        & 25.0\% & [19.5, 31.4] & 0.527 & 0.41 & 1.750 & \textcolor{tierF}{\textbf{F}} \\
+\bottomrule
+\end{tabular}
+\label{tab:results}
+\end{table}
+
+Entropy is Shannon entropy over the 4-choice probability distribution (max = 2.0 = uniform).
+Margin is the average log-probability difference between the top and second choice.
+
+%----------------------------------------------------------------------
+\section{What changed from the old method}
+
+\begin{table}[h]
+\centering
+\caption{Before/after comparison.}
+\vspace{4pt}
+\begin{tabular}{@{}lll@{}}
+\toprule
+& \textbf{Old method} & \textbf{New method} \\
+\midrule
+Scoring & Per-option continuation logprob & Single-token MCQ logprob \\
+& $P(\text{arg}_i \mid \text{prefix})$, 4 separate evals & $P(\text{label} \mid \text{full prompt})$, 1 eval \\
+\addlinespace
+Task quality & No gap filter; 46\% gaps $<$ 0.10 & min gap $\geq$ 0.15; mean gap = 0.212 \\
+\addlinespace
+Accuracy spread & 4.5pp\enspace(29.0--33.5\%) & 29.0pp\enspace(25.0--54.0\%) \\
+Significant pairs & 0\,/\,36 & 17\,/\,36 \\
+Models $>$ random & 5/9 (marginal) & 8/9 ($p < 0.001$) \\
+\bottomrule
+\end{tabular}
+\label{tab:comparison}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Why this works}
+
+\subsection{Comparative context via self-attention}
+
+The old method scored each argument independently: four separate \texttt{model.eval()} calls, each computing $P(\text{argument}_i \mid \text{prefix})$.
+The model never saw the alternatives.
+
+The new method presents all four arguments in a single prompt ending with ``\texttt{Answer:}''. At that token position, the transformer's hidden states have attended to every argument via self-attention. The logit distribution over A/B/C/D reflects a \emph{comparative} judgment---not four independent fluency estimates.
+
+\textbf{Evidence:} Under the old method, all models showed the same position A bias (28--36\% predictions for A).
+Under the new method, biases are model-specific: Gemma3-1B prefers A, Qwen3-0.6B prefers D, Falcon prefers B/C.
+This proves each model is reading the arguments and forming its own quality representation.
+
+\subsection{Confidence scales with ability}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& Accuracy & Margin & Entropy \\
+\midrule
+Falcon-H1-90M & 25.0\% & 0.41 & 1.750 \\
+Qwen3-0.6B    & 37.0\% & 1.32 & 1.324 \\
+Gemma3-4B     & 48.0\% & 4.91 & 0.336 \\
+Gemma3n-E4B   & 54.0\% & 10.80 & 0.098 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Falcon's entropy (1.75) is near the uniform maximum (2.0)---it is guessing.
+Gemma3n-E4B's entropy (0.098) indicates extreme confidence, and it is correct 54\% of the time.
+Under the old method, all models had similar entropy ($\sim$1.6).
+
+\subsection{Task quality amplifies the signal}
+
+Enforcing min gap $\geq$ 0.15 ensures every task has a genuinely distinguishable correct answer.
+But this alone would not have fixed the benchmark: tasks with large gaps still scored $\sim$33\% under the old scoring method.
+The scoring change was the primary driver; task quality widened the separation.
+
+\subsection{Why the old method fails}
+
+Per-option continuation scoring computes how ``expected'' each argument is as natural language.
+High-quality arguments tend to be longer, more detailed, and use more specific vocabulary---all of which \emph{lower} average per-token log-probability because they contain more surprising tokens.
+The quality--logprob correlation was only 0.272, likely driven entirely by the prefix mentioning ``strongest argument.''
+
+%----------------------------------------------------------------------
+\section{Emerging tiers}
+
+\begin{table}[h]
+\centering
+\caption{Model tiers derived from McNemar pairwise tests.}
+\vspace{4pt}
+\begin{tabular}{@{}clcl@{}}
+\toprule
+\textbf{Tier} & \textbf{Models} & \textbf{Accuracy} & \textbf{Separation} \\
+\midrule
+\textcolor{tierA}{\textbf{A}} & Gemma3n-E4B & 54\% & $p < 0.02$ vs.\ all $\leq$ E2B \\
+\textcolor{tierB}{\textbf{B}} & GPT-OSS-20B, DASD-4B, Gemma3-4B, Gemma3n-E2B & 48--49\% & Inseparable internally; $p < 0.03$ vs.\ D \\
+\textcolor{tierC}{\textbf{C}} & Phi4-Mini-Reasoning, Gemma3-1B & 40--43\% & Intermediate \\
+\textcolor{tierD}{\textbf{D}} & Qwen3-0.6B & 37\% & $p < 0.03$ vs.\ B; above random \\
+\textcolor{tierF}{\textbf{F}} & Falcon-H1-90M & 25\% & At random baseline (90M params) \\
+\bottomrule
+\end{tabular}
+\label{tab:tiers}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Sample size}
+
+\textbf{Current:} 200 tasks per model.\enspace\textbf{Dataset ceiling:} $\sim$1{,}000 tasks at gap $\geq$ 0.15 (10k arguments loaded).
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}rccc@{}}
+\toprule
+$n$ & CI half-width & Detect vs.\ random & Detect pairwise \\
+\midrule
+200  & $\pm$6.9pp & 8.6pp & $\sim$14pp \\
+500  & $\pm$4.4pp & 5.5pp & $\sim$9pp \\
+1000 & $\pm$3.1pp & 3.8pp & $\sim$6pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+$n = 200$ is adequate for the tier-level conclusions drawn. The tier~B models (48--49\%) differ by $\sim$1pp---separating them would require $n > 5{,}000$, which exceeds the dataset.
+Increasing to $n = 500$ would tighten CIs enough to firmly separate tier~A from tier~B (currently marginal at $p \approx 0.06$).
+
+\end{document}

@@ -1,0 +1,29 @@
+{
+  "agent": "OllamaAgent",
+  "model": "qwen3:0.6b",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.48,
+  "num_tasks": 50,
+  "total_latency_seconds": 896.4943284988403,
+  "avg_latency_seconds": 17.929886569976805,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260218_025916/matrix_recall/qwen3-0.6b/OllamaAgent",
+  "breakdown_by_difficulty": {
+    "easy": {
+      "accuracy": 0.35,
+      "correct": 7,
+      "total": 20
+    },
+    "hard": {
+      "accuracy": 0.3076923076923077,
+      "correct": 4,
+      "total": 13
+    },
+    "medium": {
+      "accuracy": 0.7647058823529411,
+      "correct": 13,
+      "total": 17
+    }
+  }
+}

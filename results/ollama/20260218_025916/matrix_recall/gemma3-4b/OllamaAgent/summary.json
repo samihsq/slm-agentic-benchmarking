@@ -1,0 +1,29 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gemma3:4b",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.62,
+  "num_tasks": 50,
+  "total_latency_seconds": 174.62152194976807,
+  "avg_latency_seconds": 3.4924304389953615,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260218_025916/matrix_recall/gemma3-4b/OllamaAgent",
+  "breakdown_by_difficulty": {
+    "medium": {
+      "accuracy": 0.8235294117647058,
+      "correct": 14,
+      "total": 17
+    },
+    "easy": {
+      "accuracy": 0.8,
+      "correct": 16,
+      "total": 20
+    },
+    "hard": {
+      "accuracy": 0.07692307692307693,
+      "correct": 1,
+      "total": 13
+    }
+  }
+}

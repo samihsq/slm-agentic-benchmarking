@@ -1,0 +1,9 @@
+{
+  "model": "mistral-large-3",
+  "provider": "Azure",
+  "num_tasks": 100,
+  "bertscore_model_type": "distilbert-base-uncased",
+  "avg_bertscore_f1": 0.792346,
+  "bs_ci_lo": 0.7841,
+  "bs_ci_hi": 0.8005
+}

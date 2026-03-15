@@ -1,0 +1,19 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.58,
+  "num_tasks": 50,
+  "total_latency_seconds": 15430.41136097908,
+  "avg_latency_seconds": 308.6082272195816,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260218_104921/matrix_recall_xhard/dasd-4b/OllamaAgent",
+  "breakdown_by_difficulty": {
+    "x-hard": {
+      "accuracy": 0.58,
+      "correct": 29,
+      "total": 50
+    }
+  }
+}

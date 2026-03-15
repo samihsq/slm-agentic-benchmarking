@@ -1,0 +1,24 @@
+{
+  "model": "Qwen3-0.6B",
+  "model_label": "Qwen3-0.6B",
+  "benchmark": "Criticality v2 (Logprob-Based)",
+  "quality_score": "WA",
+  "is_thinking_model": false,
+  "top_logprobs_requested": 10,
+  "metrics": {
+    "rank_correlation": 0.2285,
+    "top1_accuracy": 0.37,
+    "calibration_error": 0.0225,
+    "avg_margin": 1.3206,
+    "avg_entropy": 1.3238,
+    "num_tasks": 200,
+    "easy_accuracy": 0.37,
+    "hard_accuracy": 0.0
+  },
+  "num_tasks": 200,
+  "total_latency_seconds": 5.29,
+  "avg_latency_seconds": 0.03,
+  "total_prompt_tokens": 0,
+  "total_completion_tokens": 0,
+  "results_dir": "results/criticality_v2/Qwen3-0.6B_20260207_040812"
+}

@@ -1,0 +1,90 @@
+{
+  "timestamp": "20260311_173213",
+  "suite": "bbl24",
+  "examples_per_task": 20,
+  "architectures": [
+    "concurrent"
+  ],
+  "azure_models": [],
+  "ollama_models": [
+    "qwen3-0.6b",
+    "gemma3-1b",
+    "gemma3n-e2b",
+    "phi4-mini-reasoning-ollama",
+    "dasd-4b",
+    "gemma3-4b",
+    "gemma3n-e4b",
+    "gpt-oss-20b"
+  ],
+  "results": [
+    {
+      "backend": "ollama",
+      "model": "qwen3-0.6b",
+      "architecture": "concurrent",
+      "weighted_accuracy": 0.37820727514159463,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3-1b",
+      "architecture": "concurrent",
+      "weighted_accuracy": 0.2832315680337342,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3n-e2b",
+      "architecture": "concurrent",
+      "weighted_accuracy": 0.5310970261024108,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "phi4-mini-reasoning-ollama",
+      "architecture": "concurrent",
+      "weighted_accuracy": 0.3176801241824044,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "dasd-4b",
+      "architecture": "concurrent",
+      "weighted_accuracy": 0.3260562095138912,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3-4b",
+      "architecture": "concurrent",
+      "error": "'list' object has no attribute 'get'",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3n-e4b",
+      "architecture": "concurrent",
+      "error": "'list' object has no attribute 'get'",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gpt-oss-20b",
+      "architecture": "concurrent",
+      "error": "'list' object has no attribute 'get'",
+      "weighted_accuracy": null,
+      "skipped": false
+    }
+  ]
+}

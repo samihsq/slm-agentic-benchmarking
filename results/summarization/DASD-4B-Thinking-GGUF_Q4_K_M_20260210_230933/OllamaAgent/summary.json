@@ -1,0 +1,13 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.52,
+  "mean_rougeL": 0.1636,
+  "mean_rouge1": 0.237,
+  "mean_rouge2": 0.0502,
+  "mean_latency": 13.83,
+  "total_cost": 0
+}

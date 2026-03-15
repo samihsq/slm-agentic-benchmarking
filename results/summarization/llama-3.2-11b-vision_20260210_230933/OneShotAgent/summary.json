@@ -1,0 +1,13 @@
+{
+  "agent": "OneShotAgent",
+  "model": "llama-3.2-11b-vision",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.65,
+  "mean_rougeL": 0.203,
+  "mean_rouge1": 0.261,
+  "mean_rouge2": 0.084,
+  "mean_latency": 37.09,
+  "total_cost": 0
+}

@@ -1,0 +1,69 @@
+{
+  "run_date": "2026-02-07",
+  "run_type": "sequence_mode_all_models",
+  "scoring_method": "avg_logprob_continuation",
+  "scoring_description": "Each option scored independently as P(argument_text | 'Topic: {topic}. The strongest argument is: ') using average token logprob",
+  "tasks_per_model": 200,
+  "random_baseline": 0.25,
+
+  "results": {
+    "Gemma3-1B":           {"accuracy": 0.335, "rank_correlation": 0.2690, "calibration_error": 0.0263, "p_vs_random": 0.0044, "significant": true},
+    "Falcon-H1-90M":       {"accuracy": 0.320, "rank_correlation": 0.1710, "calibration_error": 0.0245, "p_vs_random": 0.0154, "significant": true},
+    "GPT-OSS-20B":         {"accuracy": 0.315, "rank_correlation": 0.2725, "calibration_error": 0.0137, "p_vs_random": 0.0226, "significant": true},
+    "Gemma3n-E4B":         {"accuracy": 0.315, "rank_correlation": 0.2685, "calibration_error": 0.0108, "p_vs_random": 0.0226, "significant": true},
+    "Qwen3-0.6B":          {"accuracy": 0.310, "rank_correlation": 0.1835, "calibration_error": 0.0197, "p_vs_random": 0.0323, "significant": true},
+    "Gemma3-4B":           {"accuracy": 0.300, "rank_correlation": 0.2760, "calibration_error": 0.0030, "p_vs_random": 0.0625, "significant": false},
+    "DASD-4B":             {"accuracy": 0.295, "rank_correlation": 0.2525, "calibration_error": 0.0078, "p_vs_random": 0.0843, "significant": false},
+    "Gemma3n-E2B":         {"accuracy": 0.295, "rank_correlation": 0.2330, "calibration_error": 0.0058, "p_vs_random": 0.0843, "significant": false},
+    "Phi4-Mini-Reasoning": {"accuracy": 0.290, "rank_correlation": 0.2390, "calibration_error": 0.0094, "p_vs_random": 0.1115, "significant": false}
+  },
+
+  "diagnosis": {
+    "verdict": "BENCHMARK BROKEN - zero discriminative power",
+    "problems": [
+      {
+        "id": "data_quality_gaps",
+        "severity": "critical",
+        "description": "46% of tasks have top-2 quality gap < 0.10 on a 0-1 scale. 26% have gap < 0.05. The 'correct' answer is essentially ambiguous in nearly half the tasks.",
+        "cause": "Dataset is 758 strong / 203 medium / 39 weak. Task generator fills 4 slots from the largest tier (strong), producing tasks where all options have similar quality.",
+        "evidence": {
+          "gap_lt_0.01": "12%",
+          "gap_lt_0.05": "26%",
+          "gap_lt_0.10": "46%",
+          "gap_lt_0.20": "80%"
+        }
+      },
+      {
+        "id": "scoring_method_wrong_signal",
+        "severity": "critical",
+        "description": "Sequence logprob scoring measures text fluency/probability, not argument quality assessment. Each option is scored independently as a continuation, so the model never sees all 4 options together to compare them.",
+        "evidence": {
+          "quality_logprob_correlation": 0.272,
+          "length_logprob_correlation": -0.048,
+          "length_quality_correlation": 0.317
+        }
+      },
+      {
+        "id": "no_pairwise_discrimination",
+        "severity": "critical",
+        "description": "All McNemar pairwise p-values > 0.24. No pair of models is statistically distinguishable. All CIs overlap completely.",
+        "evidence": {
+          "accuracy_range": "29.0% - 33.5%",
+          "accuracy_spread": "4.5%",
+          "inter_model_agreement": "54% - 80%"
+        }
+      },
+      {
+        "id": "position_bias",
+        "severity": "moderate",
+        "description": "All models show preference for option A (28-36% of predictions vs 26.5% true base rate).",
+        "cause": "Sequence scoring with shared prefix may create systematic bias toward the first option evaluated."
+      }
+    ],
+    "fixes_planned": [
+      "Option 1: Enforce min_quality_gap >= 0.15 in task generation + require multi-tier sampling",
+      "Option 2: Switch to single-token MCQ scoring (present full prompt with all 4 options, extract logprobs for A/B/C/D label tokens)",
+      "Option 3 (if needed): v2.5 pairwise comparison benchmark"
+    ]
+  }
+}

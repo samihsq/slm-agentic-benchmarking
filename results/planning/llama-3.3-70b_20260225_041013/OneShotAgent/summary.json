@@ -1,0 +1,17 @@
+{
+  "agent": "OneShotAgent",
+  "model": "llama-3.3-70b",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 5,
+  "mean_composite_score": 0.2893,
+  "mean_structure_score": 0.3333,
+  "mean_budget_score": 0.2,
+  "mean_constraint_score": 0.32,
+  "success_rate": 0.4,
+  "travel_success_rate": 0.6667,
+  "shopping_success_rate": 0.0,
+  "mean_latency": 48.72,
+  "total_cost": 0.0009
+}

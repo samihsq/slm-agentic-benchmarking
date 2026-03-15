@@ -1,0 +1,22 @@
+{
+  "timestamp": "20260305_171043",
+  "suite": "bbl24",
+  "examples_per_task": 1,
+  "architectures": [
+    "one_shot"
+  ],
+  "azure_models": [
+    "phi-4"
+  ],
+  "ollama_models": [],
+  "results": [
+    {
+      "backend": "azure",
+      "model": "phi-4",
+      "architecture": "one_shot",
+      "error": "'list' object has no attribute 'get'",
+      "weighted_accuracy": null,
+      "skipped": false
+    }
+  ]
+}

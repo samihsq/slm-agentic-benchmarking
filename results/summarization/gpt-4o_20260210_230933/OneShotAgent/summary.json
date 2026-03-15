@@ -1,0 +1,13 @@
+{
+  "agent": "OneShotAgent",
+  "model": "gpt-4o",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.71,
+  "mean_rougeL": 0.1925,
+  "mean_rouge1": 0.2674,
+  "mean_rouge2": 0.0615,
+  "mean_latency": 1.97,
+  "total_cost": 0
+}

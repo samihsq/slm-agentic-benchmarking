@@ -1,0 +1,19 @@
+{
+  "agent": "OneShotAgent",
+  "model": "mistral-small",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.34,
+  "num_tasks": 50,
+  "total_latency_seconds": 54.73179340362549,
+  "avg_latency_seconds": 1.0946358680725097,
+  "total_cost_usd": 0.034345,
+  "results_dir": "results/matrix_recall_xhard/mistral-small_20260218_102432/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "x-hard": {
+      "accuracy": 0.34,
+      "correct": 17,
+      "total": 50
+    }
+  }
+}

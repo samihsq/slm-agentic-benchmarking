@@ -1,0 +1,24 @@
+{
+  "model": "DASD-4B",
+  "model_label": "DASD-4B",
+  "benchmark": "Criticality v2 (Logprob-Based)",
+  "quality_score": "WA",
+  "is_thinking_model": false,
+  "top_logprobs_requested": 10,
+  "metrics": {
+    "rank_correlation": 0.255,
+    "top1_accuracy": 0.48,
+    "calibration_error": 0.079,
+    "avg_margin": 1.2981,
+    "avg_entropy": 1.3106,
+    "num_tasks": 200,
+    "easy_accuracy": 0.48,
+    "hard_accuracy": 0.0
+  },
+  "num_tasks": 200,
+  "total_latency_seconds": 25.05,
+  "avg_latency_seconds": 0.13,
+  "total_prompt_tokens": 0,
+  "total_completion_tokens": 0,
+  "results_dir": "results/criticality_v2/DASD-4B_20260207_040830"
+}

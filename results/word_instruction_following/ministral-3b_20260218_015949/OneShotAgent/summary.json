@@ -1,0 +1,129 @@
+{
+  "agent": "OneShotAgent",
+  "model": "ministral-3b",
+  "list_sizes": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "num_rollouts_per_size": 10,
+  "total_rollouts": 100,
+  "mean_score": 0.048,
+  "success_rate": 0.62,
+  "mean_latency": 1.38,
+  "total_cost": 0.0345,
+  "by_size": {
+    "size_1": {
+      "mean_levels_passed": 1.9,
+      "max_levels_passed": 6,
+      "rollouts": 10,
+      "mean_score": 0.0633
+    },
+    "size_2": {
+      "mean_levels_passed": 3.2,
+      "max_levels_passed": 5,
+      "rollouts": 10,
+      "mean_score": 0.1067
+    },
+    "size_3": {
+      "mean_levels_passed": 2.4,
+      "max_levels_passed": 3,
+      "rollouts": 10,
+      "mean_score": 0.08
+    },
+    "size_4": {
+      "mean_levels_passed": 1.5,
+      "max_levels_passed": 3,
+      "rollouts": 10,
+      "mean_score": 0.05
+    },
+    "size_5": {
+      "mean_levels_passed": 1.2,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.04
+    },
+    "size_6": {
+      "mean_levels_passed": 0.8,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.0267
+    },
+    "size_7": {
+      "mean_levels_passed": 1.2,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.04
+    },
+    "size_8": {
+      "mean_levels_passed": 1.0,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.0333
+    },
+    "size_9": {
+      "mean_levels_passed": 0.6,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.02
+    },
+    "size_10": {
+      "mean_levels_passed": 0.6,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.02
+    }
+  },
+  "level_accuracy": {
+    "level_1": {
+      "accuracy": 0.62,
+      "correct": 62,
+      "total": 100
+    },
+    "level_2": {
+      "accuracy": 0.9032258064516129,
+      "correct": 56,
+      "total": 62
+    },
+    "level_3": {
+      "accuracy": 0.26785714285714285,
+      "correct": 15,
+      "total": 56
+    },
+    "level_4": {
+      "accuracy": 0.3333333333333333,
+      "correct": 5,
+      "total": 15
+    },
+    "level_5": {
+      "accuracy": 1.0,
+      "correct": 5,
+      "total": 5
+    },
+    "level_6": {
+      "accuracy": 0.2,
+      "correct": 1,
+      "total": 5
+    },
+    "level_7": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 1
+    }
+  },
+  "levels_passed_distribution": {
+    "6": 1,
+    "1": 6,
+    "2": 41,
+    "3": 10,
+    "5": 4,
+    "0": 38
+  }
+}

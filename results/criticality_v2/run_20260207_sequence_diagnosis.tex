@@ -1,0 +1,142 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+% enumitem not available on this system
+\usepackage{amsmath}
+\usepackage{caption}
+
+\definecolor{crit}{HTML}{cf222e}
+\definecolor{mod}{HTML}{bf8700}
+\definecolor{lightgray}{HTML}{f6f8fa}
+
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\title{\textbf{Criticality v2 --- Sequence Scoring Diagnosis}}
+\author{SLM Agentic Benchmarking}
+\date{February 7, 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\vspace{-1em}
+\begin{center}
+\small 200 tasks per model\enspace$\cdot$\enspace 4-choice MCQ\enspace$\cdot$\enspace random baseline = 25\%\\[2pt]
+\small Scoring: per-option continuation logprob --- $P(\text{arg}_i \mid \text{``Topic: \{topic\}. The strongest argument is: ''})$
+\end{center}
+
+%----------------------------------------------------------------------
+\section*{Verdict}
+
+\colorbox{crit!10}{\parbox{\dimexpr\textwidth-2\fboxsep}{%
+\textcolor{crit}{\textbf{Benchmark broken.}}
+All 9 models cluster within 4.5pp (29.0--33.5\%). No model pair is statistically distinguishable.
+The benchmark has zero discriminative power.}}
+
+%----------------------------------------------------------------------
+\section{Results}
+
+\begin{table}[h]
+\centering
+\caption{Per-option continuation scoring. All McNemar pairwise $p > 0.24$.}
+\vspace{4pt}
+\begin{tabular}{@{}lrccc@{}}
+\toprule
+\textbf{Model} & \textbf{Acc.} & \textbf{$p$ vs.\ 25\%} & \textbf{Rank Corr.} & \textbf{Cal.\ Error} \\
+\midrule
+Gemma3-1B           & 33.5\% & 0.004 * & 0.269 & 0.026 \\
+Falcon-H1-90M       & 32.0\% & 0.015 * & 0.171 & 0.025 \\
+GPT-OSS-20B         & 31.5\% & 0.023 * & 0.273 & 0.014 \\
+Gemma3n-E4B         & 31.5\% & 0.023 * & 0.269 & 0.011 \\
+Qwen3-0.6B          & 31.0\% & 0.032 * & 0.184 & 0.020 \\
+Gemma3-4B           & 30.0\% & 0.063   & 0.276 & 0.003 \\
+DASD-4B             & 29.5\% & 0.084   & 0.253 & 0.008 \\
+Gemma3n-E2B         & 29.5\% & 0.084   & 0.233 & 0.006 \\
+Phi4-Mini-Reasoning & 29.0\% & 0.112   & 0.239 & 0.009 \\
+\bottomrule
+\end{tabular}
+\label{tab:old-results}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Problems identified}
+
+\subsection{\textcolor{crit}{Critical:} Ambiguous tasks}
+
+46\% of tasks have a top-2 quality gap below 0.10 on a 0--1 scale. The ``correct'' answer is functionally a coin flip in nearly half the tasks.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lc@{}}
+\toprule
+Gap threshold & \% of tasks below \\
+\midrule
+$< 0.01$ & 12\% \\
+$< 0.05$ & 26\% \\
+$< 0.10$ & 46\% \\
+$< 0.20$ & 80\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Cause:} The dataset contains 758 strong / 203 medium / 39 weak arguments. The task generator fills all 4 MCQ slots from the largest available tier, producing tasks where every option is ``strong'' with near-identical quality scores.
+
+\subsection{\textcolor{crit}{Critical:} Scoring measures fluency, not quality}
+
+Continuation scoring computes how ``expected'' each argument is as natural language. Each option gets a separate \texttt{model.eval()} call---the model never sees the alternatives.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lc@{}}
+\toprule
+Correlation & $r$ \\
+\midrule
+Quality vs.\ logprob & 0.272 \\
+Length vs.\ logprob  & $-0.048$ \\
+Length vs.\ quality  & 0.317 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The quality--logprob correlation (0.272) is weak and likely driven by the prefix mentioning ``strongest argument'' rather than genuine quality assessment.
+High-quality arguments use more specific vocabulary, which \emph{lowers} per-token logprob.
+
+\subsection{\textcolor{crit}{Critical:} No pairwise discrimination}
+
+All McNemar pairwise $p$-values exceed 0.24. The accuracy spread is only 4.5pp, and all 95\% CIs overlap completely. Inter-model agreement ranges from 54--80\%, suggesting models are producing near-identical predictions.
+
+\subsection{\textcolor{mod}{Moderate:} Uniform position bias}
+
+All models prefer option A (28--36\% of predictions vs.\ 26.5\% true base rate). This shared, uniform bias indicates models exploit a positional artifact in the continuation scoring rather than reading argument content.
+
+%----------------------------------------------------------------------
+\section{Root cause}
+
+The two critical issues compound:
+
+\begin{enumerate}
+\item \textbf{Data:} Nearly half the tasks are ambiguous (gap $<$ 0.10), so even a perfect evaluator would score $\sim$70\% on the ``easy'' subset and $\sim$50\% on the ``hard'' subset---blending to $\sim$35\% overall.
+\item \textbf{Method:} Continuation scoring is orthogonal to quality assessment. It measures text probability, which is dominated by syntax and vocabulary frequency, not argumentative strength.
+\end{enumerate}
+
+Together, the benchmark asks an ill-posed question (ambiguous tasks) using the wrong tool (fluency scoring). The result is indistinguishable noise.
+
+%----------------------------------------------------------------------
+\section{Fixes applied}
+
+\begin{enumerate}
+\item \textbf{Task generation (data fix):} Enforce min quality gap $\geq$ 0.15 between the best and second-best argument. Load 4{,}000+ arguments to ensure cross-tier diversity. Result: mean gap = 0.212, 100\% of tasks above threshold.
+
+\item \textbf{Single-token MCQ scoring (method fix):} Present all 4 labeled arguments in one prompt, extract logprobs for A/B/C/D at the answer position. The model now performs comparative judgment in a single forward pass.
+\end{enumerate}
+
+These fixes produced an accuracy spread of 29pp (25--54\%), with 17/36 pairwise comparisons statistically significant and 8/9 models clearly above random at $p < 0.001$.
+
+\end{document}

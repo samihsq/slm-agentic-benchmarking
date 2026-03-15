@@ -1,0 +1,29 @@
+{
+  "agent": "OneShotAgent",
+  "model": "deepseek-v3.2",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.98,
+  "num_tasks": 50,
+  "total_latency_seconds": 668.7218022346497,
+  "avg_latency_seconds": 13.374436044692994,
+  "total_cost_usd": 0.0131955,
+  "results_dir": "results/matrix_recall/deepseek-v3.2_20260218_023517/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "medium": {
+      "accuracy": 1.0,
+      "correct": 17,
+      "total": 17
+    },
+    "easy": {
+      "accuracy": 1.0,
+      "correct": 20,
+      "total": 20
+    },
+    "hard": {
+      "accuracy": 0.9230769230769231,
+      "correct": 12,
+      "total": 13
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "timestamp": "20260225_035229",
+  "configs": [
+    {
+      "model": "phi-4",
+      "benchmark": "summarization",
+      "agent": "oneshot",
+      "concurrency": 1,
+      "limit": 2,
+      "summarization_metric": "rougeL",
+      "summarization_split": "validation",
+      "summarization_threshold": null,
+      "summarization_bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+      "summarization_bartscore_model": "facebook/bart-large-cnn",
+      "summarization_device": null
+    },
+    {
+      "model": "phi-4-mini",
+      "benchmark": "summarization",
+      "agent": "oneshot",
+      "concurrency": 1,
+      "limit": 2,
+      "summarization_metric": "rougeL",
+      "summarization_split": "validation",
+      "summarization_threshold": null,
+      "summarization_bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+      "summarization_bartscore_model": "facebook/bart-large-cnn",
+      "summarization_device": null
+    }
+  ],
+  "results": [
+    {
+      "model": "phi-4-mini",
+      "benchmark": "summarization",
+      "agent": "oneshot",
+      "num_tasks": 2,
+      "correct": 1,
+      "avg_score": 0.20410628019323668,
+      "accuracy": 0.5,
+      "metric": "rougeL",
+      "split": "validation",
+      "output_dir": "results/summarization/phi-4-mini_20260225_035100"
+    },
+    {
+      "model": "phi-4",
+      "benchmark": "summarization",
+      "agent": "oneshot",
+      "num_tasks": 2,
+      "correct": 1,
+      "avg_score": 0.1557315233785822,
+      "accuracy": 0.5,
+      "metric": "rougeL",
+      "split": "validation",
+      "output_dir": "results/summarization/phi-4_20260225_035100"
+    }
+  ],
+  "errors": []
+}

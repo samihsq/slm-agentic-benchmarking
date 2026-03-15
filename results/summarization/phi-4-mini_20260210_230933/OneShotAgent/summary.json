@@ -1,0 +1,13 @@
+{
+  "agent": "OneShotAgent",
+  "model": "phi-4-mini",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.62,
+  "mean_rougeL": 0.1775,
+  "mean_rouge1": 0.2342,
+  "mean_rouge2": 0.0465,
+  "mean_latency": 22.68,
+  "total_cost": 0
+}

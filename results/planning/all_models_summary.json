@@ -1,0 +1,88 @@
+{
+  "benchmark": "planning",
+  "agent": "one_shot",
+  "limit": 50,
+  "timestamp": "20260225_141052",
+  "results": {
+    "ministral-3b": {
+      "success_rate": 0.36,
+      "avg_score": 0.3611,
+      "avg_latency": 2.1355329370498657,
+      "total_cost": 0.0127235,
+      "num_tasks": 50,
+      "run_dir": "results/planning/ministral-3b_20260225_123713"
+    },
+    "gpt-4o": {
+      "success_rate": 0.68,
+      "avg_score": 0.6007,
+      "avg_latency": 3.316143012046814,
+      "total_cost": 0.250625,
+      "num_tasks": 50,
+      "run_dir": "results/planning/gpt-4o_20260225_123713"
+    },
+    "mistral-small": {
+      "success_rate": 0.0,
+      "avg_score": 0.1329,
+      "avg_latency": 4.041008276939392,
+      "total_cost": 0.017438,
+      "num_tasks": 50,
+      "run_dir": "results/planning/mistral-small_20260225_123713"
+    },
+    "mistral-large-3": {
+      "success_rate": 0.24,
+      "avg_score": 0.3057,
+      "avg_latency": 6.340575790405273,
+      "total_cost": 0.0285525,
+      "num_tasks": 50,
+      "run_dir": "results/planning/mistral-large-3_20260225_123713"
+    },
+    "mistral-nemo": {
+      "success_rate": 0.0,
+      "avg_score": 0.075,
+      "avg_latency": 17.48937750339508,
+      "total_cost": 0.0,
+      "num_tasks": 50,
+      "run_dir": "results/planning/mistral-nemo_20260225_123713"
+    },
+    "phi-4": {
+      "success_rate": 0.0,
+      "avg_score": 0.075,
+      "avg_latency": 46.25860235214233,
+      "total_cost": 0.0,
+      "num_tasks": 50,
+      "run_dir": "results/planning/phi-4_20260225_123713"
+    },
+    "phi-4-mini": {
+      "success_rate": 0.0,
+      "avg_score": 0.0762,
+      "avg_latency": 109.59118891239166,
+      "total_cost": 0.0,
+      "num_tasks": 50,
+      "run_dir": "results/planning/phi-4-mini_20260225_123713"
+    },
+    "llama-3.3-70b": {
+      "success_rate": 0.0,
+      "avg_score": 0.0762,
+      "avg_latency": 109.59831723213196,
+      "total_cost": 0.0,
+      "num_tasks": 50,
+      "run_dir": "results/planning/llama-3.3-70b_20260225_123713"
+    },
+    "phi-4-mini-reasoning": {
+      "success_rate": 0.0,
+      "avg_score": 0.075,
+      "avg_latency": 110.75292007923126,
+      "total_cost": 0.0,
+      "num_tasks": 50,
+      "run_dir": "results/planning/phi-4-mini-reasoning_20260225_123713"
+    },
+    "llama-3.2-11b-vision": {
+      "success_rate": 0.0,
+      "avg_score": 0.0762,
+      "avg_latency": 112.332506980896,
+      "total_cost": 0.0,
+      "num_tasks": 50,
+      "run_dir": "results/planning/llama-3.2-11b-vision_20260225_123713"
+    }
+  }
+}

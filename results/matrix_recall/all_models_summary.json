@@ -1,0 +1,88 @@
+{
+  "benchmark": "matrix_recall",
+  "agent": "one_shot",
+  "limit": 50,
+  "timestamp": "20260218_055012",
+  "results": {
+    "ministral-3b": {
+      "success_rate": 0.5,
+      "avg_score": 0.5,
+      "avg_latency": 0.5219375085830689,
+      "total_cost": 0.0184535,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/ministral-3b_20260218_023517"
+    },
+    "mistral-small": {
+      "success_rate": 0.92,
+      "avg_score": 0.92,
+      "avg_latency": 0.6153880739212036,
+      "total_cost": 0.0185085,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/mistral-small_20260218_023517"
+    },
+    "mistral-large-3": {
+      "success_rate": 0.92,
+      "avg_score": 0.92,
+      "avg_latency": 0.63119966506958,
+      "total_cost": 0.0185285,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/mistral-large-3_20260218_023517"
+    },
+    "gpt-4o": {
+      "success_rate": 0.98,
+      "avg_score": 0.98,
+      "avg_latency": 0.7099856758117675,
+      "total_cost": 0.08713,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/gpt-4o_20260218_023517"
+    },
+    "phi-4": {
+      "success_rate": 0.9,
+      "avg_score": 0.9,
+      "avg_latency": 5.036302237510681,
+      "total_cost": 0.00230384,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/phi-4_20260218_023517"
+    },
+    "deepseek-v3.2": {
+      "success_rate": 0.98,
+      "avg_score": 0.98,
+      "avg_latency": 13.374436044692994,
+      "total_cost": 0.0131955,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/deepseek-v3.2_20260218_023517"
+    },
+    "phi-4-mini-reasoning": {
+      "success_rate": 0.66,
+      "avg_score": 0.66,
+      "avg_latency": 141.3302203130722,
+      "total_cost": 0.0237675,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/phi-4-mini-reasoning_20260218_023517"
+    },
+    "deepseek-r1": {
+      "success_rate": 0.12,
+      "avg_score": 0.12,
+      "avg_latency": 219.46277777194976,
+      "total_cost": 0.0026885,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/deepseek-r1_20260218_023517"
+    },
+    "deepseek-v3": {
+      "success_rate": 0.12,
+      "avg_score": 0.12,
+      "avg_latency": 224.2636126947403,
+      "total_cost": 0.001577,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/deepseek-v3_20260218_023517"
+    },
+    "phi-4-mini": {
+      "success_rate": 0.0,
+      "avg_score": 0.0,
+      "avg_latency": 233.88923029899598,
+      "total_cost": 0.0,
+      "num_tasks": 50,
+      "run_dir": "results/matrix_recall/phi-4-mini_20260218_023517"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "agent": "OneShotAgent",
+  "model": "phi-4-mini",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.0,
+  "num_tasks": 50,
+  "total_latency_seconds": 11694.461514949799,
+  "avg_latency_seconds": 233.88923029899598,
+  "total_cost_usd": 0,
+  "results_dir": "results/matrix_recall/phi-4-mini_20260218_023517/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "medium": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 17
+    },
+    "easy": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 20
+    },
+    "hard": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 13
+    }
+  }
+}

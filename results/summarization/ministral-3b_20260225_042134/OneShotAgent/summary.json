@@ -1,0 +1,12 @@
+{
+  "agent": "OneShotAgent",
+  "model": "ministral-3b",
+  "benchmark": "Summarization (XSum)",
+  "split": "validation",
+  "metric": "rougeL",
+  "threshold": 0.15,
+  "num_tasks": 100,
+  "avg_score": 0.2078106327404209,
+  "success_rate": 0.7,
+  "results_dir": "results/summarization/ministral-3b_20260225_042134/OneShotAgent"
+}

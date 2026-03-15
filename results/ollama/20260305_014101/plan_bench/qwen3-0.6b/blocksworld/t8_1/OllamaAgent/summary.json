@@ -1,0 +1,11 @@
+{
+  "agent": "OllamaAgent",
+  "model": "qwen3:0.6b",
+  "benchmark": "PlanBench",
+  "task": "t8_1",
+  "config": "blocksworld",
+  "num_tasks": 100,
+  "num_evaluated": 100,
+  "total_correct": 97,
+  "success_rate": 0.97
+}

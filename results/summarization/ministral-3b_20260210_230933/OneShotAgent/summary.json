@@ -1,0 +1,13 @@
+{
+  "agent": "OneShotAgent",
+  "model": "ministral-3b",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.71,
+  "mean_rougeL": 0.2073,
+  "mean_rouge1": 0.279,
+  "mean_rouge2": 0.0781,
+  "mean_latency": 0.86,
+  "total_cost": 0
+}

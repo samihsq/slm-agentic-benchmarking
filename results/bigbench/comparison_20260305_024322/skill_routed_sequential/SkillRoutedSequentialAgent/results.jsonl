@@ -1,0 +1,4 @@
+{"task_id": "logical_deduction_0", "config": "logical_deduction", "match": true, "latency": 446.96, "cost": 0}
+{"task_id": "navigate_0", "config": "navigate", "match": true, "latency": 201.44, "cost": 0}
+{"task_id": "penguins_in_a_table_0", "config": "penguins_in_a_table", "match": true, "latency": 266.39, "cost": 0}
+{"task_id": "causal_judgment_0", "config": "causal_judgment", "match": true, "latency": 233.74, "cost": 0}

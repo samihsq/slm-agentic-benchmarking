@@ -1,0 +1,9 @@
+{
+  "model": "phi-4",
+  "provider": "Azure",
+  "num_tasks": 100,
+  "bertscore_model_type": "distilbert-base-uncased",
+  "avg_bertscore_f1": 0.783744,
+  "bs_ci_lo": 0.7764,
+  "bs_ci_hi": 0.7908
+}

@@ -1,0 +1,11 @@
+{"task_id": "auto_debugging_0", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 1205.12, "cost": 0}
+{"task_id": "auto_debugging_1", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 240.96, "cost": 0}
+{"task_id": "auto_debugging_0", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 767.98, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_1", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 1540.68, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_2", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 953.13, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_3", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 1107.97, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_4", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 6174.25, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_5", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 1679.36, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_6", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 294992.19, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_7", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 1866.85, "cost": 0, "timed_out": true}
+{"task_id": "auto_debugging_8", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 6089.79, "cost": 0, "timed_out": true}

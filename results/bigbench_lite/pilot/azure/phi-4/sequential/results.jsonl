@@ -1,0 +1,2 @@
+{"task_id": "auto_debugging_0", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 3084.27, "cost": 0}
+{"task_id": "auto_debugging_1", "config": "auto_debugging", "scoring": "exact", "match": false, "score": 0.0, "latency": 780.94, "cost": 0}

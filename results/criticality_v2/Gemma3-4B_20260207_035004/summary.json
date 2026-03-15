@@ -1,0 +1,24 @@
+{
+  "model": "Gemma3-4B",
+  "model_label": "Gemma3-4B",
+  "benchmark": "Criticality v2 (Logprob-Based)",
+  "quality_score": "WA",
+  "is_thinking_model": false,
+  "top_logprobs_requested": 10,
+  "metrics": {
+    "rank_correlation": 0.276,
+    "top1_accuracy": 0.3,
+    "calibration_error": 0.003,
+    "avg_margin": 0.6176,
+    "avg_entropy": 1.5986,
+    "num_tasks": 200,
+    "easy_accuracy": 0.2947,
+    "hard_accuracy": 0.4
+  },
+  "num_tasks": 200,
+  "total_latency_seconds": 54.23,
+  "avg_latency_seconds": 0.27,
+  "total_prompt_tokens": 0,
+  "total_completion_tokens": 0,
+  "results_dir": "results/criticality_v2/Gemma3-4B_20260207_035004"
+}

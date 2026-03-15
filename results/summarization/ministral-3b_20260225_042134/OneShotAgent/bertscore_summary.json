@@ -1,0 +1,9 @@
+{
+  "model": "ministral-3b",
+  "provider": "Azure",
+  "num_tasks": 100,
+  "bertscore_model_type": "distilbert-base-uncased",
+  "avg_bertscore_f1": 0.788509,
+  "bs_ci_lo": 0.7797,
+  "bs_ci_hi": 0.7971
+}

@@ -1,0 +1,17 @@
+{
+  "agent": "OneShotAgent",
+  "model": "phi-4-mini",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 3,
+  "mean_composite_score": 0.2522,
+  "mean_structure_score": 0.0556,
+  "mean_budget_score": 0.5,
+  "mean_constraint_score": 0.2667,
+  "success_rate": 0.3333,
+  "travel_success_rate": 0.5,
+  "shopping_success_rate": 0.0,
+  "mean_latency": 14.58,
+  "total_cost": 0.0011
+}

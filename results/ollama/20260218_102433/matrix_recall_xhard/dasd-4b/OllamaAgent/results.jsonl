@@ -1,0 +1,7 @@
+{"task_id": "matrix_recall_0000", "difficulty": "x-hard", "match": true, "latency": 20.95, "cost": 0.0}
+{"task_id": "matrix_recall_0001", "difficulty": "x-hard", "match": true, "latency": 18.3, "cost": 0.0}
+{"task_id": "matrix_recall_0002", "difficulty": "x-hard", "match": false, "latency": 24.96, "cost": 0.0}
+{"task_id": "matrix_recall_0003", "difficulty": "x-hard", "match": false, "latency": 27.54, "cost": 0.0}
+{"task_id": "matrix_recall_0004", "difficulty": "x-hard", "match": true, "latency": 20.08, "cost": 0.0}
+{"task_id": "matrix_recall_0005", "difficulty": "x-hard", "match": false, "latency": 31.41, "cost": 0.0}
+{"task_id": "matrix_recall_0006", "difficulty": "x-hard", "match": true, "latency": 27.64, "cost": 0.0}

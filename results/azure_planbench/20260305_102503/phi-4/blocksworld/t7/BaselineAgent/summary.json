@@ -1,0 +1,11 @@
+{
+  "agent": "BaselineAgent",
+  "model": "phi-4",
+  "benchmark": "PlanBench",
+  "task": "t7",
+  "config": "blocksworld",
+  "num_tasks": 100,
+  "num_evaluated": 51,
+  "total_correct": 4,
+  "success_rate": 0.0784
+}

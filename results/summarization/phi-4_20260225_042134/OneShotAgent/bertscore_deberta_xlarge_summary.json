@@ -1,0 +1,9 @@
+{
+  "model": "phi-4",
+  "provider": "Azure",
+  "num_tasks": 100,
+  "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+  "avg_bertscore_f1": 0.666924,
+  "bs_ci_lo": 0.655,
+  "bs_ci_hi": 0.678
+}

@@ -1,0 +1,9 @@
+{
+  "model": "deepseek-v3.2",
+  "provider": "Azure",
+  "num_tasks": 100,
+  "bertscore_model_type": "distilbert-base-uncased",
+  "avg_bertscore_f1": 0.799434,
+  "bs_ci_lo": 0.7914,
+  "bs_ci_hi": 0.8076
+}

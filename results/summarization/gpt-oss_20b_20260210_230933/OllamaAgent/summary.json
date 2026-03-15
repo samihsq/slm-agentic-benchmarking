@@ -1,0 +1,13 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gpt-oss:20b",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.56,
+  "mean_rougeL": 0.1776,
+  "mean_rouge1": 0.2523,
+  "mean_rouge2": 0.0539,
+  "mean_latency": 6.75,
+  "total_cost": 0
+}

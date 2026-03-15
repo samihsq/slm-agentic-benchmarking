@@ -1,0 +1,83 @@
+[
+  {
+    "model": "dasd-4b",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 0.58,
+    "correct": 29,
+    "total": 50,
+    "elapsed_seconds": 2025.2,
+    "avg_latency": 40.5
+  },
+  {
+    "model": "falcon-h1-90m",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 50,
+    "elapsed_seconds": 118.0,
+    "avg_latency": 2.36
+  },
+  {
+    "model": "qwen3-0.6b",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 0.1,
+    "correct": 5,
+    "total": 50,
+    "elapsed_seconds": 186.3,
+    "avg_latency": 3.73
+  },
+  {
+    "model": "gemma3-1b",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 50,
+    "elapsed_seconds": 119.9,
+    "avg_latency": 2.4
+  },
+  {
+    "model": "gemma3-4b",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 50,
+    "elapsed_seconds": 119.8,
+    "avg_latency": 2.4
+  },
+  {
+    "model": "gemma3n-e2b",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 50,
+    "elapsed_seconds": 119.1,
+    "avg_latency": 2.38
+  },
+  {
+    "model": "gemma3n-e4b",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 50,
+    "elapsed_seconds": 118.8,
+    "avg_latency": 2.38
+  },
+  {
+    "model": "gpt-oss-20b",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 1.0,
+    "correct": 50,
+    "total": 50,
+    "elapsed_seconds": 383.2,
+    "avg_latency": 7.66
+  },
+  {
+    "model": "phi4-mini-reasoning-ollama",
+    "benchmark": "matrix_recall_xhard",
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 50,
+    "elapsed_seconds": 119.4,
+    "avg_latency": 2.39
+  }
+]

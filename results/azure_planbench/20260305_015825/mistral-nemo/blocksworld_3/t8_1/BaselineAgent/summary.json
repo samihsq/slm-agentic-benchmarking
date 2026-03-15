@@ -1,0 +1,11 @@
+{
+  "agent": "BaselineAgent",
+  "model": "mistral-nemo",
+  "benchmark": "PlanBench",
+  "task": "t8_1",
+  "config": "blocksworld_3",
+  "num_tasks": 100,
+  "num_evaluated": 0,
+  "total_correct": 0,
+  "success_rate": null
+}

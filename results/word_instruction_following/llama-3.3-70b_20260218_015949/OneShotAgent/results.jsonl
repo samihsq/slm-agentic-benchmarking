@@ -1,0 +1,14 @@
+{"task_id": "wif_sz01_r00", "list_size": 1, "rollout_id": 0, "levels_passed": 5, "score": 0.16666666666666666, "success": true, "latency": 63.31602096557617, "cost": 0.00042578999999999995}
+{"task_id": "wif_sz01_r01", "list_size": 1, "rollout_id": 1, "levels_passed": 5, "score": 0.16666666666666666, "success": true, "latency": 120.23403787612915, "cost": 0.00042578999999999995}
+{"task_id": "wif_sz01_r02", "list_size": 1, "rollout_id": 2, "levels_passed": 5, "score": 0.16666666666666666, "success": true, "latency": 118.50350713729858, "cost": 0.00042578999999999995}
+{"task_id": "wif_sz01_r03", "list_size": 1, "rollout_id": 3, "levels_passed": 5, "score": 0.16666666666666666, "success": true, "latency": 59.6905300617218, "cost": 0.00043173000000000007}
+{"task_id": "wif_sz01_r04", "list_size": 1, "rollout_id": 4, "levels_passed": 5, "score": 0.16666666666666666, "success": true, "latency": 60.56940698623657, "cost": 0.00043173000000000007}
+{"task_id": "wif_sz01_r05", "list_size": 1, "rollout_id": 5, "levels_passed": 5, "score": 0.16666666666666666, "success": true, "latency": 3.1822056770324707, "cost": 0.00042578999999999995}
+{"task_id": "wif_sz01_r06", "list_size": 1, "rollout_id": 6, "levels_passed": 5, "score": 0.16666666666666666, "success": true, "latency": 235.90313720703125, "cost": 0.00035721000000000006}
+{"task_id": "wif_sz01_r07", "list_size": 1, "rollout_id": 7, "levels_passed": 0, "score": 0.0, "success": false, "latency": 180.60238122940063, "cost": 0.0}
+{"task_id": "wif_sz01_r08", "list_size": 1, "rollout_id": 8, "levels_passed": 0, "score": 0.0, "success": false, "latency": 119.7137200832367, "cost": 0.0}
+{"task_id": "wif_sz01_r09", "list_size": 1, "rollout_id": 9, "levels_passed": 0, "score": 0.0, "success": false, "latency": 120.36704206466675, "cost": 0.0}
+{"task_id": "wif_sz02_r00", "list_size": 2, "rollout_id": 0, "levels_passed": 0, "score": 0.0, "success": false, "latency": 120.2391266822815, "cost": 0.0}
+{"task_id": "wif_sz02_r01", "list_size": 2, "rollout_id": 1, "levels_passed": 0, "score": 0.0, "success": false, "latency": 180.54692602157593, "cost": 0.0}
+{"task_id": "wif_sz02_r02", "list_size": 2, "rollout_id": 2, "levels_passed": 0, "score": 0.0, "success": false, "latency": 240.3243498802185, "cost": 0.0}
+{"task_id": "wif_sz02_r03", "list_size": 2, "rollout_id": 3, "levels_passed": 0, "score": 0.0, "success": false, "latency": 240.14176678657532, "cost": 0.0}

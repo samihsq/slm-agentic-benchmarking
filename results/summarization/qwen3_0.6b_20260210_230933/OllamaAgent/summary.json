@@ -1,0 +1,13 @@
+{
+  "agent": "OllamaAgent",
+  "model": "qwen3:0.6b",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.42,
+  "mean_rougeL": 0.1414,
+  "mean_rouge1": 0.2038,
+  "mean_rouge2": 0.03,
+  "mean_latency": 1.47,
+  "total_cost": 0
+}

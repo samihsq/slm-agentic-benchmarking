@@ -1,0 +1,51 @@
+{
+  "timestamp": "20260307_044006",
+  "suite": "bbl24",
+  "examples_per_task": 20,
+  "architectures": [
+    "one_shot",
+    "sequential",
+    "concurrent",
+    "group_chat"
+  ],
+  "azure_models": [
+    "mistral-small"
+  ],
+  "ollama_models": [],
+  "results": [
+    {
+      "backend": "azure",
+      "model": "mistral-small",
+      "architecture": "one_shot",
+      "weighted_accuracy": 0.666387907702214,
+      "skipped": true
+    },
+    {
+      "backend": "azure",
+      "model": "mistral-small",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.5400520355951683,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "azure",
+      "model": "mistral-small",
+      "architecture": "concurrent",
+      "weighted_accuracy": 0.6253760473587989,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "azure",
+      "model": "mistral-small",
+      "architecture": "group_chat",
+      "weighted_accuracy": 0.5733283043685237,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    }
+  ]
+}

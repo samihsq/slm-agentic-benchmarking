@@ -1,0 +1,93 @@
+{
+  "timestamp": "20260312_161103",
+  "suite": "bbl24",
+  "examples_per_task": 20,
+  "architectures": [
+    "sequential"
+  ],
+  "azure_models": [],
+  "ollama_models": [
+    "qwen3-0.6b",
+    "gemma3-1b",
+    "gemma3n-e2b",
+    "phi4-mini-reasoning-ollama",
+    "dasd-4b",
+    "gemma3-4b",
+    "gemma3n-e4b",
+    "gpt-oss-20b"
+  ],
+  "results": [
+    {
+      "backend": "ollama",
+      "model": "qwen3-0.6b",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.3791430058718952,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3-1b",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.34107518622795013,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3n-e2b",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.5155979748641819,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "phi4-mini-reasoning-ollama",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.37498536071743355,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "dasd-4b",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.3608196386230181,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3-4b",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.5190161614449292,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3n-e4b",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.5614585883142739,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gpt-oss-20b",
+      "architecture": "sequential",
+      "weighted_accuracy": 0.6289780210081269,
+      "num_examples": 518,
+      "total_cost": 0,
+      "skipped": false
+    }
+  ]
+}

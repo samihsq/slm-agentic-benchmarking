@@ -1,0 +1,12 @@
+{
+  "agent": "OneShotAgent",
+  "model": "phi-4",
+  "benchmark": "Summarization (XSum)",
+  "split": "validation",
+  "metric": "rougeL",
+  "threshold": 0.15,
+  "num_tasks": 2,
+  "avg_score": 0.1557315233785822,
+  "success_rate": 0.5,
+  "results_dir": "results/summarization/phi-4_20260225_035100/OneShotAgent"
+}

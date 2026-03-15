@@ -1,0 +1,19 @@
+{
+  "agent": "OneShotAgent",
+  "model": "deepseek-v3.2",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.84,
+  "num_tasks": 50,
+  "total_latency_seconds": 1015.1402907371521,
+  "avg_latency_seconds": 20.302805814743042,
+  "total_cost_usd": 0.0213745,
+  "results_dir": "results/matrix_recall_xhard/deepseek-v3.2_20260218_102432/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "x-hard": {
+      "accuracy": 0.84,
+      "correct": 42,
+      "total": 50
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "agent": "OllamaAgent",
+  "model": "qwen3:0.6b",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 3,
+  "mean_composite_score": 0.9156,
+  "mean_structure_score": 0.8889,
+  "mean_budget_score": 1.0,
+  "mean_constraint_score": 0.8667,
+  "success_rate": 1.0,
+  "travel_success_rate": 1.0,
+  "shopping_success_rate": 1.0,
+  "mean_latency": 4.85,
+  "total_cost": 0
+}

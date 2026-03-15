@@ -1,0 +1,16 @@
+{"task_id": "wif_sz01_r00", "list_size": 1, "rollout_id": 0, "levels_correct": 27, "score": 0.9, "success": true, "latency": 36.24033737182617, "cost": 0.0035964999999999994}
+{"task_id": "wif_sz01_r01", "list_size": 1, "rollout_id": 1, "levels_correct": 28, "score": 0.9333333333333333, "success": true, "latency": 40.536136865615845, "cost": 0.0038454999999999995}
+{"task_id": "wif_sz01_r02", "list_size": 1, "rollout_id": 2, "levels_correct": 28, "score": 0.9333333333333333, "success": true, "latency": 38.258580923080444, "cost": 0.0038604999999999993}
+{"task_id": "wif_sz01_r03", "list_size": 1, "rollout_id": 3, "levels_correct": 28, "score": 0.9333333333333333, "success": true, "latency": 44.97816348075867, "cost": 0.0038755}
+{"task_id": "wif_sz01_r04", "list_size": 1, "rollout_id": 4, "levels_correct": 25, "score": 0.8333333333333334, "success": true, "latency": 41.81584548950195, "cost": 0.0038854999999999996}
+{"task_id": "wif_sz01_r05", "list_size": 1, "rollout_id": 5, "levels_correct": 27, "score": 0.9, "success": true, "latency": 40.199687242507935, "cost": 0.0038454999999999995}
+{"task_id": "wif_sz01_r06", "list_size": 1, "rollout_id": 6, "levels_correct": 24, "score": 0.8, "success": true, "latency": 46.52901291847229, "cost": 0.0038544999999999994}
+{"task_id": "wif_sz01_r07", "list_size": 1, "rollout_id": 7, "levels_correct": 27, "score": 0.9, "success": true, "latency": 38.470584869384766, "cost": 0.0038434999999999997}
+{"task_id": "wif_sz01_r08", "list_size": 1, "rollout_id": 8, "levels_correct": 26, "score": 0.8666666666666667, "success": true, "latency": 36.78165102005005, "cost": 0.0038464999999999992}
+{"task_id": "wif_sz01_r09", "list_size": 1, "rollout_id": 9, "levels_correct": 27, "score": 0.9, "success": true, "latency": 31.266810178756714, "cost": 0.0038454999999999995}
+{"task_id": "wif_sz02_r00", "list_size": 2, "rollout_id": 0, "levels_correct": 26, "score": 0.8666666666666667, "success": true, "latency": 44.216474771499634, "cost": 0.0038864999999999993}
+{"task_id": "wif_sz02_r01", "list_size": 2, "rollout_id": 1, "levels_correct": 27, "score": 0.9, "success": true, "latency": 36.971213579177856, "cost": 0.0038959999999999997}
+{"task_id": "wif_sz02_r02", "list_size": 2, "rollout_id": 2, "levels_correct": 27, "score": 0.9, "success": true, "latency": 44.561474561691284, "cost": 0.0038909999999999995}
+{"task_id": "wif_sz02_r03", "list_size": 2, "rollout_id": 3, "levels_correct": 26, "score": 0.8666666666666667, "success": true, "latency": 37.10301971435547, "cost": 0.0038809999999999995}
+{"task_id": "wif_sz02_r04", "list_size": 2, "rollout_id": 4, "levels_correct": 28, "score": 0.9333333333333333, "success": true, "latency": 33.38629698753357, "cost": 0.0039235}
+{"task_id": "wif_sz02_r05", "list_size": 2, "rollout_id": 5, "levels_correct": 26, "score": 0.8666666666666667, "success": true, "latency": 33.14509916305542, "cost": 0.0038935}

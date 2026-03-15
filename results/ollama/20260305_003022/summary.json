@@ -1,0 +1,11 @@
+[
+  {
+    "model": "dasd-4b",
+    "benchmark": "plan_bench",
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 10,
+    "elapsed_seconds": 13.5,
+    "avg_latency": 1.35
+  }
+]

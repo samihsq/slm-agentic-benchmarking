@@ -1,0 +1,19 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/tiiuae/Falcon-H1-Tiny-R-90M-GGUF:Q4_K_M",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.0,
+  "num_tasks": 50,
+  "total_latency_seconds": 848.2503981590271,
+  "avg_latency_seconds": 16.965007963180543,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260218_104921/matrix_recall_xhard/falcon-h1-90m/OllamaAgent",
+  "breakdown_by_difficulty": {
+    "x-hard": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 50
+    }
+  }
+}

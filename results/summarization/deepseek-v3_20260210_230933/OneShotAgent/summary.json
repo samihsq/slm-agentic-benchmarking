@@ -1,0 +1,13 @@
+{
+  "agent": "OneShotAgent",
+  "model": "deepseek-v3",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.0,
+  "mean_rougeL": 0.0253,
+  "mean_rouge1": 0.0258,
+  "mean_rouge2": 0.0,
+  "mean_latency": 99.8,
+  "total_cost": 0
+}

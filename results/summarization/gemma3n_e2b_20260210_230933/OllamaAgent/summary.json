@@ -1,0 +1,13 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gemma3n:e2b",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.57,
+  "mean_rougeL": 0.1641,
+  "mean_rouge1": 0.2293,
+  "mean_rouge2": 0.055,
+  "mean_latency": 3.29,
+  "total_cost": 0
+}

@@ -1,0 +1,41 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gemma3n:e2b",
+  "num_rollouts": 10,
+  "mean_score": 0.05,
+  "success_rate": 0.5,
+  "mean_latency": 5.13,
+  "total_cost": 0,
+  "level_accuracy": {
+    "level_1": {
+      "accuracy": 0.5,
+      "correct": 5,
+      "total": 10
+    },
+    "level_2": {
+      "accuracy": 0.6,
+      "correct": 3,
+      "total": 5
+    },
+    "level_3": {
+      "accuracy": 1.0,
+      "correct": 3,
+      "total": 3
+    },
+    "level_4": {
+      "accuracy": 1.0,
+      "correct": 3,
+      "total": 3
+    },
+    "level_5": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 3
+    }
+  },
+  "levels_passed_distribution": {
+    "0": 5,
+    "1": 2,
+    "4": 3
+  }
+}

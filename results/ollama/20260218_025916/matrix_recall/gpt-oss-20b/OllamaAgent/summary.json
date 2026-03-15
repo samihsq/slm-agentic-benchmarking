@@ -1,0 +1,29 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gpt-oss:20b",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 1.0,
+  "num_tasks": 50,
+  "total_latency_seconds": 305.8723030090332,
+  "avg_latency_seconds": 6.117446060180664,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260218_025916/matrix_recall/gpt-oss-20b/OllamaAgent",
+  "breakdown_by_difficulty": {
+    "medium": {
+      "accuracy": 1.0,
+      "correct": 17,
+      "total": 17
+    },
+    "easy": {
+      "accuracy": 1.0,
+      "correct": 20,
+      "total": 20
+    },
+    "hard": {
+      "accuracy": 1.0,
+      "correct": 13,
+      "total": 13
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "model": "GPT-OSS-20B",
+  "model_label": "GPT-OSS-20B",
+  "benchmark": "Criticality v2 (Logprob-Based)",
+  "quality_score": "WA",
+  "is_thinking_model": false,
+  "top_logprobs_requested": 10,
+  "metrics": {
+    "rank_correlation": 0.2725,
+    "top1_accuracy": 0.315,
+    "calibration_error": 0.0137,
+    "avg_margin": 0.5766,
+    "avg_entropy": 1.6411,
+    "num_tasks": 200,
+    "easy_accuracy": 0.3158,
+    "hard_accuracy": 0.3
+  },
+  "num_tasks": 200,
+  "total_latency_seconds": 97.43,
+  "avg_latency_seconds": 0.49,
+  "total_prompt_tokens": 0,
+  "total_completion_tokens": 0,
+  "results_dir": "results/criticality_v2/GPT-OSS-20B_20260207_035309"
+}

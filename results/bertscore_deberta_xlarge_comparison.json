@@ -1,0 +1,200 @@
+[
+  {
+    "model": "deepseek-r1",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.43896,
+    "bs_ci_lo": 0.4352,
+    "bs_ci_hi": 0.4425
+  },
+  {
+    "model": "deepseek-v3",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.439251,
+    "bs_ci_lo": 0.4355,
+    "bs_ci_hi": 0.4428
+  },
+  {
+    "model": "deepseek-v3.2",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.689741,
+    "bs_ci_lo": 0.6769,
+    "bs_ci_hi": 0.7016
+  },
+  {
+    "model": "gemma3:1b",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.348664,
+    "bs_ci_lo": 0.3445,
+    "bs_ci_hi": 0.3527
+  },
+  {
+    "model": "gemma3:4b",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.348664,
+    "bs_ci_lo": 0.3445,
+    "bs_ci_hi": 0.3527
+  },
+  {
+    "model": "gemma3n:e2b",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.348664,
+    "bs_ci_lo": 0.3445,
+    "bs_ci_hi": 0.3527
+  },
+  {
+    "model": "gemma3n:e4b",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.348664,
+    "bs_ci_lo": 0.3445,
+    "bs_ci_hi": 0.3527
+  },
+  {
+    "model": "gpt-4o",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.675401,
+    "bs_ci_lo": 0.6633,
+    "bs_ci_hi": 0.6867
+  },
+  {
+    "model": "gpt-oss:20b",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.661202,
+    "bs_ci_lo": 0.6489,
+    "bs_ci_hi": 0.673
+  },
+  {
+    "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.649383,
+    "bs_ci_lo": 0.6374,
+    "bs_ci_hi": 0.6611
+  },
+  {
+    "model": "hf.co/tiiuae/Falcon-H1-Tiny-R-90M-GGUF:Q4_K_M",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.348664,
+    "bs_ci_lo": 0.3445,
+    "bs_ci_hi": 0.3527
+  },
+  {
+    "model": "llama-3.2-11b-vision",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.610598,
+    "bs_ci_lo": 0.5843,
+    "bs_ci_hi": 0.6369
+  },
+  {
+    "model": "llama-3.3-70b",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.489326,
+    "bs_ci_lo": 0.4674,
+    "bs_ci_hi": 0.5131
+  },
+  {
+    "model": "ministral-3b",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.682085,
+    "bs_ci_lo": 0.67,
+    "bs_ci_hi": 0.6948
+  },
+  {
+    "model": "mistral-large-3",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.677991,
+    "bs_ci_lo": 0.6646,
+    "bs_ci_hi": 0.691
+  },
+  {
+    "model": "mistral-nemo",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.411326,
+    "bs_ci_lo": 0.4071,
+    "bs_ci_hi": 0.4155
+  },
+  {
+    "model": "mistral-small",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.702299,
+    "bs_ci_lo": 0.6888,
+    "bs_ci_hi": 0.7159
+  },
+  {
+    "model": "phi-4",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.666924,
+    "bs_ci_lo": 0.655,
+    "bs_ci_hi": 0.678
+  },
+  {
+    "model": "phi-4-mini",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.647857,
+    "bs_ci_lo": 0.6314,
+    "bs_ci_hi": 0.664
+  },
+  {
+    "model": "phi-4-mini-reasoning",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.553929,
+    "bs_ci_lo": 0.5403,
+    "bs_ci_hi": 0.5685
+  },
+  {
+    "model": "phi4-mini-reasoning:latest",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.348664,
+    "bs_ci_lo": 0.3445,
+    "bs_ci_hi": 0.3527
+  },
+  {
+    "model": "qwen3:0.6b",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+    "avg_bertscore_f1": 0.637927,
+    "bs_ci_lo": 0.6285,
+    "bs_ci_hi": 0.6473
+  }
+]

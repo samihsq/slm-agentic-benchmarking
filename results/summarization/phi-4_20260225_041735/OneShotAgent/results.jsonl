@@ -1,0 +1,3 @@
+{"task_id": "xsum_38295789", "metric": "rougeL", "score": 0.243902, "success": true, "latency": 20.68, "cost": 0.0, "rougeL": 0.24390243902439027, "rouge1": 0.24390243902439027, "rouge2": 0.05128205128205128, "rougeLsum": 0.24390243902439027}
+{"task_id": "xsum_40202028", "metric": "rougeL", "score": 0.156863, "success": true, "latency": 17.26, "cost": 0.0, "rougeL": 0.1568627450980392, "rouge1": 0.19607843137254902, "rouge2": 0.04081632653061224, "rougeLsum": 0.1568627450980392}
+{"task_id": "xsum_36177725", "metric": "rougeL", "score": 0.290323, "success": true, "latency": 19.83, "cost": 0.0, "rougeL": 0.2903225806451613, "rouge1": 0.41935483870967744, "rouge2": 0.23333333333333336, "rougeLsum": 0.2903225806451613}

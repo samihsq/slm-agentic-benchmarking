@@ -1,0 +1,34 @@
+{
+  "agent": "OneShotAgent",
+  "model": "ministral-3b",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.44,
+  "num_tasks": 50,
+  "total_latency_seconds": 30.87496280670166,
+  "avg_latency_seconds": 0.6174992561340332,
+  "total_cost_usd": 0.0213245,
+  "results_dir": "results/matrix_recall/ministral-3b_20260218_102348/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "easy": {
+      "accuracy": 0.6875,
+      "correct": 11,
+      "total": 16
+    },
+    "medium": {
+      "accuracy": 0.75,
+      "correct": 9,
+      "total": 12
+    },
+    "hard": {
+      "accuracy": 0.16666666666666666,
+      "correct": 2,
+      "total": 12
+    },
+    "x-hard": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 10
+    }
+  }
+}

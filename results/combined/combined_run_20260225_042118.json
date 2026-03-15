@@ -1,0 +1,33 @@
+{
+  "timestamp": "20260225_042118",
+  "configs": [
+    {
+      "model": "phi-4",
+      "benchmark": "summarization",
+      "agent": "oneshot",
+      "concurrency": 2,
+      "limit": 5,
+      "summarization_metric": "rougeL",
+      "summarization_split": "validation",
+      "summarization_threshold": null,
+      "summarization_bertscore_model_type": "microsoft/deberta-xlarge-mnli",
+      "summarization_bartscore_model": "facebook/bart-large-cnn",
+      "summarization_device": null
+    }
+  ],
+  "results": [
+    {
+      "model": "phi-4",
+      "benchmark": "summarization",
+      "agent": "oneshot",
+      "num_tasks": 5,
+      "correct": 2,
+      "avg_score": 0.1844977132095776,
+      "accuracy": 0.4,
+      "metric": "rougeL",
+      "split": "validation",
+      "output_dir": "results/summarization/phi-4_20260225_042005"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "model": "gpt-oss-20b",
+    "benchmark": "bigbench",
+    "agent_type": "one_shot",
+    "accuracy": 0.7395833333333334,
+    "correct": 71,
+    "total": 96,
+    "elapsed_seconds": 452.3,
+    "avg_latency": 4.71
+  },
+  {
+    "model": "dasd-4b",
+    "benchmark": "bigbench",
+    "agent_type": "one_shot",
+    "accuracy": 0.59375,
+    "correct": 57,
+    "total": 96,
+    "elapsed_seconds": 506.1,
+    "avg_latency": 5.27
+  }
+]

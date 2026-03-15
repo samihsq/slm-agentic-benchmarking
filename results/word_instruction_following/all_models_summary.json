@@ -1,0 +1,88 @@
+{
+  "benchmark": "word_instruction_following",
+  "agent": "one_shot",
+  "limit": null,
+  "timestamp": "20260224_064516",
+  "results": {
+    "ministral-3b": {
+      "success_rate": 1.0,
+      "avg_score": 0.5977,
+      "avg_latency": 34.18164480447769,
+      "total_cost": 0.42469450000000003,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/ministral-3b_20260218_023159"
+    },
+    "gpt-4o": {
+      "success_rate": 1.0,
+      "avg_score": 0.856,
+      "avg_latency": 39.11409870386124,
+      "total_cost": 2.87223,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/gpt-4o_20260218_023159"
+    },
+    "mistral-small": {
+      "success_rate": 1.0,
+      "avg_score": 0.7563,
+      "avg_latency": 39.610374083518984,
+      "total_cost": 0.42543299999999995,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/mistral-small_20260218_023159"
+    },
+    "mistral-large-3": {
+      "success_rate": 1.0,
+      "avg_score": 0.7973,
+      "avg_latency": 44.748826258182525,
+      "total_cost": 0.426341,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/mistral-large-3_20260218_023159"
+    },
+    "phi-4": {
+      "success_rate": 1.0,
+      "avg_score": 0.7607,
+      "avg_latency": 257.45184870958326,
+      "total_cost": 0.06714273999999999,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/phi-4_20260218_023159"
+    },
+    "mistral-nemo": {
+      "success_rate": 0.0,
+      "avg_score": 0.0,
+      "avg_latency": 998.701249909401,
+      "total_cost": 0.0,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/mistral-nemo_20260218_023159"
+    },
+    "llama-3.2-11b-vision": {
+      "success_rate": 0.17,
+      "avg_score": 0.079,
+      "avg_latency": 5061.773346850872,
+      "total_cost": 0.054621,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/llama-3.2-11b-vision_20260218_023159"
+    },
+    "phi-4-mini": {
+      "success_rate": 0.17,
+      "avg_score": 0.0617,
+      "avg_latency": 5095.402435646057,
+      "total_cost": 0.029613499999999997,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/phi-4-mini_20260218_023159"
+    },
+    "llama-3.3-70b": {
+      "success_rate": 0.1,
+      "avg_score": 0.0403,
+      "avg_latency": 5308.2965361189845,
+      "total_cost": 0.01221534,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/llama-3.3-70b_20260218_023159"
+    },
+    "phi-4-mini-reasoning": {
+      "success_rate": 0.11,
+      "avg_score": 0.0143,
+      "avg_latency": 5330.38752471447,
+      "total_cost": 0.16144250000000002,
+      "num_tasks": 100,
+      "run_dir": "results/word_instruction_following/phi-4-mini-reasoning_20260218_023159"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "agent": "OneShotAgent",
+  "model": "gpt-4o",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.92,
+  "num_tasks": 50,
+  "total_latency_seconds": 36.81488656997681,
+  "avg_latency_seconds": 0.7362977313995361,
+  "total_cost_usd": 0.099745,
+  "results_dir": "results/matrix_recall/gpt-4o_20260218_102348/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "easy": {
+      "accuracy": 1.0,
+      "correct": 16,
+      "total": 16
+    },
+    "medium": {
+      "accuracy": 0.8333333333333334,
+      "correct": 10,
+      "total": 12
+    },
+    "hard": {
+      "accuracy": 0.9166666666666666,
+      "correct": 11,
+      "total": 12
+    },
+    "x-hard": {
+      "accuracy": 0.9,
+      "correct": 9,
+      "total": 10
+    }
+  }
+}

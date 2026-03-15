@@ -1,0 +1,17 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gemma3:4b",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 3,
+  "mean_composite_score": 0.05,
+  "mean_structure_score": 0.0,
+  "mean_budget_score": 0.1667,
+  "mean_constraint_score": 0.0,
+  "success_rate": 0.0,
+  "travel_success_rate": 0.0,
+  "shopping_success_rate": 0.0,
+  "mean_latency": 17.06,
+  "total_cost": 0
+}

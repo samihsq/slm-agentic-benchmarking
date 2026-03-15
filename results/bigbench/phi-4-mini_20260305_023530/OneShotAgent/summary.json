@@ -1,0 +1,45 @@
+{
+  "agent": "OneShotAgent",
+  "model": "phi-4-mini",
+  "benchmark": "BIG-bench",
+  "task_configs": [
+    "logical_deduction",
+    "navigate",
+    "penguins_in_a_table",
+    "causal_judgment",
+    "date_understanding",
+    "arithmetic"
+  ],
+  "accuracy": 0.0,
+  "num_tasks": 6,
+  "total_latency_seconds": 490.84239411354065,
+  "avg_latency_seconds": 81.8070656855901,
+  "total_cost_usd": 0,
+  "results_dir": "results/bigbench/phi-4-mini_20260305_023530/OneShotAgent",
+  "breakdown_by_config": {
+    "logical_deduction": {
+      "correct": 0,
+      "total": 1
+    },
+    "navigate": {
+      "correct": 0,
+      "total": 1
+    },
+    "penguins_in_a_table": {
+      "correct": 0,
+      "total": 1
+    },
+    "causal_judgment": {
+      "correct": 0,
+      "total": 1
+    },
+    "date_understanding": {
+      "correct": 0,
+      "total": 1
+    },
+    "arithmetic": {
+      "correct": 0,
+      "total": 1
+    }
+  }
+}

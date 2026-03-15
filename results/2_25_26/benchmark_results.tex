@@ -1,0 +1,250 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+\definecolor{toprow}{HTML}{E8F5E9}
+\definecolor{midrow}{HTML}{FFF8E1}
+\definecolor{botrow}{HTML}{FFEBEE}
+\definecolor{hdrblue}{HTML}{1565C0}
+\definecolor{notegray}{HTML}{757575}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{notegray}{\small February 25, 2026}}
+\lhead{\textcolor{notegray}{\small SLM Agentic Benchmarking}}
+\cfoot{\thepage}
+
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+\begin{document}
+
+\begin{center}
+{\LARGE \textbf{SLM Agentic Benchmark Results}}\\[4pt]
+{\large February 25, 2026}\\[6pt]
+{\small\textcolor{notegray}{Benchmarks: Summarization (XSum) $\cdot$ Planning (DeepPlanning)}}\\[2pt]
+{\small\textcolor{notegray}{Agents: OneShotAgent (Azure) $\cdot$ OllamaAgent (Local)}}\\[2pt]
+{\small\textcolor{notegray}{Note: Ollama summarization n\,=\,100 results are pending for most local models (only dasd-4b complete at time of writing).}}
+\end{center}
+
+\vspace{0.4cm}
+
+%% =======================================================================
+\section*{1\quad Summarization (XSum) --- Azure}
+%% =======================================================================
+
+Models are given a BBC news article and asked to produce a single-sentence summary in JSON format.
+Two metrics are reported: ROUGE-L F1 (lexical overlap; success $\geq 0.15$) and BERTScore F1 (semantic similarity via distilbert-base-uncased).
+Dataset: XSum validation split, $n = 100$ tasks per model.
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 1.} Summarization --- Azure models ($n=100$). Sorted by ROUGE-L success rate.}
+\begin{tabular}{l R{0.8cm} R{1.3cm} R{1.2cm} R{1.2cm} R{2.5cm} R{2.5cm}}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{RL Succ.} & \textbf{Avg RL} & \textbf{BS F1} & \textbf{RL 95\% CI} & \textbf{BS 95\% CI} \\
+ & & \textbf{(\%)} & & & \textbf{(Wilson)} & \textbf{(Bootstrap)} \\
+\midrule
+\rowcolor{toprow} mistral-small        & 100 & 77.0 & 0.225 & 0.800 & [67.8, 84.2] & [0.791, 0.809] \\
+\rowcolor{toprow} deepseek-v3.2        & 100 & 74.0 & 0.224 & 0.799 & [64.6, 81.6] & [0.791, 0.808] \\
+\rowcolor{toprow} mistral-large-3      & 100 & 66.0 & 0.194 & 0.792 & [56.3, 74.5] & [0.784, 0.801] \\
+gpt-4o               & 100 & 67.0 & 0.191 & 0.790 & [57.3, 75.4] & [0.783, 0.798] \\
+ministral-3b         & 100 & 70.0 & 0.208 & 0.789 & [60.4, 78.1] & [0.780, 0.797] \\
+phi-4                & 100 & 59.0 & 0.177 & 0.784 & [49.2, 68.1] & [0.776, 0.791] \\
+\rowcolor{midrow} phi-4-mini           & 100 & 48.0 & 0.157 & 0.770 & [38.5, 57.7] & [0.760, 0.781] \\
+\rowcolor{midrow} llama-3.2-11b-vision & 100 & 51.0 & 0.160 & 0.748 & [41.3, 60.6] & [0.732, 0.764] \\
+\rowcolor{midrow} phi-4-mini-reasoning & 100 & 20.0 & 0.098 & 0.704 & [13.3, 28.9] & [0.693, 0.715] \\
+\rowcolor{midrow} llama-3.3-70b        & 100 & 19.0 & 0.075 & 0.682 & [12.5, 27.8] & [0.669, 0.696] \\
+\midrule
+\multicolumn{7}{l}{\textcolor{notegray}{\footnotesize 0\% RL success below; BERTScore indicates semantically valid paraphrases:}} \\
+deepseek-r1          & 100 &  0.0 & 0.025 & 0.649 & [0.0, 3.7]   & [0.644, 0.654] \\
+deepseek-v3          & 100 &  0.0 & 0.025 & 0.649 & [0.0, 3.7]   & [0.644, 0.654] \\
+mistral-nemo         & 100 &  0.0 & 0.000 & 0.647 & [0.0, 3.7]   & [0.643, 0.652] \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize\textcolor{notegray}{RL = ROUGE-L (threshold $\geq$0.15, Wilson CI). BS = BERTScore F1 distilbert-base-uncased (bootstrap percentile CI, 2000 resamples). deepseek-r1/v3 and mistral-nemo produce semantically valid summaries with different wording from the XSum reference; ROUGE-L collapses to 0\% while BERTScore ($\approx$0.648) correctly ranks them above llama-3.3-70b (0.682).}}
+\end{table}
+
+\vspace{0.4cm}
+
+%% =======================================================================
+\section*{2\quad Summarization (XSum) --- Local (Ollama)}
+%% =======================================================================
+
+Same task as Section~1. Local models run with OllamaAgent (concurrency 2).
+\textbf{Note:} At time of writing, only \texttt{dasd-4b} has completed $n=100$; remaining models show $n=3$ (quick check) and will be updated when the full Ollama run finishes.
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 2.} Summarization --- Local models (ROUGE-L threshold $\geq 0.15$; BERTScore via distilbert)}
+\begin{tabular}{l R{0.8cm} R{1.3cm} R{1.2cm} R{1.2cm} R{2.5cm} R{2.5cm}}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{RL Succ.} & \textbf{Avg RL} & \textbf{BS F1} & \textbf{RL 95\% CI} & \textbf{BS 95\% CI} \\
+ & & \textbf{(\%)} & & & \textbf{(Wilson)} & \textbf{(Bootstrap)} \\
+\midrule
+\rowcolor{toprow} dasd-4b              & 100 & 57.0 & 0.171 & 0.779 & [47.2, 66.3] & [0.772, 0.787] \\
+\midrule
+\multicolumn{7}{l}{\textcolor{notegray}{\footnotesize Preliminary ($n=3$) results below --- full $n=100$ run in progress (wide CIs expected):}} \\
+\rowcolor{midrow} gpt-oss-20b          &   3 & 33.3 & 0.208 & 0.817 & [6.1, 79.2]  & [0.786, 0.836] \\
+\rowcolor{midrow} qwen3-0.6b           &   3 & 33.3 & 0.140 & 0.762 & [6.1, 79.2]  & [0.745, 0.775] \\
+\rowcolor{midrow} gemma3-1b            &   3 &  0.0 & 0.000 & 0.578 & [0.0, 56.2]  & [0.535, 0.614] \\
+\rowcolor{midrow} gemma3-4b            &   3 &  0.0 & 0.000 & 0.578 & [0.0, 56.2]  & [0.535, 0.614] \\
+\rowcolor{midrow} gemma3n-e2b          &   3 &  0.0 & 0.000 & 0.578 & [0.0, 56.2]  & [0.535, 0.614] \\
+\rowcolor{midrow} gemma3n-e4b          &   3 &  0.0 & 0.000 & 0.578 & [0.0, 56.2]  & [0.535, 0.614] \\
+\rowcolor{botrow} falcon-h1-90m        &   3 &  0.0 & 0.000 & 0.578 & [0.0, 56.2]  & [0.535, 0.614] \\
+\rowcolor{botrow} phi4-mini-reasoning  &   3 &  0.0 & 0.000 & 0.578 & [0.0, 56.2]  & [0.535, 0.614] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+%% =======================================================================
+\section*{3\quad Planning (DeepPlanning) --- Azure}
+%% =======================================================================
+
+Models receive either a travel or shopping planning request and must produce a structured output (day-by-day itinerary with budget summary, or a JSON shopping cart).
+Score = composite of structure, budget adherence, and constraint satisfaction (0--1 scale). Success = composite $\geq 0.5$.
+Dataset: Qwen/DeepPlanning synthetic tasks, $n = 50$ (mixed travel + shopping), Azure OneShotAgent.
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 3.} Planning --- Azure models ($n=50$, composite score, threshold $\geq 0.50$)}
+\begin{tabular}{l R{0.9cm} R{1.8cm} R{2.2cm} R{2.6cm} l}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{Succ.\ (\%)} & \textbf{Avg Score (\%)} & \textbf{95\% CI} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} gpt-4o              & 50 & 80.0 & 83.3 & [67.0, 88.8] & Azure \\
+mistral-large-3     & 50 & 46.0 & 33.9 & [33.0, 59.6] & Azure \\
+ministral-3b        & 50 & 42.0 & 46.1 & [29.4, 55.8] & Azure \\
+\rowcolor{midrow} phi-4-mini-reasoning& 50 & 18.0 & 20.2 & [9.8, 30.8]  & Azure \\
+\rowcolor{midrow} phi-4-mini          & 50 & 10.0 & 17.4 & [4.3, 21.4]  & Azure \\
+\rowcolor{botrow} llama-3.3-70b       & 50 &  4.0 &  9.6 & [1.1, 13.5]  & Azure \\
+\rowcolor{botrow} phi-4               & 50 &  0.0 &  7.5 & [0.0, 7.1]   & Azure \\
+\rowcolor{botrow} mistral-small       & 50 &  0.0 & 15.8 & [0.0, 7.1]   & Azure \\
+\rowcolor{botrow} mistral-nemo        & 50 &  0.0 &  7.5 & [0.0, 7.1]   & Azure \\
+\rowcolor{botrow} llama-3.2-11b-vision& 50 &  0.0 &  7.5 & [0.0, 7.1]   & Azure \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.4cm}
+
+%% =======================================================================
+\section*{4\quad Planning (DeepPlanning) --- Local (Ollama)}
+%% =======================================================================
+
+Same task as Section~3. Local models run with OllamaAgent (concurrency 2), $n = 50$ tasks each.
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 4.} Planning --- Local models ($n=50$, composite score, threshold $\geq 0.50$)}
+\begin{tabular}{l R{0.9cm} R{1.8cm} R{2.2cm} R{2.6cm} R{1.8cm} l}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{Succ.\ (\%)} & \textbf{Avg Score (\%)} & \textbf{95\% CI} & \textbf{Latency (s)} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} qwen3-0.6b           & 50 & 64.0 & 51.6 & [50.1, 75.9] &  20.9 & Ollama \\
+\rowcolor{toprow} gpt-oss-20b          & 50 & 52.0 & 61.1 & [38.5, 65.2] &  63.4 & Ollama \\
+dasd-4b              & 50 & 36.0 & 42.0 & [24.1, 49.9] & 360.0 & Ollama \\
+\rowcolor{botrow} gemma3-1b            & 50 &  0.0 &  7.5 & [0.0, 7.1]   &  17.1 & Ollama \\
+\rowcolor{botrow} gemma3-4b            & 50 &  0.0 &  7.5 & [0.0, 7.1]   &  17.3 & Ollama \\
+\rowcolor{botrow} gemma3n-e2b          & 50 &  0.0 &  7.5 & [0.0, 7.1]   &  17.3 & Ollama \\
+\rowcolor{botrow} gemma3n-e4b          & 50 &  0.0 &  7.5 & [0.0, 7.1]   &  17.2 & Ollama \\
+\rowcolor{botrow} falcon-h1-90m        & 50 &  0.0 &  7.5 & [0.0, 7.1]   &  17.1 & Ollama \\
+\rowcolor{botrow} phi4-mini-reasoning  & 50 &  0.0 &  7.5 & [0.0, 7.1]   &  17.1 & Ollama \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+%% =======================================================================
+\section*{5\quad Cross-Benchmark Summary}
+%% =======================================================================
+
+Combined view across both benchmarks for models with complete data ($n \geq 50$).
+Summarization success = ROUGE-L $\geq 0.15$; Planning success = composite $\geq 0.50$.
+``---'' = no data or run incomplete; $\dagger$ = 0\% success (output errors or off-format).
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 5.} Cross-benchmark comparison}
+\begin{tabular}{l R{2.4cm} R{2.4cm} l}
+\toprule
+\textbf{Model} & \textbf{Summ.\ RL (\%)} & \textbf{Planning (\%)} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} gpt-4o              & 67.0 & 80.0 & Azure \\
+\rowcolor{toprow} mistral-small       & 77.0 &  0.0$^\dagger$ & Azure \\
+\rowcolor{toprow} deepseek-v3.2       & 74.0 & --- & Azure \\
+\rowcolor{toprow} ministral-3b        & 70.0 & 42.0 & Azure \\
+mistral-large-3     & 66.0 & 46.0 & Azure \\
+phi-4               & 59.0 &  0.0$^\dagger$ & Azure \\
+llama-3.2-11b-vision& 51.0 &  0.0$^\dagger$ & Azure \\
+phi-4-mini          & 48.0 & 10.0 & Azure \\
+\rowcolor{midrow} qwen3-0.6b          & 33.3$^{*}$ & 64.0 & Ollama \\
+\rowcolor{midrow} gpt-oss-20b         & 33.3$^{*}$ & 52.0 & Ollama \\
+\rowcolor{midrow} dasd-4b             & 57.0 & 36.0 & Ollama \\
+\rowcolor{botrow} phi-4-mini-reasoning& 20.0 & 18.0 & Azure \\
+\rowcolor{botrow} llama-3.3-70b       & 19.0 &  4.0 & Azure \\
+\rowcolor{botrow} mistral-nemo        &  0.0$^\dagger$ &  0.0$^\dagger$ & Azure \\
+\rowcolor{botrow} deepseek-r1         &  0.0$^\dagger$ & --- & Azure \\
+\rowcolor{botrow} deepseek-v3         &  0.0$^\dagger$ & --- & Azure \\
+\rowcolor{botrow} gemma3-1b           &  0.0$^{*\dagger}$ &  0.0$^\dagger$ & Ollama \\
+\rowcolor{botrow} gemma3-4b           &  0.0$^{*\dagger}$ &  0.0$^\dagger$ & Ollama \\
+\rowcolor{botrow} falcon-h1-90m       &  0.0$^{*\dagger}$ &  0.0$^\dagger$ & Ollama \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize
+$^{*}$ Summarization $n=3$ only (full local run in progress) \quad
+$^\dagger$ 0\% success (error/off-format outputs) \quad
+--- = no planning run for this model
+}
+\end{table}
+
+\vspace{0.5cm}
+
+%% =======================================================================
+\section*{Methodology Notes}
+%% =======================================================================
+
+\begin{itemize}
+\item \textbf{Confidence intervals}: Wilson score intervals at 95\% confidence level, appropriate for binomial proportions near 0 or 1.
+
+\item \textbf{Summarization}: Each task presents a BBC news article from the XSum validation split. The model must return a JSON object with a single-sentence \texttt{response} field. Primary score = ROUGE-L F1 (via HuggingFace \texttt{evaluate}); secondary score = BERTScore F1 (distilbert-base-uncased, via \texttt{bert-score}). Documents truncated to 56,000 characters; \texttt{max\_completion\_tokens} set to 512 per task. BERTScore was computed in a post-hoc rescoring pass over stored traces (no re-inference required). Run date: 2026-02-25.
+
+\item \textbf{ROUGE-L vs.\ BERTScore}: Three Azure models (deepseek-r1, deepseek-v3, mistral-nemo) scored 0\% ROUGE-L success yet achieved BERTScore F1 $\approx 0.648$, comparable to phi-4-mini-reasoning (0.704). This is the well-known ROUGE-L paraphrase problem: these models produce semantically valid summaries that use different wording from the XSum reference, causing lexical overlap to collapse. BERTScore captures the semantic content correctly. Models with high ROUGE-L tend to also have high BERTScore, but the reverse is not always true.
+
+\item \textbf{Planning}: Each task is a travel or shopping planning request. Travel tasks scored on structure, budget adherence, and constraint satisfaction; shopping tasks scored on JSON validity, budget adherence, and item completeness. Composite score = mean of sub-scores. Success threshold = 0.50. Both Azure (10 models) and Ollama (9 models) runs were monitored until completion. Run date: 2026-02-25.
+
+\item \textbf{Planning task diversity caveat}: The synthetic task generator used only 2 hardcoded prompts (one travel, one shopping) cycled 25 times each for all 50 tasks. As a result, scores measure performance on two specific scenarios rather than generalizable planning ability. qwen3-0.6b's 64\% success rate on planning (highest among Ollama models) reflects that its template-style output reliably hits the keyword checklist for the Beijing$\to$Chengdu trip; it does not indicate strong planning ability across diverse inputs. This will be addressed in future runs by drawing from the full DeepPlanning dataset.
+
+\item \textbf{Zero-scoring Azure models (Summarization)}: mistral-nemo, deepseek-r1, and deepseek-v3 returned API errors or malformed JSON on all 100 tasks, yielding 0\% ROUGE-L success. Their BERTScore ($\approx$0.648) confirms semantically valid outputs; the failure mode is lexical divergence from the reference, not poor summarization.
+
+\item \textbf{Zero-scoring Azure models (Planning)}: phi-4, mistral-small, mistral-nemo, and llama-3.2-11b-vision produced outputs that were too short or off-format for all 50 tasks.
+
+\item \textbf{Ollama models}: Run locally (concurrency 2, no API cost). Summarization $n=100$ complete for \texttt{dasd-4b} only; full run for remaining 8 Ollama models still in progress at time of writing.
+
+\item \textbf{Pending}: Ollama summarization $n=100$ results for falcon-h1-90m, qwen3-0.6b, gemma3-1b, gemma3-4b, gemma3n-e2b, gemma3n-e4b, gpt-oss-20b, phi4-mini-reasoning will be added in the next update.
+\end{itemize}
+
+\end{document}

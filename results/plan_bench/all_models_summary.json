@@ -1,0 +1,38 @@
+{
+  "benchmark": "plan_bench",
+  "agent": "one_shot",
+  "limit": 2,
+  "timestamp": "20260303_233203",
+  "results": {
+    "phi-4": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_phi_4/task_1_plan_generation.json'"
+    },
+    "phi-4-mini": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_phi_4_mini/task_1_plan_generation.json'"
+    },
+    "phi-4-mini-reasoning": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_phi_4_mini_reasoning/task_1_plan_generation.json'"
+    },
+    "mistral-nemo": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_mistral_nemo/task_1_plan_generation.json'"
+    },
+    "ministral-3b": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_ministral_3b/task_1_plan_generation.json'"
+    },
+    "mistral-small": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_mistral_small/task_1_plan_generation.json'"
+    },
+    "mistral-large-3": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_mistral_large_3/task_1_plan_generation.json'"
+    },
+    "llama-3.2-11b-vision": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_llama_3_2_11b_vision/task_1_plan_generation.json'"
+    },
+    "gpt-4o": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_gpt_4o/task_1_plan_generation.json'"
+    },
+    "llama-3.3-70b": {
+      "error": "[Errno 2] No such file or directory: '/Users/samih_sully/Documents/GitHub/slm-agentic-benchmarking/benchmarks/plan_bench/responses/blocksworld/litellm_llama_3_3_70b/task_1_plan_generation.json'"
+    }
+  }
+}

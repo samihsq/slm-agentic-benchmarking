@@ -1,0 +1,19 @@
+{
+  "agent": "OneShotAgent",
+  "model": "gpt-4o",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.82,
+  "num_tasks": 50,
+  "total_latency_seconds": 56.323020458221436,
+  "avg_latency_seconds": 1.1264604091644288,
+  "total_cost_usd": 0.1557725,
+  "results_dir": "results/matrix_recall_xhard/gpt-4o_20260218_102432/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "x-hard": {
+      "accuracy": 0.82,
+      "correct": 41,
+      "total": 50
+    }
+  }
+}

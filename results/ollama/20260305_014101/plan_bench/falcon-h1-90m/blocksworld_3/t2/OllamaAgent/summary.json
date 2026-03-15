@@ -1,0 +1,11 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/tiiuae/Falcon-H1-Tiny-R-90M-GGUF:Q4_K_M",
+  "benchmark": "PlanBench",
+  "task": "t2",
+  "config": "blocksworld_3",
+  "num_tasks": 100,
+  "num_evaluated": 100,
+  "total_correct": 0,
+  "success_rate": 0.0
+}

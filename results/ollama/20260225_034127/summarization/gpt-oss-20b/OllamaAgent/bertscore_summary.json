@@ -1,0 +1,9 @@
+{
+  "model": "gpt-oss:20b",
+  "provider": "Ollama",
+  "num_tasks": 3,
+  "bertscore_model_type": "distilbert-base-uncased",
+  "avg_bertscore_f1": 0.816492,
+  "bs_ci_lo": 0.7861,
+  "bs_ci_hi": 0.8364
+}

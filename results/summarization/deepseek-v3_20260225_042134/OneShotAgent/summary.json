@@ -1,0 +1,12 @@
+{
+  "agent": "OneShotAgent",
+  "model": "deepseek-v3",
+  "benchmark": "Summarization (XSum)",
+  "split": "validation",
+  "metric": "rougeL",
+  "threshold": 0.15,
+  "num_tasks": 100,
+  "avg_score": 0.02506566636755834,
+  "success_rate": 0.0,
+  "results_dir": "results/summarization/deepseek-v3_20260225_042134/OneShotAgent"
+}

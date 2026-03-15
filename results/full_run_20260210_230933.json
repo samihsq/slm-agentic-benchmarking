@@ -1,0 +1,401 @@
+{
+  "gemma3:4b": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 16.72927737236023,
+      "n": 10,
+      "avg_levels": 0.0,
+      "max_levels": 0,
+      "avg_score": 0.0,
+      "errors": 10
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 151.54767084121704,
+      "n": 100,
+      "avg_rougeL": 0.1868361530274517,
+      "success_rate": 0.63,
+      "errors": 0
+    }
+  },
+  "gemma3:1b": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 8.693485975265503,
+      "n": 10,
+      "avg_levels": 0.0,
+      "max_levels": 0,
+      "avg_score": 0.0,
+      "errors": 10
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 101.57087993621826,
+      "n": 100,
+      "avg_rougeL": 0.1757007931046558,
+      "success_rate": 0.55,
+      "errors": 0
+    }
+  },
+  "ministral-3b": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 47.40878891944885,
+      "n": 10,
+      "avg_levels": 3.9,
+      "max_levels": 4,
+      "avg_score": 0.1392857142857143,
+      "errors": 0
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 89.79632306098938,
+      "n": 100,
+      "avg_rougeL": 0.2073477449374922,
+      "success_rate": 0.71,
+      "errors": 0
+    }
+  },
+  "mistral-small": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 48.62769293785095,
+      "n": 10,
+      "avg_levels": 3.4,
+      "max_levels": 4,
+      "avg_score": 0.12142857142857141,
+      "errors": 1
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 99.93440508842468,
+      "n": 100,
+      "avg_rougeL": 0.21951813722158453,
+      "success_rate": 0.74,
+      "errors": 0
+    }
+  },
+  "gpt-4o": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 175.08105087280273,
+      "n": 10,
+      "avg_levels": 15.0,
+      "max_levels": 15,
+      "avg_score": 0.5357142857142857,
+      "errors": 0
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 201.08740901947021,
+      "n": 100,
+      "avg_rougeL": 0.19247976900004424,
+      "success_rate": 0.71,
+      "errors": 0
+    }
+  },
+  "mistral-large-3": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 184.1647229194641,
+      "n": 10,
+      "avg_levels": 9.3,
+      "max_levels": 26,
+      "avg_score": 0.3321428571428572,
+      "errors": 0
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 201.0276210308075,
+      "n": 100,
+      "avg_rougeL": 0.202047651020773,
+      "success_rate": 0.72,
+      "errors": 0
+    }
+  },
+  "phi-4": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 299.2059600353241,
+      "n": 10,
+      "avg_levels": 0.1,
+      "max_levels": 1,
+      "avg_score": 0.0035714285714285713,
+      "errors": 9
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 2439.594032764435,
+      "n": 100,
+      "avg_rougeL": 0.1825888939326243,
+      "success_rate": 0.61,
+      "errors": 0
+    }
+  },
+  "phi-4-mini-reasoning": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 673.9742019176483,
+      "n": 10,
+      "avg_levels": 0.0,
+      "max_levels": 0,
+      "avg_score": 0.0,
+      "errors": 10
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 7699.421868085861,
+      "n": 100,
+      "avg_rougeL": 0.0865237505071011,
+      "success_rate": 0.19,
+      "errors": 24
+    }
+  },
+  "gpt-oss:20b": {
+    "summarization": {
+      "status": "OK",
+      "time": 677.461638212204,
+      "n": 100,
+      "avg_rougeL": 0.17758955117557082,
+      "success_rate": 0.56,
+      "errors": 0
+    },
+    "instruction_following": {
+      "status": "OK",
+      "time": 1150.632800102234,
+      "n": 10,
+      "avg_levels": 19.2,
+      "max_levels": 26,
+      "avg_score": 0.6857142857142857,
+      "errors": 0
+    }
+  },
+  "gemma3n:e4b": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 34.27472186088562,
+      "n": 10,
+      "avg_levels": 0.0,
+      "max_levels": 0,
+      "avg_score": 0.0,
+      "errors": 10
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 442.8275167942047,
+      "n": 100,
+      "avg_rougeL": 0.17767550249720318,
+      "success_rate": 0.55,
+      "errors": 1
+    }
+  },
+  "phi-4-mini": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 948.5617158412933,
+      "n": 10,
+      "avg_levels": 1.9,
+      "max_levels": 4,
+      "avg_score": 0.06785714285714285,
+      "errors": 3
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 2271.5504038333893,
+      "n": 100,
+      "avg_rougeL": 0.17745344262846505,
+      "success_rate": 0.62,
+      "errors": 0
+    }
+  },
+  "mistral-nemo": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 1188.3300049304962,
+      "n": 10,
+      "avg_levels": 4.0,
+      "max_levels": 4,
+      "avg_score": 0.14285714285714285,
+      "errors": 0
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 5169.156455039978,
+      "n": 100,
+      "avg_rougeL": 0.16438669856165247,
+      "success_rate": 0.56,
+      "errors": 18
+    }
+  },
+  "llama-3.2-11b-vision": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 1250.1800210475922,
+      "n": 10,
+      "avg_levels": 4.0,
+      "max_levels": 4,
+      "avg_score": 0.14285714285714285,
+      "errors": 0
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 3712.9600372314453,
+      "n": 100,
+      "avg_rougeL": 0.20300832016558398,
+      "success_rate": 0.65,
+      "errors": 9
+    }
+  },
+  "gemma3n:e2b": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 51.30045008659363,
+      "n": 10,
+      "avg_levels": 1.4,
+      "max_levels": 4,
+      "avg_score": 0.05,
+      "errors": 5
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 331.61349296569824,
+      "n": 100,
+      "avg_rougeL": 0.1641380827888915,
+      "success_rate": 0.57,
+      "errors": 11
+    }
+  },
+  "phi4-mini-reasoning:latest": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 300.0450417995453,
+      "n": 10,
+      "avg_levels": 0.5,
+      "max_levels": 2,
+      "avg_score": 0.017857142857142856,
+      "errors": 6
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 1152.9068970680237,
+      "n": 100,
+      "avg_rougeL": 0.136297999947991,
+      "success_rate": 0.43,
+      "errors": 7
+    }
+  },
+  "llama-3.3-70b": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 1970.9328351020813,
+      "n": 10,
+      "avg_levels": 1.7,
+      "max_levels": 4,
+      "avg_score": 0.06071428571428571,
+      "errors": 5
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 9378.652740001678,
+      "n": 100,
+      "avg_rougeL": 0.059915577372599886,
+      "success_rate": 0.12,
+      "errors": 48
+    }
+  },
+  "deepseek-v3.2": {
+    "summarization": {
+      "status": "OK",
+      "time": 2408.880145072937,
+      "n": 100,
+      "avg_rougeL": 0.224275262287857,
+      "success_rate": 0.78,
+      "errors": 0
+    },
+    "instruction_following": {
+      "status": "OK",
+      "time": 3355.332533121109,
+      "n": 10,
+      "avg_levels": 14.3,
+      "max_levels": 26,
+      "avg_score": 0.5107142857142858,
+      "errors": 0
+    }
+  },
+  "deepseek-v3": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 3293.6884396076202,
+      "n": 10,
+      "avg_levels": 0.0,
+      "max_levels": 0,
+      "avg_score": 0.0,
+      "errors": 10
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 9983.085019111633,
+      "n": 100,
+      "avg_rougeL": 0.02530731048887472,
+      "success_rate": 0.0,
+      "errors": 57
+    }
+  },
+  "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M": {
+    "summarization": {
+      "status": "OK",
+      "time": 1385.6462411880493,
+      "n": 100,
+      "avg_rougeL": 0.16364668652434886,
+      "success_rate": 0.52,
+      "errors": 1
+    },
+    "instruction_following": {
+      "status": "OK",
+      "time": 2796.6359009742737,
+      "n": 10,
+      "avg_levels": 21.6,
+      "max_levels": 26,
+      "avg_score": 0.7714285714285715,
+      "errors": 0
+    }
+  },
+  "hf.co/tiiuae/Falcon-H1-Tiny-R-90M-GGUF:Q4_K_M": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 136.60991501808167,
+      "n": 10,
+      "avg_levels": 0.0,
+      "max_levels": 0,
+      "avg_score": 0.0,
+      "errors": 10
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 665.5272150039673,
+      "n": 100,
+      "avg_rougeL": 0.0830249052208703,
+      "success_rate": 0.08,
+      "errors": 7
+    }
+  },
+  "qwen3:0.6b": {
+    "instruction_following": {
+      "status": "OK",
+      "time": 131.06099605560303,
+      "n": 10,
+      "avg_levels": 4.7,
+      "max_levels": 12,
+      "avg_score": 0.16785714285714287,
+      "errors": 0
+    },
+    "summarization": {
+      "status": "OK",
+      "time": 148.85297298431396,
+      "n": 100,
+      "avg_rougeL": 0.14144992841850137,
+      "success_rate": 0.42,
+      "errors": 1
+    }
+  }
+}

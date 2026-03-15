@@ -1,0 +1,159 @@
+{
+  "agent": "OneShotAgent",
+  "model": "gpt-4o",
+  "list_sizes": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "num_rollouts_per_size": 10,
+  "total_rollouts": 100,
+  "mean_score": 0.136,
+  "success_rate": 0.97,
+  "mean_latency": 6.87,
+  "total_cost": 0.4669,
+  "by_size": {
+    "size_1": {
+      "mean_levels_passed": 12.0,
+      "max_levels_passed": 12,
+      "rollouts": 10,
+      "mean_score": 0.4
+    },
+    "size_2": {
+      "mean_levels_passed": 7.6,
+      "max_levels_passed": 12,
+      "rollouts": 10,
+      "mean_score": 0.2533
+    },
+    "size_3": {
+      "mean_levels_passed": 5.3,
+      "max_levels_passed": 12,
+      "rollouts": 10,
+      "mean_score": 0.1767
+    },
+    "size_4": {
+      "mean_levels_passed": 3.8,
+      "max_levels_passed": 6,
+      "rollouts": 10,
+      "mean_score": 0.1267
+    },
+    "size_5": {
+      "mean_levels_passed": 2.5,
+      "max_levels_passed": 6,
+      "rollouts": 10,
+      "mean_score": 0.0833
+    },
+    "size_6": {
+      "mean_levels_passed": 2.0,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.0667
+    },
+    "size_7": {
+      "mean_levels_passed": 1.9,
+      "max_levels_passed": 3,
+      "rollouts": 10,
+      "mean_score": 0.0633
+    },
+    "size_8": {
+      "mean_levels_passed": 2.1,
+      "max_levels_passed": 3,
+      "rollouts": 10,
+      "mean_score": 0.07
+    },
+    "size_9": {
+      "mean_levels_passed": 1.8,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.06
+    },
+    "size_10": {
+      "mean_levels_passed": 1.8,
+      "max_levels_passed": 2,
+      "rollouts": 10,
+      "mean_score": 0.06
+    }
+  },
+  "level_accuracy": {
+    "level_1": {
+      "accuracy": 0.97,
+      "correct": 97,
+      "total": 100
+    },
+    "level_2": {
+      "accuracy": 1.0,
+      "correct": 97,
+      "total": 97
+    },
+    "level_3": {
+      "accuracy": 0.3711340206185567,
+      "correct": 36,
+      "total": 97
+    },
+    "level_4": {
+      "accuracy": 0.75,
+      "correct": 27,
+      "total": 36
+    },
+    "level_5": {
+      "accuracy": 1.0,
+      "correct": 27,
+      "total": 27
+    },
+    "level_6": {
+      "accuracy": 0.8148148148148148,
+      "correct": 22,
+      "total": 27
+    },
+    "level_7": {
+      "accuracy": 0.7727272727272727,
+      "correct": 17,
+      "total": 22
+    },
+    "level_8": {
+      "accuracy": 1.0,
+      "correct": 17,
+      "total": 17
+    },
+    "level_9": {
+      "accuracy": 1.0,
+      "correct": 17,
+      "total": 17
+    },
+    "level_10": {
+      "accuracy": 1.0,
+      "correct": 17,
+      "total": 17
+    },
+    "level_11": {
+      "accuracy": 1.0,
+      "correct": 17,
+      "total": 17
+    },
+    "level_12": {
+      "accuracy": 1.0,
+      "correct": 17,
+      "total": 17
+    },
+    "level_13": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 17
+    }
+  },
+  "levels_passed_distribution": {
+    "12": 17,
+    "5": 5,
+    "3": 9,
+    "2": 61,
+    "6": 5,
+    "0": 3
+  }
+}

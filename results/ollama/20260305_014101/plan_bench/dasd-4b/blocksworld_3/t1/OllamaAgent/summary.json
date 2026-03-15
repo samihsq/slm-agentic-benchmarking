@@ -1,0 +1,11 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+  "benchmark": "PlanBench",
+  "task": "t1",
+  "config": "blocksworld_3",
+  "num_tasks": 100,
+  "num_evaluated": 100,
+  "total_correct": 3,
+  "success_rate": 0.03
+}

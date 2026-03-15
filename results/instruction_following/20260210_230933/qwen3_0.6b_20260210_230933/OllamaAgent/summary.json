@@ -1,0 +1,82 @@
+{
+  "agent": "OllamaAgent",
+  "model": "qwen3:0.6b",
+  "num_rollouts": 10,
+  "mean_score": 0.1679,
+  "success_rate": 1.0,
+  "mean_latency": 13.1,
+  "total_cost": 0,
+  "level_accuracy": {
+    "level_1": {
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10
+    },
+    "level_2": {
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10
+    },
+    "level_3": {
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10
+    },
+    "level_4": {
+      "accuracy": 0.7,
+      "correct": 7,
+      "total": 10
+    },
+    "level_5": {
+      "accuracy": 0.42857142857142855,
+      "correct": 3,
+      "total": 7
+    },
+    "level_6": {
+      "accuracy": 0.3333333333333333,
+      "correct": 1,
+      "total": 3
+    },
+    "level_7": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "total": 1
+    },
+    "level_8": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "total": 1
+    },
+    "level_9": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "total": 1
+    },
+    "level_10": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "total": 1
+    },
+    "level_11": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "total": 1
+    },
+    "level_12": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "total": 1
+    },
+    "level_13": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 1
+    }
+  },
+  "levels_passed_distribution": {
+    "4": 4,
+    "3": 3,
+    "5": 2,
+    "12": 1
+  }
+}

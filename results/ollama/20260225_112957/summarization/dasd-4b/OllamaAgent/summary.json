@@ -1,0 +1,12 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+  "benchmark": "Summarization (XSum)",
+  "split": "validation",
+  "metric": "rougeL",
+  "threshold": 0.15,
+  "num_tasks": 100,
+  "avg_score": 0.17100728972234808,
+  "success_rate": 0.57,
+  "results_dir": "results/ollama/20260225_112957/summarization/dasd-4b/OllamaAgent"
+}

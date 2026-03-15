@@ -1,0 +1,200 @@
+[
+  {
+    "model": "deepseek-r1",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.648658,
+    "bs_ci_lo": 0.6438,
+    "bs_ci_hi": 0.6537
+  },
+  {
+    "model": "deepseek-v3",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.648608,
+    "bs_ci_lo": 0.6437,
+    "bs_ci_hi": 0.6536
+  },
+  {
+    "model": "deepseek-v3.2",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.799434,
+    "bs_ci_lo": 0.7914,
+    "bs_ci_hi": 0.8076
+  },
+  {
+    "model": "gemma3:1b",
+    "provider": "Ollama",
+    "num_tasks": 3,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.578109,
+    "bs_ci_lo": 0.535,
+    "bs_ci_hi": 0.6144
+  },
+  {
+    "model": "gemma3:4b",
+    "provider": "Ollama",
+    "num_tasks": 3,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.578109,
+    "bs_ci_lo": 0.535,
+    "bs_ci_hi": 0.6144
+  },
+  {
+    "model": "gemma3n:e2b",
+    "provider": "Ollama",
+    "num_tasks": 3,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.578109,
+    "bs_ci_lo": 0.535,
+    "bs_ci_hi": 0.6144
+  },
+  {
+    "model": "gemma3n:e4b",
+    "provider": "Ollama",
+    "num_tasks": 3,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.578109,
+    "bs_ci_lo": 0.535,
+    "bs_ci_hi": 0.6144
+  },
+  {
+    "model": "gpt-4o",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.79036,
+    "bs_ci_lo": 0.7827,
+    "bs_ci_hi": 0.7978
+  },
+  {
+    "model": "gpt-oss:20b",
+    "provider": "Ollama",
+    "num_tasks": 3,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.816492,
+    "bs_ci_lo": 0.7861,
+    "bs_ci_hi": 0.8364
+  },
+  {
+    "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+    "provider": "Ollama",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.779375,
+    "bs_ci_lo": 0.7717,
+    "bs_ci_hi": 0.7869
+  },
+  {
+    "model": "hf.co/tiiuae/Falcon-H1-Tiny-R-90M-GGUF:Q4_K_M",
+    "provider": "Ollama",
+    "num_tasks": 3,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.578109,
+    "bs_ci_lo": 0.535,
+    "bs_ci_hi": 0.6144
+  },
+  {
+    "model": "llama-3.2-11b-vision",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.747877,
+    "bs_ci_lo": 0.7317,
+    "bs_ci_hi": 0.764
+  },
+  {
+    "model": "llama-3.3-70b",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.681764,
+    "bs_ci_lo": 0.6689,
+    "bs_ci_hi": 0.6962
+  },
+  {
+    "model": "ministral-3b",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.788509,
+    "bs_ci_lo": 0.7797,
+    "bs_ci_hi": 0.7971
+  },
+  {
+    "model": "mistral-large-3",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.792346,
+    "bs_ci_lo": 0.7841,
+    "bs_ci_hi": 0.8005
+  },
+  {
+    "model": "mistral-nemo",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.647209,
+    "bs_ci_lo": 0.6427,
+    "bs_ci_hi": 0.6517
+  },
+  {
+    "model": "mistral-small",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.800189,
+    "bs_ci_lo": 0.7909,
+    "bs_ci_hi": 0.8087
+  },
+  {
+    "model": "phi-4",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.783744,
+    "bs_ci_lo": 0.7764,
+    "bs_ci_hi": 0.7908
+  },
+  {
+    "model": "phi-4-mini",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.770408,
+    "bs_ci_lo": 0.76,
+    "bs_ci_hi": 0.7807
+  },
+  {
+    "model": "phi-4-mini-reasoning",
+    "provider": "Azure",
+    "num_tasks": 100,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.703591,
+    "bs_ci_lo": 0.6932,
+    "bs_ci_hi": 0.7149
+  },
+  {
+    "model": "phi4-mini-reasoning:latest",
+    "provider": "Ollama",
+    "num_tasks": 3,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.578109,
+    "bs_ci_lo": 0.535,
+    "bs_ci_hi": 0.6144
+  },
+  {
+    "model": "qwen3:0.6b",
+    "provider": "Ollama",
+    "num_tasks": 3,
+    "bertscore_model_type": "distilbert-base-uncased",
+    "avg_bertscore_f1": 0.761916,
+    "bs_ci_lo": 0.7454,
+    "bs_ci_hi": 0.7745
+  }
+]

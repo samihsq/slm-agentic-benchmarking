@@ -1,0 +1,213 @@
+{
+  "agent": "SequentialAgent",
+  "model": "mistral-small",
+  "backend": "azure",
+  "architecture": "sequential",
+  "benchmark": "bigbench",
+  "suite": "bbl24",
+  "task_count": 24,
+  "examples_per_task": 20,
+  "num_examples_total": 518,
+  "raw_accuracy": 0.5282651072124757,
+  "weighted_accuracy": 0.5400520355951683,
+  "total_latency_seconds": 144104.41328835487,
+  "avg_latency_seconds": 278.1938480470171,
+  "total_cost_usd": 0,
+  "results_dir": "results/bigbench_lite/azure/mistral-small/sequential",
+  "task_configs": [
+    "auto_debugging",
+    "bbq_lite_json",
+    "code_line_description",
+    "conceptual_combinations",
+    "conlang_translation",
+    "emoji_movie",
+    "formal_fallacies_syllogisms_negation",
+    "hindu_knowledge",
+    "known_unknowns",
+    "language_identification",
+    "linguistics_puzzles",
+    "logic_grid_puzzle",
+    "logical_deduction",
+    "misconceptions_russian",
+    "novel_concepts",
+    "operators",
+    "parsinlu_reading_comprehension",
+    "play_dialog_same_or_different",
+    "repeat_copy_logic",
+    "strange_stories",
+    "strategyqa",
+    "symbol_interpretation",
+    "vitaminc_fact_verification",
+    "winowhy"
+  ],
+  "breakdown_by_task": {
+    "auto_debugging": {
+      "accuracy": 0.5161290322580645,
+      "correct": 16,
+      "total": 31,
+      "scoring": "exact",
+      "undersized": true
+    },
+    "bbq_lite_json": {
+      "accuracy": 0.35,
+      "correct": 7,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "code_line_description": {
+      "accuracy": 0.7,
+      "correct": 14,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "conceptual_combinations": {
+      "accuracy": 0.6,
+      "correct": 12,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "conlang_translation": {
+      "accuracy": 0.18536812423310628,
+      "correct": 1,
+      "total": 20,
+      "scoring": "bleu",
+      "undersized": false
+    },
+    "emoji_movie": {
+      "accuracy": 1.0,
+      "correct": 20,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "formal_fallacies_syllogisms_negation": {
+      "accuracy": 0.4,
+      "correct": 8,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "hindu_knowledge": {
+      "accuracy": 0.65,
+      "correct": 13,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "known_unknowns": {
+      "accuracy": 0.7,
+      "correct": 14,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "language_identification": {
+      "accuracy": 0.55,
+      "correct": 11,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "linguistics_puzzles": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 20,
+      "scoring": "exact",
+      "undersized": false
+    },
+    "logic_grid_puzzle": {
+      "accuracy": 0.3,
+      "correct": 6,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "logical_deduction": {
+      "accuracy": 0.7,
+      "correct": 14,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "misconceptions_russian": {
+      "accuracy": 0.85,
+      "correct": 17,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "novel_concepts": {
+      "accuracy": 0.46875,
+      "correct": 15,
+      "total": 32,
+      "scoring": "mc",
+      "undersized": true
+    },
+    "operators": {
+      "accuracy": 0.95,
+      "correct": 19,
+      "total": 20,
+      "scoring": "exact",
+      "undersized": false
+    },
+    "parsinlu_reading_comprehension": {
+      "accuracy": 0.3684210526315789,
+      "correct": 7,
+      "total": 19,
+      "scoring": "exact",
+      "undersized": false
+    },
+    "play_dialog_same_or_different": {
+      "accuracy": 0.4,
+      "correct": 8,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "repeat_copy_logic": {
+      "accuracy": 0.3225806451612903,
+      "correct": 10,
+      "total": 31,
+      "scoring": "exact",
+      "undersized": true
+    },
+    "strange_stories": {
+      "accuracy": 0.7,
+      "correct": 14,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "strategyqa": {
+      "accuracy": 0.6,
+      "correct": 12,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "symbol_interpretation": {
+      "accuracy": 0.3,
+      "correct": 6,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "vitaminc_fact_verification": {
+      "accuracy": 0.65,
+      "correct": 13,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    },
+    "winowhy": {
+      "accuracy": 0.7,
+      "correct": 14,
+      "total": 20,
+      "scoring": "mc",
+      "undersized": false
+    }
+  }
+}

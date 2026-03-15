@@ -1,0 +1,29 @@
+{
+  "agent": "OneShotAgent",
+  "model": "mistral-small",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.92,
+  "num_tasks": 50,
+  "total_latency_seconds": 30.76940369606018,
+  "avg_latency_seconds": 0.6153880739212036,
+  "total_cost_usd": 0.0185085,
+  "results_dir": "results/matrix_recall/mistral-small_20260218_023517/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "medium": {
+      "accuracy": 1.0,
+      "correct": 17,
+      "total": 17
+    },
+    "easy": {
+      "accuracy": 1.0,
+      "correct": 20,
+      "total": 20
+    },
+    "hard": {
+      "accuracy": 0.6923076923076923,
+      "correct": 9,
+      "total": 13
+    }
+  }
+}

@@ -1,0 +1,3 @@
+{"task_id": "synthetic_travel_0000", "score": 0.933333, "success": true, "latency": 73.73, "cost": 0.00113, "domain": "travel", "structure_score": 0.8333333333333334, "budget_score": 1.0, "constraint_score": 1.0}
+{"task_id": "synthetic_shopping_0001", "score": 0.15, "success": false, "latency": 68.55, "cost": 0.001107, "domain": "shopping", "json_score": 0.0, "budget_score": 0.5, "completeness_score": 0.0}
+{"task_id": "synthetic_travel_0002", "score": 0.866667, "success": true, "latency": 66.71, "cost": 0.00113, "domain": "travel", "structure_score": 0.6666666666666666, "budget_score": 1.0, "constraint_score": 1.0}

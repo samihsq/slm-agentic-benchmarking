@@ -1,0 +1,17 @@
+{
+  "agent": "OneShotAgent",
+  "model": "mistral-small",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 50,
+  "mean_composite_score": 0.1329,
+  "mean_structure_score": 0.0,
+  "mean_budget_score": 0.25,
+  "mean_constraint_score": 0.193,
+  "success_rate": 0.0,
+  "travel_success_rate": 0.0,
+  "shopping_success_rate": 0.0,
+  "mean_latency": 4.04,
+  "total_cost": 0.0174
+}

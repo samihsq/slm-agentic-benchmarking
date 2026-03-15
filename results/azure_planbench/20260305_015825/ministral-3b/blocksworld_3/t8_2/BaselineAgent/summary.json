@@ -1,0 +1,11 @@
+{
+  "agent": "BaselineAgent",
+  "model": "ministral-3b",
+  "benchmark": "PlanBench",
+  "task": "t8_2",
+  "config": "blocksworld_3",
+  "num_tasks": 100,
+  "num_evaluated": 100,
+  "total_correct": 81,
+  "success_rate": 0.81
+}

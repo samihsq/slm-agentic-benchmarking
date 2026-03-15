@@ -1,0 +1,254 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{longtable}
+
+\definecolor{tierA}{HTML}{1a7f37}
+\definecolor{tierB}{HTML}{0969da}
+\definecolor{tierC}{HTML}{8250df}
+\definecolor{tierD}{HTML}{bf8700}
+\definecolor{tierF}{HTML}{cf222e}
+\definecolor{lightgray}{HTML}{f6f8fa}
+
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\title{\textbf{SLM Benchmark Results}\\[0.3em]
+\large Criticality, Instruction Following, Summarization}
+\author{SLM Agentic Benchmarking}
+\date{February 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\vspace{-1em}
+\begin{center}
+\small 21 models\enspace$\cdot$\enspace Azure AI (12) + Ollama local (9)\enspace$\cdot$\enspace 3 skill benchmarks
+\end{center}
+
+%----------------------------------------------------------------------
+\section{Benchmarks \& Methods}
+
+\subsection{Criticality v2 (Argument Quality Judgment)}
+
+\textbf{Background:} Evaluating argument strength is a core skill for agents that must filter information, detect weak reasoning, or assist in decision-making. This benchmark tests whether models can identify the strongest argument from a set of candidates.
+
+\textbf{Dataset:} IBM Argument Quality Ranking (Gretz et al., 2019). 30,497 crowd-sourced arguments across 71 topics, each with a Weighted Average quality score (0--1). Tasks are constructed as 4-choice MCQs with a minimum quality gap $\geq 0.15$ to ensure clear ground truth.
+
+\textbf{Task:} Given a topic and four arguments, select the strongest. Scored via single-token logprob extraction (A/B/C/D) from a full-context MCQ prompt, forcing comparative reasoning over all options simultaneously.
+
+\textbf{Metric:} Top-1 accuracy. Random baseline: 25\%. 200 tasks per model. CIs: Wilson score. $p$: one-sided binomial test vs.\ 25\%.
+
+\subsection{Instruction Following (Sequential Matrix Transformation)}
+
+\textbf{Background:} Agentic systems must follow multi-step procedural instructions precisely. This benchmark tests whether models can apply mathematical transformation rules to structured data and maintain correctness across an escalating sequence of operations.
+
+\textbf{Dataset:} 28 progressively difficult matrix transformation rules (ADD\_1 $\to$ MUL\_2 $\to$ TRANSPOSE $\to$ NEIGHBOR\_SUM $\to$ \ldots $\to$ BLOCK\_SUM $\to$ ENCODE). Each rollout starts with a random 4$\times$4 integer matrix and applies rules sequentially, \textbf{stopping on first failure}.
+
+\textbf{Task:} At each level, the model receives the current matrix and a rule description, then must return the exact transformed matrix as JSON. Each level requires an exact match on a 4$\times$4 integer grid, so chance correctness is negligible.
+
+\textbf{Metric:} Levels passed (0--28). 10 rollouts per model (280 total evaluations). CIs: $t$-distribution. $p$: one-sided $t$-test, $H_0\!: \mu = 0$ (no systematic instruction-following ability).
+
+\subsection{Summarization (Extreme Single-Sentence)}
+
+\textbf{Background:} Summarization is a fundamental generation skill for agents producing reports, digests, or briefings. This benchmark uses extreme summarization---compressing a full article into a single headline---to test compression quality.
+
+\textbf{Dataset:} XSum (Narayan et al., 2018). BBC news articles paired with single-sentence summaries written by journalists.
+
+\textbf{Task:} Given a full article, produce a one-sentence summary.
+
+\textbf{Metric:} ROUGE-L F1 (longest common subsequence). Pass threshold: $\geq 0.15$. 100 tasks per model. CIs: $t$-distribution.
+
+\subsection{Statistical Methods}
+
+Criticality: $n = 200$ tasks, 95\% Wilson score CIs, one-sided binomial $p$ vs.\ 25\%. Instruction Following: $n = 10$ rollouts, 95\% $t$-distribution CIs, one-sided $t$-test vs.\ $\mu = 0$. Summarization: $n = 100$ tasks, 95\% $t$-distribution CIs. 21 models tested: Ollama local (9, all 3 benchmarks) + Azure AI (12, IF + SU only).
+
+%----------------------------------------------------------------------
+\section{Combined Results Overview}
+
+\begin{longtable}{@{}llrccccc@{}}
+\caption{All models across three benchmarks. Criticality tiers: \textcolor{tierA}{A}=top, \textcolor{tierB}{B}=high, \textcolor{tierC}{C}=mid, \textcolor{tierD}{D}=low, \textcolor{tierF}{F}=random.}\\
+\toprule
+\textbf{Model} & \textbf{Provider} & \textbf{Size} & \textbf{Crit} & \textbf{IF avg} & \textbf{IF max} & \textbf{SU rL} & \textbf{SU pass} \\
+\midrule
+\endfirsthead
+\multicolumn{8}{c}{\tablename\ \thetable\ -- continued from previous page} \\
+\toprule
+\textbf{Model} & \textbf{Provider} & \textbf{Size} & \textbf{Crit} & \textbf{IF avg} & \textbf{IF max} & \textbf{SU rL} & \textbf{SU pass} \\
+\midrule
+\endhead
+\midrule \multicolumn{8}{r}{Continued on next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+
+\multicolumn{8}{l}{\textit{Sorted by Instruction Following avg levels}} \\[4pt]
+
+DASD-4B              & Ollama & 4.0B  & \textcolor{tierB}{48.0\%} & \textbf{21.6} & 26 & 0.164 & 52\% \\
+gpt-oss:20b          & Ollama & 20.9B & \textcolor{tierB}{49.0\%} & \textbf{19.2} & 26 & 0.178 & 56\% \\
+gpt-4o               & Azure  & 200B  & ---                       & \textbf{15.0} & 15 & 0.192 & 71\% \\
+deepseek-v3.2        & Azure  & 685B  & ---                       & \textbf{14.3} & 26 & 0.224 & 78\% \\
+mistral-large-3      & Azure  & 123B  & ---                       & 9.3           & 26 & 0.202 & 72\% \\
+qwen3:0.6b           & Ollama & 0.8B  & \textcolor{tierD}{37.0\%} & 4.7           & 12 & 0.141 & 42\% \\
+mistral-nemo         & Azure  & 12B   & ---                       & 4.0           & 4  & 0.164 & 56\% \\
+llama-3.2-11b-vision & Azure  & 11B   & ---                       & 4.0           & 4  & 0.203 & 65\% \\
+ministral-3b         & Azure  & 3B    & ---                       & 3.9           & 4  & 0.207 & 71\% \\
+mistral-small        & Azure  & 24B   & ---                       & 3.4           & 4  & 0.220 & 74\% \\
+phi-4-mini           & Azure  & 3.8B  & ---                       & 1.9           & 4  & 0.177 & 62\% \\
+llama-3.3-70b        & Azure  & 70B   & ---                       & 1.7           & 4  & ---   & --- \\
+gemma3n:e2b          & Ollama & 4.5B  & \textcolor{tierB}{48.0\%} & 1.4           & 4  & 0.164 & 57\% \\
+phi4-mini-reasoning  & Ollama & 3.8B  & \textcolor{tierC}{42.5\%} & 0.5           & 2  & 0.136 & 43\% \\
+phi-4                & Azure  & 14B   & ---                       & 0.1           & 1  & 0.183 & 61\% \\
+deepseek-v3          & Azure  & 685B  & ---                       & 0.0           & 0  & ---   & --- \\
+phi-4-mini-reasoning & Azure  & 3.8B  & ---                       & 0.0           & 0  & 0.136 & 43\% \\
+gemma3:4b            & Ollama & 4.3B  & \textcolor{tierB}{48.0\%} & 0.0           & 0  & 0.187 & 63\% \\
+gemma3:1b            & Ollama & 1.0B  & \textcolor{tierC}{40.5\%} & 0.0           & 0  & 0.176 & 55\% \\
+gemma3n:e4b          & Ollama & 6.9B  & \textcolor{tierA}{54.0\%} & 0.0           & 0  & 0.178 & 55\% \\
+Falcon-H1-90M        & Ollama & 108M  & \textcolor{tierF}{25.0\%} & 0.0           & 0  & 0.083 & 8\% \\
+
+\end{longtable}
+
+\textbf{Key:} Crit = Criticality v2 accuracy (200 tasks, 4-MCQ). IF = Instruction Following (10 rollouts, stop-on-fail, 28 levels max). SU = Summarization (100 tasks, ROUGE-L F1). \textbf{---} indicates benchmark not run for that model. llama-3.3-70b and deepseek-v3 SU incomplete due to API failures.
+
+%----------------------------------------------------------------------
+\section{Instruction Following}
+
+DASD-4B (4B, local) is the best model overall at 21.6 average levels, beating GPT-4o (15.0) and all Azure endpoints. Model size does not predict performance: the 752M-parameter qwen3:0.6b passes 4.7 levels while the 14B phi-4 averages 0.1.
+
+\begin{table}[h]
+\centering
+\caption{Instruction Following: sorted by average levels passed (out of 28). $n = 10$ rollouts per model. $H_0$: model has no systematic instruction-following ability (expected levels passed $= 0$). $p$: one-sided $t$-test. Each level requires an exact matrix match on a 4$\times$4 integer grid, so chance correctness is negligible.}
+\vspace{4pt}
+\small
+\begin{tabular}{@{}llrcrcc@{}}
+\toprule
+\textbf{Model} & \textbf{Prov.} & \textbf{Avg} & \textbf{95\% CI} & \textbf{Max} & \textbf{$p$} & \textbf{SD} \\
+\midrule
+DASD-4B              & Ollama & \textbf{21.6} & [17.5, 25.7] & 26 & $<$0.0001 & 5.7 \\
+gpt-oss:20b          & Ollama & \textbf{19.2} & [15.3, 23.1] & 26 & $<$0.0001 & 5.4 \\
+gpt-4o               & Azure  & \textbf{15.0} & [15.0, 15.0] & 15 & $<$0.0001 & 0.0 \\
+deepseek-v3.2        & Azure  & \textbf{14.3} & [\phantom{0}7.7, 20.9] & 26 & 0.0004 & 9.2 \\
+mistral-large-3      & Azure  & 9.3           & [\phantom{0}2.8, 15.8] & 26 & 0.0053 & 9.1 \\
+qwen3:0.6b           & Ollama & 4.7           & [\phantom{0}2.8, \phantom{0}6.6] & 12 & 0.0002 & 2.7 \\
+mistral-nemo         & Azure  & 4.0           & [\phantom{0}4.0, \phantom{0}4.0] & 4  & $<$0.0001 & 0.0 \\
+llama-3.2-11b-vision & Azure  & 4.0           & [\phantom{0}4.0, \phantom{0}4.0] & 4  & $<$0.0001 & 0.0 \\
+ministral-3b         & Azure  & 3.9           & [\phantom{0}3.7, \phantom{0}4.1] & 4  & $<$0.0001 & 0.3 \\
+mistral-small        & Azure  & 3.4           & [\phantom{0}2.4, \phantom{0}4.4] & 4  & $<$0.0001 & 1.3 \\
+phi-4-mini           & Azure  & 1.9           & [\phantom{0}0.8, \phantom{0}3.0] & 4  & 0.0022 & 1.6 \\
+llama-3.3-70b        & Azure  & 1.7           & [\phantom{0}0.3, \phantom{0}3.1] & 4  & 0.0125 & 2.0 \\
+gemma3n:e2b          & Ollama & 1.4           & [\phantom{0}0.1, \phantom{0}2.7] & 4  & 0.0197 & 1.8 \\
+phi4-mini-reasoning  & Ollama & 0.5           & [\phantom{-}0.0, \phantom{0}1.0] & 2  & 0.0261 & 0.7 \\
+phi-4                & Azure  & 0.1           & [-0.1, \phantom{0}0.3] & 1  & 0.172 & 0.3 \\
+deepseek-v3          & Azure  & 0.0           & [\phantom{0}0.0, \phantom{0}0.0] & 0  & --- & 0.0 \\
+phi-4-mini-reasoning & Azure  & 0.0           & [\phantom{0}0.0, \phantom{0}0.0] & 0  & --- & 0.0 \\
+gemma3:4b            & Ollama & 0.0           & [\phantom{0}0.0, \phantom{0}0.0] & 0  & --- & 0.0 \\
+gemma3:1b            & Ollama & 0.0           & [\phantom{0}0.0, \phantom{0}0.0] & 0  & --- & 0.0 \\
+gemma3n:e4b          & Ollama & 0.0           & [\phantom{0}0.0, \phantom{0}0.0] & 0  & --- & 0.0 \\
+Falcon-H1-90M        & Ollama & 0.0           & [\phantom{0}0.0, \phantom{0}0.0] & 0  & --- & 0.0 \\
+\bottomrule
+\end{tabular}
+\label{tab:instruction}
+\end{table}
+
+\textbf{Statistical notes.} $H_0$ posits the model has no ability to follow matrix transformation instructions---any non-zero levels would be due to sampling noise. Since each level requires an exact match on a 4$\times$4 integer matrix, the probability of passing a level by chance is effectively zero, making $H_0\!: \mu = 0$ the appropriate null. Models with SD\,=\,0 either achieved the same level deterministically or scored 0 on all 10 rollouts.
+
+\textbf{Key finding:} DASD-4B (4B local model) averages 21.6 levels (95\% CI [17.5, 25.7], $p < 0.0001$), beating GPT-4o (15.0, deterministic) and all other Azure endpoints. The top-5 models all reject $H_0$ at $p < 0.01$, but models with high variance (deepseek-v3.2: SD\,=\,9.2, mistral-large-3: SD\,=\,9.1) have wide CIs that overlap with the mid-pack.
+
+\textbf{Model size does not predict performance:} qwen3:0.6b (752M params) significantly passes 4.7 levels ($p = 0.0002$), while phi-4 (14B) averages 0.1 ($p = 0.17$, not significant). The task requires precise format adherence and incremental state tracking; these capabilities emerge non-monotonically with scale.
+
+%----------------------------------------------------------------------
+\section{Summarization}
+
+Summarization discriminates weakly: ROUGE-L scores cluster tightly at 0.14--0.22 for 17 of 21 models, with overlapping CIs making the top cluster (0.19--0.22) statistically inseparable. The bottom four models fall below the 0.10 baseline, two due to API failures rather than capability gaps.
+
+\begin{table}[h]
+\centering
+\caption{Summarization: sorted by ROUGE-L F1 score. $n = 100$ tasks per model.}
+\vspace{4pt}
+\small
+\begin{tabular}{@{}llrcc@{}}
+\toprule
+\textbf{Model} & \textbf{Prov.} & \textbf{ROUGE-L} & \textbf{95\% CI} & \textbf{SD} \\
+\midrule
+deepseek-v3.2        & Azure  & \textbf{0.224} & [0.204, 0.245] & 0.104 \\
+mistral-small        & Azure  & \textbf{0.220} & [0.199, 0.240] & 0.104 \\
+ministral-3b         & Azure  & 0.207          & [0.189, 0.226] & 0.091 \\
+llama-3.2-11b-vision & Azure  & 0.203          & [0.178, 0.228] & 0.126 \\
+mistral-large-3      & Azure  & 0.202          & [0.185, 0.219] & 0.085 \\
+gpt-4o               & Azure  & 0.192          & [0.176, 0.209] & 0.084 \\
+gemma3:4b            & Ollama & 0.187          & [0.170, 0.204] & 0.087 \\
+phi-4                & Azure  & 0.183          & [0.167, 0.198] & 0.078 \\
+gpt-oss:20b          & Ollama & 0.178          & [0.161, 0.194] & 0.083 \\
+gemma3n:e4b          & Ollama & 0.178          & [0.161, 0.194] & 0.083 \\
+phi-4-mini           & Azure  & 0.177          & [0.162, 0.193] & 0.079 \\
+gemma3:1b            & Ollama & 0.176          & [0.160, 0.192] & 0.081 \\
+mistral-nemo         & Azure  & 0.164          & [0.140, 0.189] & 0.125 \\
+DASD-4B              & Ollama & 0.164          & [0.149, 0.178] & 0.071 \\
+gemma3n:e2b          & Ollama & 0.164          & [0.146, 0.182] & 0.091 \\
+qwen3:0.6b           & Ollama & 0.141          & [0.127, 0.156] & 0.074 \\
+phi4-mini-reasoning  & Ollama & 0.136          & [0.123, 0.150] & 0.069 \\
+phi-4-mini-reasoning & Azure  & 0.087          & [0.073, 0.100] & 0.066 \\
+Falcon-H1-90M        & Ollama & 0.083          & [0.074, 0.092] & 0.047 \\
+llama-3.3-70b        & Azure  & 0.060          & [0.040, 0.080] & 0.099 \\
+deepseek-v3          & Azure  & 0.025          & [0.019, 0.031] & 0.030 \\
+\bottomrule
+\end{tabular}
+\label{tab:summarization}
+\end{table}
+
+\textbf{Observations:} The top cluster (0.19--0.22) is tightly packed with overlapping CIs, indicating these models are largely inseparable on this task. The bottom four models---phi-4-mini-reasoning (Azure), Falcon-H1-90M, llama-3.3-70b, and deepseek-v3---have CIs entirely below 0.10; the latter two due to API failures producing mostly empty or malformed responses.
+
+%----------------------------------------------------------------------
+\section{Criticality v2: Argument Quality Judgment}
+
+Gemma3n-E4B leads at 54\% accuracy (tier A), cleanly separable from all other models. Four models cluster at 48--49\% (tier B, internally inseparable), while Falcon-H1-90M sits at exactly the 25\% random baseline.
+
+\begin{table}[h]
+\centering
+\caption{Criticality v2: 9 Ollama models only (Azure models not tested on this benchmark).}
+\vspace{4pt}
+\begin{tabular}{@{}lrccl@{}}
+\toprule
+\textbf{Model} & \textbf{Accuracy} & \textbf{95\% CI} & \textbf{$p$} & \textbf{Tier} \\
+\midrule
+Gemma3n-E4B          & \textbf{54.0\%} & [47.1, 60.8] & $<$0.0001 & \textcolor{tierA}{\textbf{A}} \\
+GPT-OSS-20B          & 49.0\%          & [42.2, 55.9] & $<$0.0001 & \textcolor{tierB}{\textbf{B}} \\
+DASD-4B              & 48.0\%          & [41.2, 54.9] & $<$0.0001 & \textcolor{tierB}{\textbf{B}} \\
+Gemma3-4B            & 48.0\%          & [41.2, 54.9] & $<$0.0001 & \textcolor{tierB}{\textbf{B}} \\
+Gemma3n-E2B          & 48.0\%          & [41.2, 54.9] & $<$0.0001 & \textcolor{tierB}{\textbf{B}} \\
+Phi4-Mini-Reasoning  & 42.5\%          & [35.9, 49.4] & $<$0.0001 & \textcolor{tierC}{\textbf{C}} \\
+Gemma3-1B            & 40.5\%          & [33.9, 47.4] & $<$0.0001 & \textcolor{tierC}{\textbf{C}} \\
+Qwen3-0.6B           & 37.0\%          & [30.6, 43.9] & 0.0001    & \textcolor{tierD}{\textbf{D}} \\
+Falcon-H1-90M        & 25.0\%          & [19.5, 31.4] & 0.527     & \textcolor{tierF}{\textbf{F}} \\
+\bottomrule
+\end{tabular}
+\label{tab:criticality}
+\end{table}
+
+CIs: Wilson score. $p$-values: one-sided binomial test vs.\ 25\%. Tier A (54\%) separable from all $\leq$ E2B; tier B (48--49\%) inseparable internally; tier F (25\%) at random baseline.
+
+\textbf{Methodology:} Single-token MCQ scoring presents all 4 arguments in one prompt and extracts logprobs for tokens A/B/C/D at the answer position. This forces comparative reasoning via self-attention over all options, unlike continuation scoring which evaluates each argument independently and confounds quality with fluency.
+
+%----------------------------------------------------------------------
+\section{Cross-Benchmark Observations}
+
+\textbf{Instruction Following dominance does not transfer.}
+DASD-4B averages 21.6 IF levels (best overall) but scores 48\% on Criticality (tier B, tied with 3 others) and 0.164 ROUGE-L on Summarization (middling). Similarly, Gemma3n-E4B ranks tier A on Criticality (54\%) but fails all IF levels (empty-response parsing issue).
+
+\textbf{Model size is uncorrelated with Instruction Following performance.}
+The 752M-parameter qwen3:0.6b model averages 4.7 levels, while the 14B-parameter phi-4 averages 0.1 levels (parse errors). The 4B DASD model outperforms all 100B+ Azure models. IF requires precise output formatting and incremental state tracking; these capabilities emerge non-monotonically with scale.
+
+\textbf{Summarization performance is stable across architectures.}
+ROUGE-L scores span only 0.14--0.22 for 19/21 working models (excluding the 90M Falcon outlier at 0.083). Pass rates (threshold 0.15) range 43--78\%. Unlike IF (0--26 levels) and Criticality (25--54\%), summarization discriminates weakly.
+
+\textbf{Provider differences matter for some tasks but not others.}
+Azure models were not tested on Criticality v2, but on IF and SU both providers show similar distributions. The top IF performers happen to be local (DASD, gpt-oss), but Azure's GPT-4o and deepseek-v3.2 also reach high levels. On SU, Azure's deepseek-v3.2 leads at 0.224 ROUGE-L.
+
+\end{document}

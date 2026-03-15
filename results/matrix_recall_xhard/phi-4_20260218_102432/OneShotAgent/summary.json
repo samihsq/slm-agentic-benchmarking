@@ -1,0 +1,19 @@
+{
+  "agent": "OneShotAgent",
+  "model": "phi-4",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.4,
+  "num_tasks": 50,
+  "total_latency_seconds": 589.1450462341309,
+  "avg_latency_seconds": 11.782900924682616,
+  "total_cost_usd": 0.00399532,
+  "results_dir": "results/matrix_recall_xhard/phi-4_20260218_102432/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "x-hard": {
+      "accuracy": 0.4,
+      "correct": 20,
+      "total": 50
+    }
+  }
+}

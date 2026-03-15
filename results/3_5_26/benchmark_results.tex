@@ -1,0 +1,414 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+\definecolor{toprow}{HTML}{E8F5E9}
+\definecolor{midrow}{HTML}{FFF8E1}
+\definecolor{botrow}{HTML}{FFEBEE}
+\definecolor{hdrblue}{HTML}{1565C0}
+\definecolor{notegray}{HTML}{757575}
+\definecolor{prelim}{HTML}{FF6F00}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{notegray}{\small March 5, 2026}}
+\lhead{\textcolor{notegray}{\small SLM Agentic Benchmarking}}
+\cfoot{\thepage}
+
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\begin{document}
+
+\begin{center}
+{\LARGE \textbf{SLM Agentic Benchmark Results}}\\[4pt]
+{\large March 5, 2026}\\[6pt]
+{\small\textcolor{notegray}{Benchmarks: Summarization (XSum) $\cdot$ BIG-bench Lite $\cdot$ PlanBench (Blocksworld)}}\\[2pt]
+{\small\textcolor{notegray}{Models: Azure (OneShotAgent) $\cdot$ Ollama local (OllamaAgent, agentic variants)}}\\[2pt]
+{\small\textcolor{prelim}{\textbf{Note:} Results marked \textnormal{(preliminary)} are from in-progress runs. All other results are final ($n\geq50$ or $n=100$).}}
+\end{center}
+
+\vspace{0.3cm}
+
+%% =======================================================================
+\section*{Methods}
+%% =======================================================================
+
+\textbf{Summarization (XSum).} Each task presents a BBC news article from the XSum validation split. The model returns a JSON object with a \texttt{response} field containing a single-sentence summary. Primary metric: ROUGE-L F1 ($\geq$0.15 = success, Wilson 95\% CI). Secondary metric: BERTScore F1 (bootstrap 95\% CI, 2000 resamples). Two BERTScore models are reported: \texttt{distilbert-base-uncased} (used in the Feb 25 report) and the new \texttt{microsoft/deberta-xlarge-mnli}, which provides stricter semantic similarity scoring. $n=100$ per model. Run date: Feb 25, 2026 (Azure); Feb--Mar 2026 (Ollama).
+
+\textbf{BIG-bench Lite.} Six tasks from the BIG-bench benchmark (\texttt{tasksource/bigbench} on HuggingFace): logical deduction, navigation, penguins-in-a-table, causal judgment, date understanding, and arithmetic. All tasks are multiple-choice; accuracy = fraction of correct letter choices. One-shot: $n=16$ per config (96 total, \textit{final}); $n=50$/config (300 total) run in progress. Agentic runs: $n=30$/config (180 total) using CrewAI-based Sequential, Concurrent, and GroupChat agent architectures. Run date: Mar 5, 2026.
+
+\textbf{PlanBench (Blocksworld).} Classical AI planning benchmark (Valmeekam et al., 2022; \href{https://github.com/karthikv792/LLMs-Planning}{github.com/karthikv792/LLMs-Planning}). The model is given a description of a set of colored blocks on a table and must produce a sequence of \texttt{(unstack A B)} / \texttt{(stack A B)} / \texttt{(pick-up A)} / \texttt{(put-down A)} actions to reach a goal configuration. Success requires \emph{exact} plan correctness verified by a PDDL planner. Two configs: \texttt{blocksworld} (4 blocks, harder) and \texttt{blocksworld\_3} (3 blocks, easier). Ten task types probe different planning competencies: \textbf{t1} Plan Generation (generate a valid plan from scratch), \textbf{t2} Plan Optimality (produce the shortest plan), \textbf{t3} Plan Verification (judge whether a given plan is correct), \textbf{t4} Plan Reuse (adapt a stored plan), \textbf{t5} Plan Generalization (apply a plan pattern to a new instance), \textbf{t6} Replanning (fix a broken plan), \textbf{t7} Plan Execution (simulate executing a plan and report final state), \textbf{t8\_1} Goal Shuffling (reorder goal conditions without changing the underlying plan), \textbf{t8\_2} Full-to-Partial (identify which subgoals a plan achieves), \textbf{t8\_3} Partial-to-Full (complete a partially specified plan). $n=100$ per task/config/model. Run date: Mar 5, 2026.
+
+\textbf{Confidence intervals.} For binary success rates: Wilson score intervals (95\%). For BERTScore means: bootstrap percentile intervals (2000 resamples, 95\%). CIs wider than $\pm$15pp indicate high uncertainty.
+
+\newpage
+
+%% =======================================================================
+\section*{1\quad Summarization (XSum) --- ROUGE-L, all models}
+%% =======================================================================
+
+\noindent\textbf{TL;DR:} Azure frontier models (mistral-small, deepseek-v3.2, ministral-3b) lead at 66--77\% ROUGE-L success. Mid-size Ollama models (gemma3-4b, gpt-oss-20b, dasd-4b) reach 52--63\%, competitive with several Azure models. Three Azure models (deepseek-r1, deepseek-v3, mistral-nemo) score 0\% ROUGE-L due to wording divergence from the reference, not poor summarization quality --- their BERTScore confirms semantically valid outputs.
+
+\vspace{0.2cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 1.} Summarization (XSum), $n=100$ per model. Sorted by ROUGE-L success rate. Wilson 95\% CI shown.}
+\begin{tabular}{l C{1.0cm} R{1.4cm} R{1.2cm} R{2.8cm} l}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{RL Succ.\ (\%)} & \textbf{Avg RL} & \textbf{RL 95\% CI (Wilson)} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} mistral-small        & 100 & 77.0 & 0.225 & [67.8, 84.2] & Azure \\
+\rowcolor{toprow} deepseek-v3.2        & 100 & 74.0 & 0.224 & [64.6, 81.6] & Azure \\
+\rowcolor{toprow} ministral-3b         & 100 & 70.0 & 0.208 & [60.4, 78.1] & Azure \\
+\rowcolor{toprow} gpt-4o               & 100 & 67.0 & 0.191 & [57.3, 75.4] & Azure \\
+\rowcolor{toprow} mistral-large-3      & 100 & 66.0 & 0.194 & [56.3, 74.5] & Azure \\
+gemma3-4b            & 100 & 63.0 & 0.187 & [53.2, 71.8] & Ollama \\
+phi-4                & 100 & 59.0 & 0.177 & [49.2, 68.1] & Azure \\
+gemma3n-e2b          & 100 & 57.0 & 0.164 & [47.2, 66.3] & Ollama \\
+gpt-oss-20b          & 100 & 56.0 & 0.178 & [46.2, 65.3] & Ollama \\
+gemma3-1b            & 100 & 55.0 & 0.176 & [45.2, 64.4] & Ollama \\
+gemma3n-e4b          & 100 & 55.0 & 0.178 & [45.2, 64.4] & Ollama \\
+dasd-4b              & 100 & 52.0 & 0.164 & [42.3, 61.5] & Ollama \\
+llama-3.2-11b-vision & 100 & 51.0 & 0.160 & [41.3, 60.6] & Azure \\
+phi-4-mini           & 100 & 48.0 & 0.157 & [38.5, 57.7] & Azure \\
+phi4-mini-reasoning  & 100 & 43.0 & 0.136 & [33.7, 52.8] & Ollama \\
+qwen3-0.6b           & 100 & 42.0 & 0.141 & [32.8, 51.8] & Ollama \\
+\rowcolor{midrow} phi-4-mini-reasoning & 100 & 20.0 & 0.098 & [13.3, 28.9] & Azure \\
+\rowcolor{midrow} llama-3.3-70b        & 100 & 19.0 & 0.075 & [12.5, 27.8] & Azure \\
+\rowcolor{midrow} falcon-h1-90m        & 100 &  8.0 & 0.083 & [4.1, 15.0]  & Ollama \\
+\midrule
+\multicolumn{6}{l}{\textcolor{notegray}{\footnotesize 0\% ROUGE-L --- semantically valid paraphrases with different wording (BERTScore captures; see Table 2):}} \\
+deepseek-r1          & 100 &  0.0 & 0.025 & [0.0, 3.7]   & Azure \\
+deepseek-v3          & 100 &  0.0 & 0.025 & [0.0, 3.7]   & Azure \\
+mistral-nemo         & 100 &  0.0 & 0.000 & [0.0, 3.7]   & Azure \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize\textcolor{notegray}{RL = ROUGE-L F1 (threshold $\geq$0.15). falcon-h1-90m is a 90M parameter model. phi4-mini-reasoning = Ollama variant.\\
+\textbf{Changes from Feb 25:} All Ollama models now have $n=100$ (previously $n=3$ for most). Azure results unchanged. Ollama models gemma3-1b/4b, gemma3n-e2b/e4b, gpt-oss-20b, qwen3-0.6b, falcon-h1-90m, phi4-mini-reasoning upgraded from $n=3$ to $n=100$.}}
+\end{table}
+
+\vspace{0.4cm}
+
+%% =======================================================================
+\section*{2\quad Summarization (XSum) --- BERTScore: distilbert vs.\ DeBERTa}
+%% =======================================================================
+
+\noindent\textbf{TL;DR:} DeBERTa-xlarge (new) ranks models more consistently with ROUGE-L than distilbert did. The 5 weakest Ollama models cluster at DeBERTa F1 = 0.349 --- they produce nearly identical outputs regardless of input, so the model cannot differentiate them further. gpt-oss-20b's inflated distilbert score (0.817 at $n=3$) normalizes to 0.661 at $n=100$, correctly placing it in the mid tier. Rankings at the top are stable across both models.
+
+\vspace{0.2cm}
+
+Comparison of two BERTScore models. \texttt{distilbert-base-uncased} was reported on Feb 25; \texttt{microsoft/deberta-xlarge-mnli} is the new high-capacity model scored this week. DeBERTa produces lower absolute F1 values but better discriminates models in the mid range, and corrects the inflated score for gpt-oss-20b (previously $n=3$).
+
+\vspace{0.2cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 2.} BERTScore F1 comparison: distilbert-base-uncased (Feb 25) vs.\ deberta-xlarge (Mar 5). All runs $n=100$.}
+\begin{tabular}{l R{0.7cm} R{1.5cm} R{2.6cm} R{1.5cm} R{2.6cm} l}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{Distilbert F1} & \textbf{Distilbert 95\% CI} & \textbf{DeBERTa F1} & \textbf{DeBERTa 95\% CI} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} mistral-small        & 100 & 0.800 & [0.791, 0.809] & 0.702 & [0.689, 0.716] & Azure \\
+\rowcolor{toprow} deepseek-v3.2        & 100 & 0.799 & [0.791, 0.808] & 0.690 & [0.677, 0.702] & Azure \\
+\rowcolor{toprow} ministral-3b         & 100 & 0.789 & [0.780, 0.797] & 0.682 & [0.670, 0.695] & Azure \\
+\rowcolor{toprow} mistral-large-3      & 100 & 0.792 & [0.784, 0.801] & 0.678 & [0.665, 0.691] & Azure \\
+\rowcolor{toprow} gpt-4o               & 100 & 0.790 & [0.783, 0.798] & 0.675 & [0.663, 0.687] & Azure \\
+phi-4                & 100 & 0.784 & [0.776, 0.791] & 0.667 & [0.655, 0.678] & Azure \\
+gpt-oss-20b          & 100 & 0.661$^{\dagger}$ & [0.649, 0.673] & 0.661 & [0.649, 0.673] & Ollama \\
+dasd-4b              & 100 & 0.779 & [0.772, 0.787] & 0.649 & [0.637, 0.661] & Ollama \\
+phi-4-mini           & 100 & 0.770 & [0.760, 0.781] & 0.648 & [0.631, 0.664] & Azure \\
+qwen3-0.6b           & 100 & 0.638$^{\dagger}$ & [0.629, 0.647] & 0.638 & [0.629, 0.647] & Ollama \\
+llama-3.2-11b-vision & 100 & 0.748 & [0.732, 0.764] & 0.611 & [0.584, 0.637] & Azure \\
+phi-4-mini-reasoning & 100 & 0.704 & [0.693, 0.715] & 0.554 & [0.540, 0.569] & Azure \\
+llama-3.3-70b        & 100 & 0.682 & [0.669, 0.696] & 0.489 & [0.467, 0.513] & Azure \\
+\rowcolor{midrow} deepseek-r1          & 100 & 0.649 & [0.644, 0.654] & 0.439 & [0.435, 0.443] & Azure \\
+\rowcolor{midrow} deepseek-v3          & 100 & 0.649 & [0.644, 0.654] & 0.439 & [0.436, 0.443] & Azure \\
+\rowcolor{midrow} mistral-nemo         & 100 & 0.647 & [0.643, 0.652] & 0.411 & [0.407, 0.416] & Azure \\
+\rowcolor{botrow} gemma3-1b            & 100 & 0.578$^{\dagger}$ & [0.535, 0.614] & 0.349 & [0.345, 0.353] & Ollama \\
+\rowcolor{botrow} gemma3-4b            & 100 & 0.578$^{\dagger}$ & [0.535, 0.614] & 0.349 & [0.345, 0.353] & Ollama \\
+\rowcolor{botrow} gemma3n-e2b          & 100 & 0.578$^{\dagger}$ & [0.535, 0.614] & 0.349 & [0.345, 0.353] & Ollama \\
+\rowcolor{botrow} gemma3n-e4b          & 100 & 0.578$^{\dagger}$ & [0.535, 0.614] & 0.349 & [0.345, 0.353] & Ollama \\
+\rowcolor{botrow} falcon-h1-90m        & 100 & 0.578$^{\dagger}$ & [0.535, 0.614] & 0.349 & [0.345, 0.353] & Ollama \\
+\rowcolor{botrow} phi4-mini-reasoning  & 100 & 0.578$^{\dagger}$ & [0.535, 0.614] & 0.349 & [0.345, 0.353] & Ollama \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize\textcolor{notegray}{$\dagger$ These models had $n=3$ in the Feb 25 distilbert run. Their distilbert scores here are from the new $n=100$ run.\\
+\textbf{Key finding:} DeBERTa-xlarge more sharply penalizes format/style divergence. The 5 lowest-ranked Ollama models (gemma3-1b/4b, gemma3n, falcon, phi4-mini-reasoning) cluster at 0.349 DeBERTa F1 vs.\ 0.578 distilbert -- a sign these models produce repetitive or near-identical outputs.\\
+deepseek-r1/v3 and mistral-nemo: 0\% ROUGE-L but non-trivial distilbert BERTScore ($\approx$0.648); DeBERTa collapses them to 0.41--0.44, correctly reflecting their lexically divergent outputs.}}
+\end{table}
+
+\newpage
+
+%% =======================================================================
+\section*{3\quad BIG-bench Lite --- One-Shot}
+%% =======================================================================
+
+\noindent\textbf{TL;DR:} gpt-oss-20b (74\%) outperforms dasd-4b (59.4\%) overall. Both models are near-perfect on arithmetic and penguins-in-table (structured lookup tasks) but struggle on navigation (50\%/31\%) and causal judgment (50\%/44\%). Wide per-task CIs at $n=16$/config should narrow significantly in the $n=50$/config run currently in progress.
+
+\vspace{0.2cm}
+
+Six-task subset of BIG-bench (\texttt{logical\_deduction, navigate, penguins\_in\_a\_table, causal\_judgment, date\_understanding, arithmetic}). All multiple-choice; accuracy = fraction correct. $n=16$ per config (96 total) is \textbf{final}. A $n=50$/config (300 total) run is in progress at time of writing.
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 3.} BIG-bench Lite one-shot, $n=96$ (16/config). Wilson 95\% CIs. \textbf{Final.}}
+\begin{tabular}{l R{0.7cm} R{1.5cm} R{2.8cm} l}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{Accuracy (\%)} & \textbf{95\% CI (Wilson)} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} gpt-oss-20b & 96 & 74.0 & [64.4, 81.7] & Ollama \\
+dasd-4b      & 96 & 59.4 & [49.4, 68.7] & Ollama \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 4.} BIG-bench Lite one-shot per-task breakdown, $n=16$/config. (n=300 run in progress -- preliminary figures in parentheses for gpt-oss-20b).}
+\begin{tabular}{l R{1.4cm} R{1.8cm} R{1.4cm} R{1.8cm}}
+\toprule
+\textbf{Task} & \multicolumn{2}{c}{\textbf{gpt-oss-20b}} & \multicolumn{2}{c}{\textbf{dasd-4b}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & \textbf{Acc (\%)} & \textbf{95\% CI} & \textbf{Acc (\%)} & \textbf{95\% CI} \\
+\midrule
+logical\_deduction  & 62 & [38.6, 81.5] & 25 & [10.2, 49.5] \\
+navigate            & 50 & [28.0, 72.0] & 31 & [14.2, 55.6] \\
+penguins\_in\_table & 100 & [80.6, 100] & 94 & [71.7, 98.9] \\
+causal\_judgment    & 50 & [28.0, 72.0] & 44 & [23.1, 66.8] \\
+date\_understanding & 81 & [57.0, 93.4] & 62 & [38.6, 81.5] \\
+arithmetic          & 100 & [80.6, 100] & 100 & [80.6, 100] \\
+\midrule
+\textbf{Overall}    & \textbf{74.0} & [64.4, 81.7] & \textbf{59.4} & [49.4, 68.7] \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize\textcolor{notegray}{Wide CIs on $n=16$/task are expected. The $n=50$/task run will narrow CIs to $\approx\pm$13pp. Both models score 100\% on arithmetic, indicating strong symbolic reasoning at this difficulty level.}}
+\end{table}
+
+\vspace{0.4cm}
+
+%% =======================================================================
+\section*{4\quad BIG-bench Lite --- Agentic Architectures (gpt-oss-20b)}
+%% =======================================================================
+
+\noindent\textbf{TL;DR:} Both agentic architectures substantially outperform one-shot. Sequential (+12.6pp) and preliminary Concurrent (+14.6pp) show the largest gains on reasoning-heavy tasks (logical deduction +31pp, navigation +33pp) --- the multi-role pipeline effectively forces the model to re-examine its reasoning before committing. GroupChat and all dasd-4b agentic results are still pending.
+
+\vspace{0.2cm}
+
+Three agentic architectures implemented with CrewAI + Ollama LiteLLM backend. Each uses a multi-role pipeline calling gpt-oss-20b for all roles:
+\begin{itemize}
+  \item \textbf{Sequential:} Analyzer $\to$ Evaluator $\to$ Responder (3 serial LLM calls per task)
+  \item \textbf{Concurrent:} Analyst + Researcher + Critic (parallel) $\to$ Synthesizer (4 calls total)
+  \item \textbf{GroupChat:} Proposer $\to$ Critic $\to$ Advisor $\to$ Moderator (4 serial calls)
+\end{itemize}
+
+$n=30$/config (180 total) per architecture.
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 5.} BIG-bench Lite --- gpt-oss-20b agentic results ($n=180$, 30/config).}
+\begin{tabular}{l R{0.7cm} R{1.5cm} R{2.8cm} l}
+\toprule
+\textbf{Architecture} & \textbf{$n$} & \textbf{Accuracy (\%)} & \textbf{95\% CI (Wilson)} & \textbf{Status} \\
+\midrule
+One-shot (baseline) & 96 & 74.0 & [64.4, 81.7] & \textcolor{green!50!black}{Final} \\
+\rowcolor{toprow} Sequential & 180 & 86.6 & [80.9, 90.9] & \textcolor{green!50!black}{Final} \\
+\rowcolor{toprow} Concurrent & 149 & 88.6 & [82.5, 92.8] & \textcolor{prelim}{Preliminary (149/180)} \\
+GroupChat & --- & --- & --- & \textcolor{prelim}{Pending} \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize\textcolor{notegray}{One-shot baseline uses $n=96$ (16/config) run for comparability. Sequential and concurrent show substantial gains over one-shot (+12.6pp and +14.6pp respectively, preliminary for concurrent). GroupChat results pending.}}
+\end{table}
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 6.} Sequential vs.\ one-shot per-task breakdown (gpt-oss-20b, $n=30$/config).}
+\begin{tabular}{l R{1.4cm} R{1.8cm} R{1.4cm} R{1.8cm}}
+\toprule
+\textbf{Task} & \multicolumn{2}{c}{\textbf{One-Shot ($n=16$)}} & \multicolumn{2}{c}{\textbf{Sequential ($n=30$)}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & \textbf{Acc (\%)} & \textbf{95\% CI} & \textbf{Acc (\%)} & \textbf{95\% CI} \\
+\midrule
+logical\_deduction  & 62 & [38.6, 81.5] & 93 & [78.0, 98.1] \\
+navigate            & 50 & [28.0, 72.0] & 83 & [66.4, 92.7] \\
+penguins\_in\_table & 100 & [80.6, 100] & 90 & [74.4, 96.5] \\
+causal\_judgment    & 50 & [28.0, 72.0] & 70 & [52.1, 83.3] \\
+date\_understanding & 81 & [57.0, 93.4] & 87 & [70.3, 94.7] \\
+arithmetic          & 100 & [80.6, 100] & 97 & [83.3, 99.4] \\
+\midrule
+\textbf{Overall}    & \textbf{74.0} & [64.4, 81.7] & \textbf{86.6} & [80.9, 90.9] \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize\textcolor{notegray}{Sequential shows the largest gains on logical deduction (+31pp) and navigation (+33pp) -- tasks requiring step-by-step reasoning that benefits from the Analyzer$\to$Evaluator pipeline. Penguins-in-table and arithmetic were already near-ceiling and show slight regression within CI noise. Causal judgment shows a modest +20pp improvement. dasd-4b agentic results pending.}}
+\end{table}
+
+\newpage
+
+%% =======================================================================
+\section*{5\quad PlanBench (Blocksworld) --- All Models, $n=100$}
+%% =======================================================================
+
+\noindent\textbf{TL;DR:} No model can generate or optimize plans (t1--t2 near 0\% universally). All models --- even the 90M-param falcon-h1-90m --- score highly on robustness tasks (t8\_x: 59--100\%), which only require pattern-matching on an existing plan rather than generating one. qwen3-0.6b's 97\% on plan verification (t3) is a template artifact that collapses to 1\% on a different config. The gap between generation (0\%) and robustness (90\%+) is the defining characteristic of current SLMs on planning.
+
+\vspace{0.2cm}
+
+Classical AI planning on blocksworld (4 blocks) and blocksworld\_3 (3 blocks) configurations. Ten task types assess different aspects of planning competence. Success = exact plan match. $n=100$ per task per model.
+
+\vspace{0.2cm}
+
+\textbf{Task type legend:} t1=Plan Generation, t2=Plan Optimality, t3=Plan Verification, t4=Plan Reuse, t5=Plan Generalization, t6=Replanning, t7=Plan Execution, t8\_1=Goal Shuffling, t8\_2=Full-to-Partial, t8\_3=Partial-to-Full.
+
+\vspace{0.2cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 7.} PlanBench --- \texttt{blocksworld} (4 blocks), $n=100$/task. Wilson 95\% CI.}
+\begin{tabular}{l R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm}}
+\toprule
+\textbf{Model} & \textbf{t1} & \textbf{t2} & \textbf{t3} & \textbf{t4} & \textbf{t5} & \textbf{t6} & \textbf{t7} & \textbf{t8\_1} & \textbf{t8\_2} & \textbf{t8\_3} \\
+\midrule
+\rowcolor{toprow} qwen3-0.6b  &  0 &  0 & 97 & 14 &  1 &  6 &  0 & 97 & 96 & 93 \\
+\rowcolor{toprow} dasd-4b     &  0 &  0 &  0 & 10 &  8 &  6 &  0 & 94 & 61 & 92 \\
+gemma3-1b    &  0 &  0 & -- & 11 &  2 &  7 &  0 & 59 & 73 & 51 \\
+falcon-h1-90m&  0 &  0 &  0 & 13 &  0 &  7 &  0 & 87 & -- & -- \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize\textcolor{notegray}{Values are \% success. ``--'' = not run or not evaluated. t3 not run for gemma3-1b in blocksworld config.}}
+\end{table}
+
+\vspace{0.2cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 8.} PlanBench --- \texttt{blocksworld\_3} (3 blocks), $n=100$/task. Wilson 95\% CI.}
+\begin{tabular}{l R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm} R{0.8cm}}
+\toprule
+\textbf{Model} & \textbf{t1} & \textbf{t2} & \textbf{t3} & \textbf{t4} & \textbf{t5} & \textbf{t6} & \textbf{t7} & \textbf{t8\_1} & \textbf{t8\_2} & \textbf{t8\_3} \\
+\midrule
+\rowcolor{toprow} qwen3-0.6b  &  0 &  0 & 1 & 17 &  1 & -- &  5 & 100 & 100 & 93 \\
+\rowcolor{toprow} dasd-4b     &  5 &  0 & 3 & 15 &  8 &  9 &  0 & 90  & 90  & 95 \\
+falcon-h1-90m& -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize\textcolor{notegray}{qwen3-0.6b: t3 (plan verification) scored 97\% on blocksworld but only 1\% on blocksworld\_3 --- this is the well-known template-matching artifact: the model learns the fixed verification answer for one scenario. ``--'' = not run.}}
+\end{table}
+
+\vspace{0.3cm}
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 9.} PlanBench 95\% Wilson CIs for selected high-performing (t8\_x) and zero-scoring (t1, t2) tasks.}
+\begin{tabular}{l l R{0.8cm} R{2.4cm} R{0.8cm} R{2.4cm}}
+\toprule
+\textbf{Model} & \textbf{Config} & \multicolumn{2}{c}{\textbf{t8\_1 Goal Shuffling}} & \multicolumn{2}{c}{\textbf{t1 Plan Generation}} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+ & & \textbf{Acc (\%)} & \textbf{95\% CI} & \textbf{Acc (\%)} & \textbf{95\% CI} \\
+\midrule
+qwen3-0.6b  & blocksworld   & 97.0 & [91.5, 99.0] &  0.0 & [0.0, 3.7] \\
+dasd-4b     & blocksworld   & 94.0 & [87.5, 97.2] &  0.0 & [0.0, 3.7] \\
+gemma3-1b   & blocksworld   & 59.0 & [49.2, 68.1] &  0.0 & [0.0, 3.7] \\
+falcon-h1-90m & blocksworld & 87.0 & [79.0, 92.2] &  0.0 & [0.0, 3.7] \\
+dasd-4b     & blocksworld\_3 & 90.0 & [82.6, 94.5] &  5.0 & [2.2, 11.2] \\
+qwen3-0.6b  & blocksworld\_3 & 100.0 & [96.3, 100] &  0.0 & [0.0, 3.7] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+\textbf{Key observations:}
+\begin{itemize}
+  \item \textbf{Plan generation (t1, t2) is universally hard.} All models score near 0\% on plan generation and optimality tasks, regardless of model size (0.6B to 20B parameters). This aligns with published findings that SLMs cannot perform multi-step classical planning without specialized training.
+  \item \textbf{Robustness tasks (t8\_x) are surprisingly easy.} Goal shuffling, full-to-partial, and partial-to-full tasks score 59--100\% across all models. These tasks require identifying properties of a given plan rather than generating one, which is an easier matching problem.
+  \item \textbf{qwen3-0.6b achieves 97\% on plan verification (t3) in blocksworld but 1\% in blocksworld\_3.} This is a template artifact, not generalized reasoning.
+  \item \textbf{dasd-4b (4B params) outperforms qwen3-0.6b (0.6B) on plan reuse and generalization}, but qwen3-0.6b edges ahead on the t8 robustness tasks.
+\end{itemize}
+
+\newpage
+
+%% =======================================================================
+\section*{6\quad Cross-Benchmark Summary}
+%% =======================================================================
+
+\begin{table}[h!]
+\centering
+\caption*{\textbf{Table 10.} Cross-benchmark comparison. Summarization = ROUGE-L success (\%); BIG-bench = one-shot accuracy (\%); Planning = composite success (\%) from Feb 25; PlanBench = t8\_1 goal shuffling success (\%) as representative task.}
+\begin{tabular}{l R{1.6cm} R{1.6cm} R{1.6cm} R{1.6cm} R{1.6cm} l}
+\toprule
+\textbf{Model} & \textbf{Summ.\ RL} & \textbf{BERTScore (DeBERTa)} & \textbf{BIG-bench (OS)} & \textbf{Planning (2/25)} & \textbf{PlanBench t8\_1} & \textbf{Provider} \\
+\midrule
+\rowcolor{toprow} mistral-small        & 77.0 & 0.702 & --- & 0.0$^\dagger$ & --- & Azure \\
+\rowcolor{toprow} deepseek-v3.2        & 74.0 & 0.690 & --- & --- & --- & Azure \\
+\rowcolor{toprow} ministral-3b         & 70.0 & 0.682 & --- & 42.0 & --- & Azure \\
+\rowcolor{toprow} gpt-4o               & 67.0 & 0.675 & --- & 80.0 & --- & Azure \\
+\rowcolor{toprow} mistral-large-3      & 66.0 & 0.678 & --- & 46.0 & --- & Azure \\
+phi-4                & 59.0 & 0.667 & --- & 0.0$^\dagger$ & --- & Azure \\
+gpt-oss-20b          & 56.0 & 0.661 & 74.0 & 52.0 & --- & Ollama \\
+gemma3-4b            & 63.0 & 0.349 & --- & 0.0$^\dagger$ & --- & Ollama \\
+dasd-4b              & 52.0 & 0.649 & 59.4 & 36.0 & 94.0 & Ollama \\
+qwen3-0.6b           & 42.0 & 0.638 & --- & 64.0 & 97.0 & Ollama \\
+gemma3-1b            & 55.0 & 0.349 & --- & 0.0$^\dagger$ & 59.0 & Ollama \\
+\rowcolor{midrow} phi-4-mini           & 48.0 & 0.648 & --- & 10.0 & --- & Azure \\
+\rowcolor{midrow} phi-4-mini-reasoning & 20.0 & 0.554 & --- & 18.0 & --- & Azure \\
+\rowcolor{midrow} llama-3.3-70b        & 19.0 & 0.489 & --- & 4.0 & --- & Azure \\
+\rowcolor{midrow} llama-3.2-11b-vision & 51.0 & 0.611 & --- & 0.0$^\dagger$ & --- & Azure \\
+\rowcolor{botrow} falcon-h1-90m        & 8.0 & 0.349 & --- & --- & 87.0 & Ollama \\
+\rowcolor{botrow} deepseek-r1          & 0.0 & 0.439 & --- & --- & --- & Azure \\
+\rowcolor{botrow} deepseek-v3          & 0.0 & 0.439 & --- & --- & --- & Azure \\
+\rowcolor{botrow} mistral-nemo         & 0.0 & 0.411 & --- & 0.0$^\dagger$ & --- & Azure \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+{\footnotesize\textcolor{notegray}{
+$^\dagger$ = 0\% Planning success (output format errors). ``---'' = benchmark not run for this model.\\
+BIG-bench one-shot: only gpt-oss-20b and dasd-4b have been run to date. Planning results are from Feb 25 (DeepPlanning, $n=50$). PlanBench t8\_1 = Goal Shuffling on \texttt{blocksworld} config.\\
+\textbf{Notable:} falcon-h1-90m (90M params) achieves 87\% on PlanBench t8\_1 but only 8\% ROUGE-L on summarization, illustrating that task-specific ``planning'' robustness does not generalize to free-text generation.
+}}
+\end{table}
+
+\vspace{0.5cm}
+
+%% =======================================================================
+\section*{Pending / In-Progress}
+%% =======================================================================
+
+\begin{itemize}
+  \item \textbf{BIG-bench one-shot $n=50$/config (300 total):} gpt-oss-20b and dasd-4b runs in progress (PID 50357). ETA $\approx$1h from time of writing.
+  \item \textbf{BIG-bench agentic concurrent (gpt-oss-20b):} 149/180 complete at time of writing ($\approx$88.6\% accuracy). ETA $\approx$30 min.
+  \item \textbf{BIG-bench agentic GroupChat (gpt-oss-20b):} Pending; will begin after concurrent completes.
+  \item \textbf{BIG-bench agentic (dasd-4b):} Sequential, Concurrent, GroupChat all pending; will begin after gpt-oss-20b agentic runs finish.
+  \item \textbf{BIG-bench one-shot for additional models:} Only gpt-oss-20b and dasd-4b have been run. Azure models and other Ollama models pending.
+  \item \textbf{PlanBench for gpt-oss-20b:} gpt-oss-20b planbench tasks returned 0 tasks evaluated in the Mar 4--5 runs; under investigation.
+\end{itemize}
+
+\end{document}

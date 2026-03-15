@@ -1,0 +1,9 @@
+{
+  "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+  "provider": "Ollama",
+  "num_tasks": 100,
+  "bertscore_model_type": "distilbert-base-uncased",
+  "avg_bertscore_f1": 0.779375,
+  "bs_ci_lo": 0.7717,
+  "bs_ci_hi": 0.7869
+}

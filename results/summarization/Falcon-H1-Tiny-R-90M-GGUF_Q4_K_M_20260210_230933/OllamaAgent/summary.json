@@ -1,0 +1,13 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/tiiuae/Falcon-H1-Tiny-R-90M-GGUF:Q4_K_M",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.08,
+  "mean_rougeL": 0.083,
+  "mean_rouge1": 0.1089,
+  "mean_rouge2": 0.0097,
+  "mean_latency": 6.63,
+  "total_cost": 0
+}

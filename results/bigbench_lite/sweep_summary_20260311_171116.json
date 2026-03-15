@@ -1,0 +1,85 @@
+{
+  "timestamp": "20260311_171116",
+  "suite": "bbl24",
+  "examples_per_task": 20,
+  "architectures": [
+    "concurrent"
+  ],
+  "azure_models": [],
+  "ollama_models": [
+    "qwen3-0.6b",
+    "gemma3-1b",
+    "gemma3n-e2b",
+    "phi4-mini-reasoning-ollama",
+    "dasd-4b",
+    "gemma3-4b",
+    "gemma3n-e4b",
+    "gpt-oss-20b"
+  ],
+  "results": [
+    {
+      "backend": "ollama",
+      "model": "qwen3-0.6b",
+      "architecture": "concurrent",
+      "error": "[Errno 32] Broken pipe",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3-1b",
+      "architecture": "concurrent",
+      "error": "[Errno 32] Broken pipe",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3n-e2b",
+      "architecture": "concurrent",
+      "error": "[Errno 32] Broken pipe",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "phi4-mini-reasoning-ollama",
+      "architecture": "concurrent",
+      "error": "[Errno 32] Broken pipe",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "dasd-4b",
+      "architecture": "concurrent",
+      "error": "[Errno 32] Broken pipe",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3-4b",
+      "architecture": "concurrent",
+      "error": "[Errno 32] Broken pipe",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gemma3n-e4b",
+      "architecture": "concurrent",
+      "error": "[Errno 32] Broken pipe",
+      "weighted_accuracy": null,
+      "skipped": false
+    },
+    {
+      "backend": "ollama",
+      "model": "gpt-oss-20b",
+      "architecture": "concurrent",
+      "error": "[Errno 32] Broken pipe",
+      "weighted_accuracy": null,
+      "skipped": false
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "model": "Phi4-Mini-Reasoning",
+  "model_label": "Phi4-Mini-Reasoning",
+  "benchmark": "Criticality v2 (Logprob-Based)",
+  "quality_score": "WA",
+  "is_thinking_model": false,
+  "top_logprobs_requested": 10,
+  "metrics": {
+    "rank_correlation": 0.283,
+    "top1_accuracy": 0.425,
+    "calibration_error": 0.0254,
+    "avg_margin": 3.0514,
+    "avg_entropy": 0.6437,
+    "num_tasks": 200,
+    "easy_accuracy": 0.425,
+    "hard_accuracy": 0.0
+  },
+  "num_tasks": 200,
+  "total_latency_seconds": 22.89,
+  "avg_latency_seconds": 0.11,
+  "total_prompt_tokens": 0,
+  "total_completion_tokens": 0,
+  "results_dir": "results/criticality_v2/Phi4-Mini-Reasoning_20260207_040858"
+}

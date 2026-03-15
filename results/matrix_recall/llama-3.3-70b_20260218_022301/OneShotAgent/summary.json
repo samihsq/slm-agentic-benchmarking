@@ -1,0 +1,19 @@
+{
+  "agent": "OneShotAgent",
+  "model": "llama-3.3-70b",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.0,
+  "num_tasks": 1,
+  "total_latency_seconds": 293.0538396835327,
+  "avg_latency_seconds": 293.0538396835327,
+  "total_cost_usd": 0,
+  "results_dir": "results/matrix_recall/llama-3.3-70b_20260218_022301/OneShotAgent",
+  "breakdown_by_difficulty": {
+    "hard": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 1
+    }
+  }
+}

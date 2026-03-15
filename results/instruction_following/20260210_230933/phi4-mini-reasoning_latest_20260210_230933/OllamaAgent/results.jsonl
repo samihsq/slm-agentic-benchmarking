@@ -1,0 +1,10 @@
+{"task_id": "if_rollout_0000", "rollout_id": 0, "levels_passed": 2, "score": 0.07142857142857142, "success": true, "latency": 36.12195801734924, "cost": 0}
+{"task_id": "if_rollout_0001", "rollout_id": 1, "levels_passed": 0, "score": 0.0, "success": false, "latency": 11.444894790649414, "cost": 0}
+{"task_id": "if_rollout_0002", "rollout_id": 2, "levels_passed": 0, "score": 0.0, "success": false, "latency": 21.545126914978027, "cost": 0}
+{"task_id": "if_rollout_0003", "rollout_id": 3, "levels_passed": 1, "score": 0.03571428571428571, "success": true, "latency": 50.216554403305054, "cost": 0}
+{"task_id": "if_rollout_0004", "rollout_id": 4, "levels_passed": 1, "score": 0.03571428571428571, "success": true, "latency": 24.00305700302124, "cost": 0}
+{"task_id": "if_rollout_0005", "rollout_id": 5, "levels_passed": 0, "score": 0.0, "success": false, "latency": 19.22712206840515, "cost": 0}
+{"task_id": "if_rollout_0006", "rollout_id": 6, "levels_passed": 1, "score": 0.03571428571428571, "success": true, "latency": 45.63691782951355, "cost": 0}
+{"task_id": "if_rollout_0007", "rollout_id": 7, "levels_passed": 0, "score": 0.0, "success": false, "latency": 30.82226300239563, "cost": 0}
+{"task_id": "if_rollout_0008", "rollout_id": 8, "levels_passed": 0, "score": 0.0, "success": false, "latency": 30.63179636001587, "cost": 0}
+{"task_id": "if_rollout_0009", "rollout_id": 9, "levels_passed": 0, "score": 0.0, "success": false, "latency": 30.37085795402527, "cost": 0}

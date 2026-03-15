@@ -1,0 +1,13 @@
+{
+  "agent": "OneShotAgent",
+  "model": "mistral-small",
+  "dataset": "xsum",
+  "split": "validation",
+  "num_tasks": 100,
+  "success_rate": 0.74,
+  "mean_rougeL": 0.2195,
+  "mean_rouge1": 0.2928,
+  "mean_rouge2": 0.0825,
+  "mean_latency": 0.96,
+  "total_cost": 0
+}

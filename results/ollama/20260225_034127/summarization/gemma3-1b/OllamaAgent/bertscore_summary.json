@@ -1,0 +1,9 @@
+{
+  "model": "gemma3:1b",
+  "provider": "Ollama",
+  "num_tasks": 3,
+  "bertscore_model_type": "distilbert-base-uncased",
+  "avg_bertscore_f1": 0.578109,
+  "bs_ci_lo": 0.535,
+  "bs_ci_hi": 0.6144
+}

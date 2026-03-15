@@ -1,0 +1,12 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gpt-oss:20b",
+  "benchmark": "Summarization (XSum)",
+  "split": "validation",
+  "metric": "rougeL",
+  "threshold": 0.15,
+  "num_tasks": 100,
+  "avg_score": 0.173702260834971,
+  "success_rate": 0.57,
+  "results_dir": "results/ollama/20260225_123747/summarization/gpt-oss-20b/OllamaAgent"
+}

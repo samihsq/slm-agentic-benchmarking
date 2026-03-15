@@ -1,0 +1,45 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+  "benchmark": "BIG-bench",
+  "task_configs": [
+    "logical_deduction",
+    "navigate",
+    "penguins_in_a_table",
+    "causal_judgment",
+    "date_understanding",
+    "arithmetic"
+  ],
+  "accuracy": 0.59375,
+  "num_tasks": 96,
+  "total_latency_seconds": 3868.7219293117523,
+  "avg_latency_seconds": 40.29918676366409,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260305_034144/bigbench/dasd-4b/one_shot/OllamaAgent",
+  "breakdown_by_config": {
+    "logical_deduction": {
+      "correct": 4,
+      "total": 16
+    },
+    "navigate": {
+      "correct": 5,
+      "total": 16
+    },
+    "penguins_in_a_table": {
+      "correct": 15,
+      "total": 16
+    },
+    "causal_judgment": {
+      "correct": 7,
+      "total": 16
+    },
+    "date_understanding": {
+      "correct": 10,
+      "total": 16
+    },
+    "arithmetic": {
+      "correct": 16,
+      "total": 16
+    }
+  }
+}

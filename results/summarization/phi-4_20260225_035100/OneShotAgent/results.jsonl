@@ -1,0 +1,2 @@
+{"task_id": "xsum_38295789", "metric": "rougeL", "score": 0.196078, "success": true, "latency": 35.26, "cost": 0.0, "rougeL": 0.19607843137254904, "rouge1": 0.19607843137254904, "rouge2": 0.04081632653061225, "rougeLsum": 0.19607843137254904}
+{"task_id": "xsum_40202028", "metric": "rougeL", "score": 0.115385, "success": false, "latency": 50.08, "cost": 0.0, "rougeL": 0.11538461538461539, "rouge1": 0.15384615384615385, "rouge2": 0.04, "rougeLsum": 0.11538461538461539}

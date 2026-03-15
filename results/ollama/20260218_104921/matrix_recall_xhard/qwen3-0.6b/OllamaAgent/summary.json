@@ -1,0 +1,19 @@
+{
+  "agent": "OllamaAgent",
+  "model": "qwen3:0.6b",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.1,
+  "num_tasks": 50,
+  "total_latency_seconds": 1348.372596502304,
+  "avg_latency_seconds": 26.96745193004608,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260218_104921/matrix_recall_xhard/qwen3-0.6b/OllamaAgent",
+  "breakdown_by_difficulty": {
+    "x-hard": {
+      "accuracy": 0.1,
+      "correct": 5,
+      "total": 50
+    }
+  }
+}

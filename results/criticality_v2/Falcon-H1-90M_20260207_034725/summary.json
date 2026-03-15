@@ -1,0 +1,24 @@
+{
+  "model": "Falcon-H1-90M",
+  "model_label": "Falcon-H1-90M",
+  "benchmark": "Criticality v2 (Logprob-Based)",
+  "quality_score": "WA",
+  "is_thinking_model": false,
+  "top_logprobs_requested": 10,
+  "metrics": {
+    "rank_correlation": 0.171,
+    "top1_accuracy": 0.32,
+    "calibration_error": 0.0245,
+    "avg_margin": 0.5314,
+    "avg_entropy": 1.6645,
+    "num_tasks": 200,
+    "easy_accuracy": 0.3105,
+    "hard_accuracy": 0.5
+  },
+  "num_tasks": 200,
+  "total_latency_seconds": 9.79,
+  "avg_latency_seconds": 0.05,
+  "total_prompt_tokens": 0,
+  "total_completion_tokens": 0,
+  "results_dir": "results/criticality_v2/Falcon-H1-90M_20260207_034725"
+}

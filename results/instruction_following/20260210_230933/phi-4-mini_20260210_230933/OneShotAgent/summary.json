@@ -1,0 +1,43 @@
+{
+  "agent": "OneShotAgent",
+  "model": "phi-4-mini",
+  "num_rollouts": 10,
+  "mean_score": 0.0679,
+  "success_rate": 0.7,
+  "mean_latency": 94.85,
+  "total_cost": 0,
+  "level_accuracy": {
+    "level_1": {
+      "accuracy": 0.7,
+      "correct": 7,
+      "total": 10
+    },
+    "level_2": {
+      "accuracy": 0.8571428571428571,
+      "correct": 6,
+      "total": 7
+    },
+    "level_3": {
+      "accuracy": 0.6666666666666666,
+      "correct": 4,
+      "total": 6
+    },
+    "level_4": {
+      "accuracy": 0.5,
+      "correct": 2,
+      "total": 4
+    },
+    "level_5": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 2
+    }
+  },
+  "levels_passed_distribution": {
+    "0": 3,
+    "3": 2,
+    "2": 2,
+    "4": 2,
+    "1": 1
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gemma3n:e4b",
+  "benchmark": "PlanBench",
+  "task": "t1",
+  "config": "blocksworld",
+  "num_tasks": 10,
+  "num_evaluated": 10,
+  "total_correct": 1,
+  "success_rate": 0.1
+}

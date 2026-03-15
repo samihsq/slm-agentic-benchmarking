@@ -1,0 +1,19 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gemma3:1b",
+  "benchmark": "Matrix Recall",
+  "matrix_size": 10,
+  "accuracy": 0.0,
+  "num_tasks": 50,
+  "total_latency_seconds": 859.2488849163055,
+  "avg_latency_seconds": 17.18497769832611,
+  "total_cost_usd": 0,
+  "results_dir": "results/ollama/20260218_104921/matrix_recall_xhard/gemma3-1b/OllamaAgent",
+  "breakdown_by_difficulty": {
+    "x-hard": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 50
+    }
+  }
+}

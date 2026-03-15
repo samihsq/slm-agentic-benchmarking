@@ -1,0 +1,5 @@
+{"task_id": "synthetic_travel_0000", "score": 0.513333, "success": true, "latency": 127.72, "cost": 0.000241, "domain": "travel", "structure_score": 0.8333333333333334, "budget_score": 0.0, "constraint_score": 0.6000000000000001}
+{"task_id": "synthetic_shopping_0001", "score": 0.15, "success": false, "latency": 49.78, "cost": 7.3e-05, "domain": "shopping", "json_score": 0.0, "budget_score": 0.5, "completeness_score": 0.0}
+{"task_id": "synthetic_travel_0002", "score": 0.12, "success": false, "latency": 26.17, "cost": 0.000274, "domain": "travel", "structure_score": 0.0, "budget_score": 0.0, "constraint_score": 0.4}
+{"task_id": "synthetic_shopping_0003", "score": 0.15, "success": false, "latency": 31.05, "cost": 7.3e-05, "domain": "shopping", "json_score": 0.0, "budget_score": 0.5, "completeness_score": 0.0}
+{"task_id": "synthetic_travel_0004", "score": 0.513333, "success": true, "latency": 8.88, "cost": 0.000243, "domain": "travel", "structure_score": 0.8333333333333334, "budget_score": 0.0, "constraint_score": 0.6000000000000001}

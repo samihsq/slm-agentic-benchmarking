@@ -1,0 +1,9 @@
+{
+  "model": "qwen3:0.6b",
+  "provider": "Ollama",
+  "num_tasks": 3,
+  "bertscore_model_type": "distilbert-base-uncased",
+  "avg_bertscore_f1": 0.761916,
+  "bs_ci_lo": 0.7454,
+  "bs_ci_hi": 0.7745
+}

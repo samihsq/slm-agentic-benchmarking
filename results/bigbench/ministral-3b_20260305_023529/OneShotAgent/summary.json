@@ -1,0 +1,45 @@
+{
+  "agent": "OneShotAgent",
+  "model": "ministral-3b",
+  "benchmark": "BIG-bench",
+  "task_configs": [
+    "logical_deduction",
+    "navigate",
+    "penguins_in_a_table",
+    "causal_judgment",
+    "date_understanding",
+    "arithmetic"
+  ],
+  "accuracy": 0.8333333333333334,
+  "num_tasks": 6,
+  "total_latency_seconds": 4.980211973190308,
+  "avg_latency_seconds": 0.8300353288650513,
+  "total_cost_usd": 0.000957,
+  "results_dir": "results/bigbench/ministral-3b_20260305_023529/OneShotAgent",
+  "breakdown_by_config": {
+    "navigate": {
+      "correct": 1,
+      "total": 1
+    },
+    "logical_deduction": {
+      "correct": 1,
+      "total": 1
+    },
+    "penguins_in_a_table": {
+      "correct": 1,
+      "total": 1
+    },
+    "causal_judgment": {
+      "correct": 1,
+      "total": 1
+    },
+    "arithmetic": {
+      "correct": 1,
+      "total": 1
+    },
+    "date_understanding": {
+      "correct": 0,
+      "total": 1
+    }
+  }
+}

@@ -1,0 +1,3 @@
+{"task_id": "crit_v2_0000", "predicted": "D", "correct": "B", "is_correct": false, "margin": 0.02235446611668168, "entropy": 1.9917423787235027, "latency": 0.14, "extraction_source": "sequence"}
+{"task_id": "crit_v2_0001", "predicted": "B", "correct": "B", "is_correct": true, "margin": 0.08601786098442954, "entropy": 1.9518406444552379, "latency": 0.08, "extraction_source": "sequence"}
+{"task_id": "crit_v2_0002", "predicted": "A", "correct": "A", "is_correct": true, "margin": 0.4024473945347635, "entropy": 1.5500079724354507, "latency": 0.08, "extraction_source": "sequence"}

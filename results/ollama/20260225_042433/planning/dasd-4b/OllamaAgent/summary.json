@@ -1,0 +1,17 @@
+{
+  "agent": "OllamaAgent",
+  "model": "hf.co/mradermacher/DASD-4B-Thinking-GGUF:Q4_K_M",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 50,
+  "mean_composite_score": 0.4199,
+  "mean_structure_score": 0.3733,
+  "mean_budget_score": 0.43,
+  "mean_constraint_score": 0.472,
+  "success_rate": 0.36,
+  "travel_success_rate": 0.0,
+  "shopping_success_rate": 0.72,
+  "mean_latency": 359.99,
+  "total_cost": 0
+}

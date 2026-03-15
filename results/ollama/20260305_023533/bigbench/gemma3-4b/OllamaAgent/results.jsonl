@@ -1,0 +1,6 @@
+{"task_id": "logical_deduction_0", "config": "logical_deduction", "match": false, "latency": 16.28, "cost": 0}
+{"task_id": "navigate_0", "config": "navigate", "match": false, "latency": 16.98, "cost": 0}
+{"task_id": "causal_judgment_0", "config": "causal_judgment", "match": false, "latency": 17.04, "cost": 0}
+{"task_id": "penguins_in_a_table_0", "config": "penguins_in_a_table", "match": false, "latency": 17.7, "cost": 0}
+{"task_id": "arithmetic_0", "config": "arithmetic", "match": false, "latency": 16.0, "cost": 0}
+{"task_id": "date_understanding_0", "config": "date_understanding", "match": false, "latency": 17.46, "cost": 0}

@@ -1,0 +1,17 @@
+{
+  "agent": "OneShotAgent",
+  "model": "gpt-4o",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 50,
+  "mean_composite_score": 0.6007,
+  "mean_structure_score": 0.76,
+  "mean_budget_score": 0.2,
+  "mean_constraint_score": 0.789,
+  "success_rate": 0.68,
+  "travel_success_rate": 0.44,
+  "shopping_success_rate": 0.92,
+  "mean_latency": 3.32,
+  "total_cost": 0.2506
+}

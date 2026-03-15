@@ -1,0 +1,12 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gemma3:4b",
+  "benchmark": "Summarization (XSum)",
+  "split": "validation",
+  "metric": "rougeL",
+  "threshold": 0.15,
+  "num_tasks": 100,
+  "avg_score": 0.0,
+  "success_rate": 0.0,
+  "results_dir": "results/ollama/20260225_123747/summarization/gemma3-4b/OllamaAgent"
+}

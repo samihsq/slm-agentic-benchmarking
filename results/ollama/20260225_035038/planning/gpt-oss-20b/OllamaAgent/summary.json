@@ -1,0 +1,17 @@
+{
+  "agent": "OllamaAgent",
+  "model": "gpt-oss:20b",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 3,
+  "mean_composite_score": 0.5156,
+  "mean_structure_score": 0.3889,
+  "mean_budget_score": 0.6667,
+  "mean_constraint_score": 0.5333,
+  "success_rate": 0.6667,
+  "travel_success_rate": 0.5,
+  "shopping_success_rate": 1.0,
+  "mean_latency": 39.36,
+  "total_cost": 0
+}

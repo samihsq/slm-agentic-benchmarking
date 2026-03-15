@@ -1,0 +1,19 @@
+{
+  "agent": "OneShotAgent",
+  "model": "llama-3.2-11b-vision",
+  "num_rollouts": 1,
+  "mean_score": 0.0,
+  "success_rate": 0.0,
+  "mean_latency": 1.53,
+  "total_cost": 0.0002,
+  "level_accuracy": {
+    "level_1": {
+      "accuracy": 0.0,
+      "correct": 0,
+      "total": 1
+    }
+  },
+  "levels_passed_distribution": {
+    "0": 1
+  }
+}

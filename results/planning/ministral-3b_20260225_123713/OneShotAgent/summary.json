@@ -1,0 +1,17 @@
+{
+  "agent": "OneShotAgent",
+  "model": "ministral-3b",
+  "benchmark": "Planning (DeepPlanning)",
+  "domain": "all",
+  "language": "en",
+  "num_tasks": 50,
+  "mean_composite_score": 0.3611,
+  "mean_structure_score": 0.41,
+  "mean_budget_score": 0.17,
+  "mean_constraint_score": 0.487,
+  "success_rate": 0.36,
+  "travel_success_rate": 0.0,
+  "shopping_success_rate": 0.72,
+  "mean_latency": 2.14,
+  "total_cost": 0.0127
+}
