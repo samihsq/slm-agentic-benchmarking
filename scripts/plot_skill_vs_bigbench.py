@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-SKILLS = ["planning", "criticality", "recall", "summarization", "instruction_following"]
+SKILLS = ["criticality", "recall", "summarization", "instruction_following"]
 
 ARCHITECTURE_MARKERS = {
     "one_shot":   "o",
@@ -90,8 +90,12 @@ def plot_all(
     plot_paths = []
 
     for skill in SKILLS:
-        # Filter to rows that have both skill score and BBL accuracy
-        rows = [r for r in joined if r.get(skill) is not None and r.get("weighted_accuracy") is not None]
+        # Include rows with real data (skill not None) and exclude pilot runs (BBL < 5%)
+        rows = [
+            r for r in joined
+            if r.get("weighted_accuracy") is not None
+            and r["weighted_accuracy"] >= 0.05  # exclude pilot runs
+        ]
         if not rows:
             print(f"  Skipping {skill}: no data")
             continue
@@ -99,59 +103,22 @@ def plot_all(
         fig, ax = plt.subplots(figsize=(9, 6))
 
         for r in rows:
-            x = r[skill] * 100
-            y = r["weighted_accuracy"] * 100
             model = r["model"]
             arch = r["architecture"]
             backend = r.get("backend", "azure")
             marker = ARCHITECTURE_MARKERS.get(arch, "o")
             color = color_map.get(model, "#888888")
             edge_color = "#000000" if backend == "azure" else "#888888"
-
-            # A point "failed" if BBL accuracy < 5% OR skill score is 0/missing
             skill_val = r.get(skill)
-            failed = (r["weighted_accuracy"] < 0.05) or (skill_val is None) or (skill_val == 0)
 
-            # 95% CI ellipse (1.96 × SE in each axis) — only for non-failed points
-            if not failed:
-                se_x = r.get(f"{skill}_se")
-                se_y = r.get("weighted_accuracy_se")
-                if se_x is not None and se_y is not None:
-                    ellipse = mpatches.Ellipse(
-                        (x, y),
-                        width=2 * 1.96 * se_x * 100,
-                        height=2 * 1.96 * se_y * 100,
-                        facecolor=color,
-                        edgecolor="none",
-                        alpha=0.18,
-                        zorder=2,
-                    )
-                    ax.add_patch(ellipse)
-                elif se_y is not None:
-                    ellipse = mpatches.Ellipse(
-                        (x, y),
-                        width=2.0,
-                        height=2 * 1.96 * se_y * 100,
-                        facecolor=color,
-                        edgecolor="none",
-                        alpha=0.18,
-                        zorder=2,
-                    )
-                    ax.add_patch(ellipse)
-
-            if failed:
-                # Hollow marker with thick dashed edge to signal failure
-                ax.scatter(
-                    x, y,
-                    marker=marker,
-                    facecolors="none",
-                    edgecolors=color,
-                    linewidths=2.0,
-                    s=100,
-                    zorder=3,
-                    linestyle="--",
-                )
+            if skill_val is None:
+                # Missing data — hollow marker with gray dashed edge
+                # Place at x=-3 (off the visible axis) to indicate no data
+                continue  # skip missing data points entirely
             else:
+                x = skill_val * 100
+                y = r["weighted_accuracy"] * 100
+                # Real data point — filled marker (including real 0% scores)
                 ax.scatter(
                     x, y,
                     marker=marker,
@@ -163,21 +130,27 @@ def plot_all(
                 )
 
         ax.set_xlabel(f"{skill.replace('_', ' ').title()} Score (%)", fontsize=11)
-        ax.set_ylabel("BIG-bench Lite Accuracy (%) — equal task weight", fontsize=11)
+        ax.set_ylabel("BIG-bench Lite Accuracy (%)", fontsize=11)
         ax.set_title(
-            f"BIG-bench Lite vs. {skill.replace('_', ' ').title()} Skill",
+            f"BBL24 Accuracy vs. {skill.replace('_', ' ').title()}",
             fontsize=13, fontweight="bold",
         )
         ax.set_xlim(-2, 102)
         ax.set_ylim(-2, 102)
         ax.grid(True, linestyle="--", alpha=0.5)
 
-        # Legend: color = model
+        # Legend: color = model (only models present in this skill's data)
+        skill_models = sorted(set(
+            r["model"] for r in rows if r.get(skill) is not None
+        ))
         model_handles = [
             mpatches.Patch(color=color_map[m], label=_short_model(m))
-            for m in sorted(set(r["model"] for r in rows))
+            for m in skill_models
         ]
-        # Legend: shape = architecture
+        # Legend: shape = orchestration
+        skill_archs = sorted(set(
+            r["architecture"] for r in rows if r.get(skill) is not None
+        ))
         arch_handles = [
             mlines.Line2D(
                 [], [],
@@ -187,23 +160,26 @@ def plot_all(
                 markersize=8,
                 label=ARCHITECTURE_LABELS.get(a, a),
             )
-            for a in sorted(set(r["architecture"] for r in rows))
+            for a in skill_archs
         ]
 
-        # Two-column legend: models on left, architectures on right
+        # Two-column legend: models on left, orchestrations on right
         leg1 = ax.legend(
             handles=model_handles, title="Model",
             bbox_to_anchor=(1.01, 1), loc="upper left", fontsize=7, title_fontsize=8,
         )
         ax.add_artist(leg1)
         ax.legend(
-            handles=arch_handles, title="Architecture",
+            handles=arch_handles, title="Orchestration",
             bbox_to_anchor=(1.01, 0.35), loc="upper left", fontsize=8, title_fontsize=8,
         )
 
         fig.tight_layout()
+        # Save both PNG and vector PDF
         out_path = output_dir / f"skill_vs_bigbench_{skill}.png"
         fig.savefig(out_path, dpi=dpi, bbox_inches="tight")
+        pdf_path = output_dir / f"skill_vs_bigbench_{skill}.pdf"
+        fig.savefig(pdf_path, bbox_inches="tight")
         plot_paths.append(out_path)
         print(f"  Saved: {out_path}")
         plt.close(fig)
@@ -231,7 +207,7 @@ def plot_all(
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Plot skill score vs. BIG-bench Lite accuracy (5 plots)"
+        description="Plot skill score vs. BIG-bench Lite accuracy (4 plots)"
     )
     parser.add_argument(
         "--input", type=Path, default=Path("results/bigbench_skill_join.json"),
@@ -261,7 +237,7 @@ def main() -> int:
             json.dump({"skills": SKILLS, "rows": 0, "plot_paths": [], "message": "No data"}, f, indent=2)
         return 0
 
-    print(f"\nGenerating 5 scatter plots → {args.output_dir}/")
+    print(f"\nGenerating {len(SKILLS)} scatter plots → {args.output_dir}/")
     plot_all(joined, args.output_dir, show=args.show, dpi=args.dpi)
     return 0
 
