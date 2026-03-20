@@ -34,7 +34,7 @@ SKILL_BUCKETS: Dict[str, List[str]] = {
     "criticality":           ["criticality", "criticality_v2"],
     "recall":                ["recall", "matrix_recall"],
     "summarization":         ["summarization"],
-    "instruction_following": ["instruction_following", "word_instruction_following"],
+    "instruction_following": ["instruction_following"],  # matrix IF only; word IF is too easy
 }
 
 SKILLS = list(SKILL_BUCKETS.keys())
@@ -200,6 +200,10 @@ def _extract_backend(path: Path) -> str:
     parts_lower = [p.lower() for p in path.parts]
     if "ollama" in parts_lower:
         return "ollama"
+    # Also detect Ollama from agent class name in path
+    ollama_agents = {"ollamaagent", "ollamasequentialagent", "ollamaconcurrentagent", "ollamagroupchatagent"}
+    if any(p in ollama_agents for p in parts_lower):
+        return "ollama"
     return "azure"
 
 
@@ -283,16 +287,49 @@ def load_skill_scores(
 # Join
 # ---------------------------------------------------------------------------
 
+def _best_score_for_benchmark(
+    scores: List[float],
+    ns: List[int],
+) -> float:
+    """Pick the most representative score for a benchmark with multiple runs.
+
+    Strategy: among runs with the maximum sample size, exclude any that
+    scored exactly 0 when other runs with the same n scored > 0 (these are
+    likely infrastructure failures, e.g. all-Error traces).  Then average
+    the remaining runs.  Falls back to mean of all runs when sample sizes
+    are unavailable.
+    """
+    if ns and len(ns) == len(scores):
+        max_n = max(ns)
+        candidates = [(s, n) for s, n in zip(scores, ns) if n == max_n]
+        # If some max-n runs scored > 0 and others scored exactly 0,
+        # drop the zeros (likely broken runs).
+        nonzero = [s for s, _ in candidates if s > 0]
+        if nonzero and len(nonzero) < len(candidates):
+            return sum(nonzero) / len(nonzero)
+        best = [s for s, _ in candidates]
+        return sum(best) / len(best)
+    # No sample-size info: mean across runs
+    return sum(scores) / len(scores)
+
+
 def compute_skill_score(
     benchmark_scores: Dict[str, List[float]],
     skill: str,
+    benchmark_n: Optional[Dict[str, List[int]]] = None,
 ) -> Optional[float]:
-    """Mean of best scores across benchmarks in the skill bucket."""
+    """Mean of representative scores across benchmarks in the skill bucket.
+
+    For each benchmark, we average runs with the largest sample size
+    (most representative) rather than ``max`` which cherry-picks the best
+    run regardless of sample size.
+    """
     benchmarks = SKILL_BUCKETS.get(skill, [])
     vals = []
     for b in benchmarks:
         if b in benchmark_scores and benchmark_scores[b]:
-            vals.append(max(benchmark_scores[b]))
+            ns = (benchmark_n or {}).get(b, [])
+            vals.append(_best_score_for_benchmark(benchmark_scores[b], ns))
     return sum(vals) / len(vals) if vals else None
 
 
@@ -311,9 +348,15 @@ def compute_skill_se(
     vals, ns = [], []
     for b in benchmarks:
         if b in benchmark_scores and benchmark_scores[b]:
-            vals.append(max(benchmark_scores[b]))
-            if b in benchmark_n and benchmark_n[b]:
-                ns.append(sum(benchmark_n[b]) // len(benchmark_n[b]))
+            scores = benchmark_scores[b]
+            b_ns = benchmark_n.get(b, [])
+            val = _best_score_for_benchmark(scores, b_ns)
+            vals.append(val)
+            if b_ns:
+                max_n = max(b_ns)
+                ns.append(max_n)
+            else:
+                ns.append(50)  # fallback
     if not vals:
         return None
     if len(vals) >= 2:
@@ -341,40 +384,48 @@ def join(
     """
     joined = []
     for row in bigbench_rows:
-        key = (row["backend"], row["model"], row["architecture"])
-        bench_scores = skill_scores.get(key, {})
-        bench_n = skill_n.get(key, {})
+        model = row["model"]
+        arch = row["architecture"]
 
-        # Also try without backend (Azure results may lack explicit backend label)
-        if not bench_scores:
-            for candidate_backend in ("azure", "ollama"):
-                alt_key = (candidate_backend, row["model"], row["architecture"])
-                if alt_key in skill_scores:
-                    bench_scores = skill_scores[alt_key]
-                    bench_n = skill_n.get(alt_key, {})
-                    break
+        # Merge skill scores across all backends and architectures for this model.
+        # Priority: exact (backend, model, arch) → any backend same arch → any backend one_shot.
+        # Merge per-benchmark so that e.g. criticality from azure backend fills in
+        # even when the primary match has only instruction_following from ollama.
+        merged_scores: Dict[str, List[float]] = {}
+        merged_n: Dict[str, List[int]] = {}
 
-        # Fall back to one_shot skill scores for the same model — skill scores reflect
-        # the model's inherent capability and were only measured with one_shot agents.
-        if not bench_scores:
-            for candidate_backend in ("azure", "ollama"):
-                fallback_key = (candidate_backend, row["model"], "one_shot")
-                if fallback_key in skill_scores:
-                    bench_scores = skill_scores[fallback_key]
-                    bench_n = skill_n.get(fallback_key, {})
-                    break
+        candidate_keys = []
+        for be in (row["backend"], "azure", "ollama"):
+            candidate_keys.append((be, model, arch))
+        for be in (row["backend"], "azure", "ollama"):
+            candidate_keys.append((be, model, "one_shot"))
+        # Deduplicate while preserving order
+        seen_keys: set = set()
+        unique_keys = []
+        for k in candidate_keys:
+            if k not in seen_keys:
+                seen_keys.add(k)
+                unique_keys.append(k)
+
+        for k in unique_keys:
+            if k in skill_scores:
+                for bench, scores_list in skill_scores[k].items():
+                    if bench not in merged_scores:
+                        merged_scores[bench] = scores_list
+                        if k in skill_n and bench in skill_n[k]:
+                            merged_n[bench] = skill_n[k][bench]
 
         out = {
             "backend":              row["backend"],
-            "model":                row["model"],
-            "architecture":         row["architecture"],
+            "model":                model,
+            "architecture":         arch,
             "weighted_accuracy":    row["weighted_accuracy"],
             "weighted_accuracy_se": row.get("weighted_accuracy_se"),
             "_bbl_source":          row.get("_source", ""),
         }
         for skill in SKILLS:
-            out[skill] = compute_skill_score(bench_scores, skill)
-            out[f"{skill}_se"] = compute_skill_se(bench_scores, bench_n, skill)
+            out[skill] = compute_skill_score(merged_scores, skill, benchmark_n=merged_n)
+            out[f"{skill}_se"] = compute_skill_se(merged_scores, merged_n, skill)
         joined.append(out)
     return joined
 
@@ -386,8 +437,9 @@ def join(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Join BBL24 results with skill benchmark scores")
     parser.add_argument(
-        "--bigbench-dir", type=Path, default=Path("results/bigbench_lite"),
-        help="Root of BIG-bench Lite results (default: results/bigbench_lite)",
+        "--bigbench-dir", type=Path, nargs="+",
+        default=[Path("results/bigbench_lite_chained"), Path("results/bigbench_lite")],
+        help="Root(s) of BIG-bench Lite results (default: results/bigbench_lite_chained results/bigbench_lite). First listed takes priority on duplicates.",
     )
     parser.add_argument(
         "--results-dir", type=Path, default=Path("results"),
@@ -401,9 +453,27 @@ def main() -> int:
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
-    print(f"Loading BBL24 results from: {args.bigbench_dir}")
-    bbl_rows = load_bigbench_results(args.bigbench_dir)
-    print(f"  Found {len(bbl_rows)} (backend, model, architecture) BBL24 entries.")
+    bbl_rows = []
+    for bbl_dir in args.bigbench_dir:
+        if bbl_dir.exists():
+            print(f"Loading BBL24 results from: {bbl_dir}")
+            rows = load_bigbench_results(bbl_dir)
+            print(f"  Found {len(rows)} (backend, model, architecture) BBL24 entries.")
+            bbl_rows.extend(rows)
+        else:
+            print(f"Skipping (not found): {bbl_dir}")
+
+    # Deduplicate: if same (backend, model, architecture) appears in both dirs,
+    # prefer the entry from the first directory listed (i.e. chained over old CrewAI runs).
+    seen = set()
+    deduped = []
+    for r in bbl_rows:
+        key = (r["backend"], r["model"], r["architecture"])
+        if key not in seen:
+            seen.add(key)
+            deduped.append(r)
+    bbl_rows = deduped
+    print(f"  Total unique: {len(bbl_rows)} (backend, model, architecture) BBL24 entries.")
 
     if not bbl_rows:
         print("No BBL24 results found. Writing empty joined file; run scripts/run_bigbench_lite_sweep.py to populate.")
