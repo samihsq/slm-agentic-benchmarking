@@ -2,7 +2,11 @@
 name = "slm-agentic-benchmarking"
 version = "0.1.0"
 description = "Benchmarking framework for evaluating SLMs in agentic architectures"
-authors = ["Samih Qureshi <samih@example.com>"]
+authors = [
+    "Samih Qureshi",
+    "Fiona Han",
+    "Justin Yang",
+]
 readme = "README.md"
 license = "MIT"
 package-mode = false

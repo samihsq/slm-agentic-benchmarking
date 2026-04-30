@@ -275,15 +275,15 @@ def get_llm_config(model_name: Optional[str] = None) -> Dict[str, Any]:
     config["azure_api_key"] = os.getenv("AZURE_API_KEY")
     # Per-model endpoint takes priority (for dedicated managed online endpoints).
     # Falls back to the shared serverless endpoint env var.
-    config["azure_endpoint"] = config.get("azure_endpoint") or os.getenv(
-        "AZURE_AI_ENDPOINT",
-        "<AZURE_ENDPOINT>"
-    )
-    
+    config["azure_endpoint"] = config.get("azure_endpoint") or os.getenv("AZURE_AI_ENDPOINT")
+
     if not config["azure_api_key"]:
         raise ValueError(
-            "AZURE_API_KEY environment variable required. "
-            "Get it from Azure AI Foundry console."
+            "AZURE_API_KEY environment variable is required for Azure-hosted models."
+        )
+    if not config["azure_endpoint"]:
+        raise ValueError(
+            "AZURE_AI_ENDPOINT environment variable is required for Azure-hosted models."
         )
 
     return config

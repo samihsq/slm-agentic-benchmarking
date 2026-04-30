@@ -74,6 +74,7 @@ HF_CACHE_VOLUME = modal.Volume.from_name("slm-hf-cache", create_if_missing=True)
 _IGNORE_PATTERNS = [
     ".git",
     ".venv",
+    ".claude",
     ".cursor",
     ".pytest_cache",
     "__pycache__",
@@ -351,13 +352,12 @@ def run_model_shard(
 
 
 def _download_volume_tree(remote_prefix: str, local_root: Path) -> int:
-    RESULTS_VOLUME.reload()
     local_root.mkdir(parents=True, exist_ok=True)
 
     downloaded = 0
     remote_prefix_path = PurePosixPath(remote_prefix)
     for entry in RESULTS_VOLUME.iterdir(remote_prefix, recursive=True):
-        if entry.is_dir:
+        if entry.type != 1:  # FileEntryType.FILE == 1
             continue
 
         remote_path = PurePosixPath(entry.path)

@@ -1,7 +1,7 @@
 """
 PlanBench runner: runs the vendored PlanBench pipeline with LiteLLM (Azure/Ollama).
 Uses USE_LITELLM=1 and LITELLM_MODEL so the vendored response_generation
-calls our adapter in benchmarks/plan_bench/utils/llm_utils.py.
+calls our adapter in vendor/plan_bench/utils/llm_utils.py.
 Evaluation requires VAL: set VAL env to the directory containing the validate binary (KCL-Planning/VAL).
 If VAL is missing, instances are not evaluated (evaluated=False, success=None).
 """
@@ -42,7 +42,7 @@ def _engine_slug(model: str) -> str:
 
 def _plan_bench_root() -> Path:
     repo_root = Path(__file__).resolve().parents[4]
-    return repo_root / "benchmarks" / "plan_bench"
+    return repo_root / "vendor" / "plan_bench"
 
 
 def _results_from_structured(

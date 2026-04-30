@@ -1,148 +1,130 @@
-# SLM Agentic Benchmarking Framework
+# Maximizing Small Models: How Agentic Skill Profiles Predict Orchestration Performance
 
-Comprehensive benchmarking framework for evaluating Small Language Models (SLMs) in agentic architectures, deployed on Azure AI.
+Code accompanying our submission to the [Agents in the Wild](https://agentwild-workshop.github.io/icml2026/) workshop at ICML 2026. We benchmark 11 small language models (SLMs, ~0.6B–20B parameters) across four agent architectures on BIG-bench Lite and a set of skill-specific probes, and study whether per-skill profiles predict performance under multi-agent orchestration.
 
-## Overview
+## What this evaluates
 
-This framework extends the CrewAI-based agent architectures to benchmark SOTA SLMs on:
-- **Medical benchmarks**: MedAgentBench (agentic), MedQA/MedMCQA (knowledge)
-- **Tool calling benchmarks**: MCP-Bench, BFCL v3
-- **Reasoning & Memory benchmarks**: Criticality, Recall, Episodic Memory
+**Models** — 11 SLMs across two backends:
 
-## Features
+- *Ollama (local)*: `qwen3-0.6b`, `gemma3-1b`, `gemma3n-e2b`, `gemma3n-e4b`, `gemma3-4b`, `dasd-4b` (DeepSeek-distilled), `phi4-mini-reasoning`, `gpt-oss-20b`.
+- *Azure AI Foundry (serverless)*: `phi-4`, `ministral-3b`, `mistral-small`.
 
-- **4 Agent Architectures**: OneShot, Sequential, Concurrent, GroupChat
-- **SOTA Baseline**: GPT-4o/GPT-4o-mini non-agentic comparison
-- **Cost Tracking**: Real-time budget monitoring with alerts
-- **Azure Integration**: Serverless models + Azure ML endpoints
-- **Multiple Benchmarks**: Medical, tool-calling, reasoning, and memory evaluation
+Both registries live in `src/config/azure_llm_config.py` (`OLLAMA_MODELS`, `AVAILABLE_MODELS`).
 
-## Quick Start
+**Architectures** (`src/agents/`):
+- `OneShotAgent` — single direct LLM call (non-agentic baseline).
+- `SequentialAgent` — CrewAI Analyzer → Evaluator → Responder pipeline.
+- `ConcurrentAgent` — multiple CrewAI agents on the same task in parallel, results merged.
+- `GroupChatAgent` — CrewAI agents in a discussion loop with a manager.
 
-### 1. Install Dependencies
+**Benchmarks** (`src/benchmarks/skills/`):
+- **BIG-bench Lite (BBL24)** — primary suite, 24 tasks loaded from [`tasksource/bigbench`](https://huggingface.co/datasets/tasksource/bigbench) on HuggingFace.
+- Skill probes: `recall`, `episodic_memory`, `criticality`, `summarization`, `instruction_following`, `planning`, `plan_bench`, `matrix_recall`.
+
+Full model and architecture details are in `src/config/azure_llm_config.py` and `src/agents/`.
+
+## Setup
 
 ```bash
 poetry install
+
+# Ollama (local) — pull the models you want to evaluate (one-time)
+ollama pull qwen3:0.6b gemma3:1b gemma3n:e2b gemma3:4b gpt-oss:20b
+# ...etc; full list in src/config/azure_llm_config.py
+
+# Azure AI Foundry — needed for phi-4 / ministral-3b / mistral-small
+export AZURE_API_KEY="<your key>"
+export AZURE_AI_ENDPOINT="<your endpoint>"     # optional; a default is set in code
 ```
 
-### 2. Configure Azure Credentials
+The Ollama path needs no credentials. The Azure path requires an Azure AI Foundry deployment with the three serverless models above accessible via your `AZURE_API_KEY`. Reproducing the paper's full results requires both; the Ollama-only subset (8 of 11 models) runs without any API keys.
 
+### Datasets
+
+Datasets are pulled at runtime from their original sources — none are vendored:
+
+| Benchmark | Source | Notes |
+|---|---|---|
+| BIG-bench Lite | HuggingFace `tasksource/bigbench` | auto-downloaded by `datasets.load_dataset` on first run |
+| Recall, Episodic Memory | HuggingFace | auto-downloaded; cached under `data/` (gitignored) |
+| Criticality | IBM ArgQ-30k | follow upstream instructions |
+| PlanBench | Karthik Valmeekam's [PlanBench](https://github.com/karthikv792/LLMs-Planning) | vendored under `vendor/plan_bench/` |
+
+The `data/` directory is gitignored; first invocation of a runner will populate it.
+
+## Reproducing the paper
+
+The paper's main results come from the BIG-bench Lite sweep across 11 models × 4 architectures (8 Ollama + 3 Azure).
+
+**Local run:**
 ```bash
-# For Azure OpenAI (GPT-4o baseline)
-export AZURE_OPENAI_API_KEY="your-key"
-export AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com"
+# Full sweep — Azure models run concurrently, Ollama models sequentially
+poetry run python scripts/run_bigbench_lite_sweep.py
 
-# For Azure AI Foundry (serverless models)
-export AZURE_AI_API_KEY="your-key"
+# Ollama-only subset (no Azure credentials needed)
+poetry run python scripts/run_bigbench_lite_sweep.py --backends ollama
 
-# For Azure ML endpoints (custom models)
-export AZURE_ML_ENDPOINT="https://your-endpoint.inference.ml.azure.com"
+# Resume after interruption
+poetry run python scripts/run_bigbench_lite_sweep.py --resume
+
+# Pilot (4 examples/task) for a fast sanity check
+poetry run python scripts/run_bigbench_lite_sweep.py --pilot
 ```
 
-### 3. Estimate Costs
-
+**Modal (4× L4 GPUs, the configuration we used for the Ollama half):**
 ```bash
-python run_benchmark.py --estimate --models all --benchmark all
+modal token new                                   # one-time
+poetry run modal run scripts/modal_ollama_bigbench.py
+poetry run modal run scripts/modal_ollama_bigbench.py --sync-only   # pull results back
 ```
+Worker → model assignments are at the top of `scripts/modal_ollama_bigbench.py`. The Azure models are run separately via the local sweep script.
 
-### 4. Run Benchmarks
-
+**Skill probes** (recall, criticality, etc.) are run via:
 ```bash
-# Non-agentic baseline
-python run_benchmark.py --model gpt-4o-mini --agent baseline --benchmark medqa
-
-# Agentic architecture
-python run_benchmark.py --model phi-4 --agent sequential --benchmark medagent
-
-# Compare agentic vs baseline
-python run_benchmark.py --compare-baseline --model phi-4 --agent sequential --benchmark medqa
-
-# Run reasoning benchmarks
-python run_benchmark.py --model phi-4 --agent one_shot --benchmark criticality --limit 100
-python run_benchmark.py --model phi-4 --agent one_shot --benchmark recall --limit 100
-
-# Run multiple models concurrently
-python benchmark_runner.py --models phi-4,gpt-4o,mistral-small --benchmarks criticality,recall --limit 100
+poetry run python run_benchmark.py --model <name> --agent <arch> --benchmark <skill>
 ```
 
-## Available Models
+### Results layout
 
-### Serverless (Pay-per-token)
-- `phi-4` - Microsoft Phi-4 14B
-- `llama-3.3-70b` - Meta Llama 3.3 70B
-- `mistral-small` - Mistral Small 24B
-- `mistral-large-3` - Mistral Large 3 123B
-- `deepseek-v3.2` - DeepSeek V3.2 671B
-- `gpt-4o` - OpenAI GPT-4o (baseline)
-- `gpt-4o-mini` - OpenAI GPT-4o-mini (cost-efficient baseline)
-
-### Azure ML Endpoints (Requires deployment)
-- `glm-4.7-flash` - GLM-4.7-Flash 30B MoE
-- `qwen3-30b-a3b` - Qwen3 30B MoE
-- `lfm2.5-1.2b` - LFM2.5 1.2B Thinking
-
-## Benchmarks
-
-### Medical
-- **MedAgentBench**: 100 clinical agentic tasks (FHIR-compliant)
-- **MedQA**: 1,273 USMLE-style questions
-- **MedMCQA**: Indian medical MCQs
-
-### Tool Calling
-- **MCP-Bench**: 250+ tool-calling tasks
-- **BFCL v3**: Function calling evaluation
-
-### Reasoning & Memory
-- **Criticality**: Argument quality assessment (IBM 30k dataset)
-  - Tests ability to judge argument strength and persuasiveness
-  - Pairwise comparisons with crowd-sourced quality scores
-- **Recall**: Keyword-based sentence retrieval
-  - Tests information retrieval from passages (100-2000 tokens)
-  - Difficulty levels: easy, medium, hard
-- **Episodic Memory**: Long-context state tracking
-  - Tests entity tracking across extended narratives (10K-1M tokens)
-  - Simple recall and chronological awareness
-
-## Cost Management
-
-The framework includes built-in cost tracking:
-
-```python
-from src.evaluation import CostTracker
-
-tracker = CostTracker(budget_limit=10000.0)
-tracker.print_summary()  # View spending breakdown
-```
-
-Budget alerts trigger at 30%, 60%, and 90% thresholds.
-
-## Project Structure
+A successful sweep populates:
 
 ```
-slm-agentic-benchmarking/
-├── src/
-│   ├── agents/          # Agent architectures (OneShot, Sequential, Concurrent, GroupChat)
-│   ├── benchmarks/      # Benchmark runners (MedQA, BFCL, Criticality, Recall, Episodic Memory)
-│   ├── config/          # Azure LLM configuration
-│   ├── evaluation/      # Metrics and cost tracking
-│   └── utils/           # Utilities (rate limiting, tracing)
-├── docs/                # Documentation and project proposals
-├── scripts/             # Utility scripts (e.g., reevaluate_bfcl.py)
-├── data/                # Datasets (episodic_memory, etc.)
-├── results/             # Benchmark results and traces
-│   └── combined/        # Combined run results
-├── benchmark_runner.py  # Concurrent multi-model runner with live dashboard
-├── run_benchmark.py     # Single model CLI
-└── pyproject.toml       # Dependencies
+results/bigbench_lite/ollama/<model>/<architecture>/
+    summary.json      # suite-level metrics
+    results.jsonl     # per-question results
+    <task_id>/trace.json   # full prompt/response/token/latency trace
 ```
 
-## Documentation
+The full `results/` tree from our sweep is not committed to git — it will be attached as a GitHub release alongside the workshop submission so figures and tables can be regenerated without re-running the sweep.
 
-- **[docs/PLAN.md](docs/PLAN.md)** - Implementation plan and architecture
-- **[docs/EXPLANATION.md](docs/EXPLANATION.md)** - Detailed system explanation
-- **[docs/CS120_Final_Project.pdf](docs/CS120_Final_Project.pdf)** - Course project documentation
-- **[docs/Project Proposal...pdf](docs/)** - Original project proposal
+Aggregation/plotting helpers:
+- `scripts/join_bigbench_skill_scores.py` — joins BBL scores with skill-probe scores.
+- `scripts/plot_skill_vs_bigbench.py` — generates the skill-vs-BBL scatter plots.
+- `scripts/generate_results_report.py` — assembles summary tables.
+
+## Repo layout
+
+```
+src/
+  agents/          # 4 architectures, Azure + Ollama variants
+  benchmarks/skills/  # active runners (bigbench, recall, criticality, ...)
+  config/          # model registries (Azure + Ollama)
+  utils/trace.py   # TraceCapture context manager
+scripts/           # sweep runners, Modal entrypoint, plotting
+vendor/plan_bench/  # vendored PlanBench harness
+```
+
+## Citation
+
+```bibtex
+@inproceedings{slm-agentic-2026,
+  title     = {Maximizing Small Models: How Agentic Skill Profiles Predict Orchestration Performance},
+  author    = {Qureshi, Samih and Han, Fiona and Yang, Justin},
+  booktitle = {ICML 2026 Workshop on Agents in the Wild},
+  year      = {2026}
+}
+```
 
 ## License
 
-MIT License
+MIT — see `LICENSE`.

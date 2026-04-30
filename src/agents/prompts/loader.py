@@ -1,9 +1,8 @@
 """
 Prompt loader utility for benchmark-specific prompts.
 
-Provides easy access to prompts organized by:
-- Benchmark type (medical, tool_calling, general)
-- Agent role (oneshot, sequential_*, concurrent_*, groupchat_*)
+Prompts are organized by benchmark type (e.g. bigbench, general) and
+agent role (oneshot, sequential_*, concurrent_*, groupchat_*).
 """
 
 from pathlib import Path
@@ -38,16 +37,15 @@ def get_prompt(benchmark: str, role: str) -> str:
     Get a prompt for a specific benchmark and agent role.
     
     Args:
-        benchmark: The benchmark type (medical, tool_calling, general)
-        role: The agent role (oneshot, sequential_analyzer, concurrent_synthesizer, etc.)
-    
+        benchmark: The benchmark type (e.g. "bigbench", "general").
+        role: The agent role (oneshot, sequential_analyzer, concurrent_synthesizer, etc.).
+
     Returns:
-        The prompt string
-        
+        The prompt string.
+
     Examples:
-        >>> get_prompt("medical", "oneshot")
-        >>> get_prompt("tool_calling", "sequential_responder")
-        >>> get_prompt("tool_calling", "groupchat_moderator")
+        >>> get_prompt("bigbench", "oneshot")
+        >>> get_prompt("general", "sequential_responder")
     """
     prompts = _load_prompts_for_benchmark(benchmark)
     

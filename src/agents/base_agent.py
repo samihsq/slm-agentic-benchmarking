@@ -149,40 +149,24 @@ class BaseAgent(ABC):
     def get_system_prompt(self, benchmark_type: str = "general", role: str = "oneshot") -> str:
         """
         Get the system prompt for task response generation.
-        
+
         Args:
-            benchmark_type: The benchmark type (medical, tool_calling, general)
-            role: The agent role (oneshot, sequential_analyzer, etc.)
-        
-        Returns:
-            The appropriate prompt string
+            benchmark_type: The benchmark type (e.g. "bigbench", "general").
+            role: The agent role (oneshot, sequential_analyzer, etc.).
         """
         try:
             from .prompts import get_prompt
             return get_prompt(benchmark_type, role)
         except (ImportError, FileNotFoundError, KeyError):
-            # Fallback to basic prompts if prompt system not available
             return self._get_fallback_prompt(benchmark_type)
-    
+
     def _get_fallback_prompt(self, benchmark_type: str) -> str:
-        """Fallback prompts if the prompt system is not available."""
-        prompts = {
-            "medical": """You are a medical AI assistant. Answer the multiple-choice question by selecting the best answer.
-
-OUTPUT FORMAT (required JSON):
-{"reasoning": "<your analysis>", "answer": "<A, B, C, D, or E>", "confidence": <0.0-1.0>}""",
-            
-            "tool_calling": """You are an AI assistant for function calling. Determine the correct function call(s).
-
-OUTPUT FORMAT (required JSON):
-{"reasoning": "<your analysis>", "tool_calls": [{"name": "<func>", "arguments": {...}}], "confidence": <0.0-1.0>}""",
-            
-            "general": """You are an AI assistant. Answer the question accurately.
-
-OUTPUT FORMAT (required JSON):
-{"reasoning": "<your analysis>", "answer": "<your answer>", "confidence": <0.0-1.0>}"""
-        }
-        return prompts.get(benchmark_type, prompts["general"])
+        """Fallback prompt if the YAML prompt system is unavailable."""
+        return (
+            "You are an AI assistant. Answer the question accurately.\n\n"
+            "OUTPUT FORMAT (required JSON):\n"
+            '{"reasoning": "<your analysis>", "answer": "<your answer>", "confidence": <0.0-1.0>}'
+        )
 
     def parse_json_response(self, result: str) -> BenchmarkResponse:
         """

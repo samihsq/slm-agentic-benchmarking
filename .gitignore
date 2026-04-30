@@ -5,66 +5,36 @@ __pycache__/
 *.so
 .Python
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
 *.egg
 
 # Virtual environments
+.venv
 venv/
 env/
-ENV/
-.venv
 
-# IDE
+# IDE / OS
 .vscode/
 .idea/
 *.swp
-*.swo
-*~
+.DS_Store
 
-# Results and logs
-plots/
-cost_tracking.json
+# Logs
 *.log
 
-# Per-question LLM call traces (heavy; stored in GitHub release instead)
-results/**/trace.json
-
-# Environment variables
+# Environment / credentials
 .env
 .env.local
-
-# Azure credentials
 *.pem
 *.key
-azure_credentials.json
 
-# Poetry
-poetry.lock
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Large data files (downloaded datasets, episodic memory benchmark data)
+# Datasets (downloaded at runtime)
 data/
-
-# GGUF model files (downloaded from HuggingFace)
 models/*.gguf
 
-# Combined results are tracked
-
-# PlanBench vendored generated outputs (keep prompts/ for pre-generated if needed)
-benchmarks/plan_bench/responses/
-benchmarks/plan_bench/results/
+# Run artifacts (not part of the public release)
+results/
+plots/
+paper/
+cost_tracking.json

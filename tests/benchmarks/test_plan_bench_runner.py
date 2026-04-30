@@ -139,7 +139,7 @@ class TestPlanBenchPromptStructure:
 def _load_llm_utils():
     """Load vendored llm_utils module for testing."""
     import importlib.util
-    plan_bench_root = Path(__file__).resolve().parents[2] / "benchmarks" / "plan_bench"
+    plan_bench_root = Path(__file__).resolve().parents[2] / "vendor" / "plan_bench"
     llm_utils_path = plan_bench_root / "utils" / "llm_utils.py"
     if not llm_utils_path.exists():
         pytest.skip("Vendored plan_bench not present")
@@ -223,7 +223,7 @@ class TestValApiRouting:
         import sys
         import types
 
-        plan_bench_root = Path(__file__).resolve().parents[2] / "benchmarks" / "plan_bench"
+        plan_bench_root = Path(__file__).resolve().parents[2] / "vendor" / "plan_bench"
         if not (plan_bench_root / "utils" / "__init__.py").exists():
             pytest.skip("Vendored plan_bench not present")
 

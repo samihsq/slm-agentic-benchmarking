@@ -72,7 +72,10 @@ def main():
     # Quick connectivity check
     import os, urllib.request
     key  = os.environ.get("AZURE_API_KEY", "")
-    base = os.environ.get("AZURE_AI_ENDPOINT", "<AZURE_ENDPOINT>")
+    base = os.environ.get("AZURE_AI_ENDPOINT", "")
+    if not base:
+        print("AZURE_AI_ENDPOINT is not set; skipping connectivity check.")
+        return
     try:
         req = urllib.request.Request(
             base.rstrip("/") + "/models",
